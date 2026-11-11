@@ -1,0 +1,420 @@
+<html>
+<head><meta charset="utf-8"/>
+<style>
+</style>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+                STRUC 0
+SF_RBP:         DU8     ?;
+SF_RIP:         DU8     ?;
+SF_ARG1:        DU8     ?;
+SF_ARG2:        DU8     ?;
+SF_ARG3:        DU8     ?;
+SF_ARG4:        DU8     ?;
+SF_ARG5:        DU8     ?;
+SF_ARG6:        DU8     ?;
+SF_ARG7:        DU8     ?;
+SF_ARG8:        DU8     ?;
+                ENDS
+
+                STRUC 0
+NULL_SEL:               DU8     ?,?;
+SYS_BOOT_DS_SEL:        DU8     ?,?;
+SYS_BOOT_CS_SEL:        DU8     ?,?;
+SYS_CS_SEL:             DU8     ?,?;
+SYS_CS64_SEL:           DU8     ?,?;
+ZERO_DS_SEL:            DU8     ?,?;
+CPU_TR_SELS:            DU1     MP_MAX_PROCESSORS*16 DUP(?);
+GDTTAB_SIZE:
+        ENDS
+
+#assert GDTTAB_SIZE/16==MAXGDT
+
+
+        STRUC 0
+EXCEPT_NEXT:            DU8     ?;
+EXCEPT_LAST:            DU8     ?;
+EXCEPT_HANDLER_START:   DU8     ?;
+EXCEPT_HANDLER_SKIP:    DU8     ?;
+EXCEPT_RSP:             DU8     ?;
+EXCEPT_RBP:             DU8     ?;
+EXCEPT_RFLAGS:          DU8     ?;
+EXCEPT_RSI:             DU8     ?;
+EXCEPT_RDI:             DU8     ?;
+EXCEPT_R12:             DU8     ?;
+EXCEPT_R13:             DU8     ?;
+EXCEPT_R14:             DU8     ?;
+EXCEPT_R15:             DU8     ?;
+EXCEPT_STRUCT_SIZE:
+        ENDS
+
+        STRUC   0
+BPT_NEXT:               DU8     ?;
+BPT_ADDRESS:            DU8     ?;
+BPT_U1:                 DU1     ?,7 DUP(?);
+        ENDS
+
+        STRUC 0 Redundent C+ Struct
+TASK_ADDRESS:           DU8     ?;
+TASK_SIGNATURE:         DU4     ?;
+TASK_IN_QUEUE_SIGNATURE: DU4    ?;
+TASK_TASK_FLAGS:        DU8     ?;
+TASK_LOCKED_FLAGS:      DU8     ?;
+TASK_DISPLAY_FLAGS:     DU8     ?;
+TASK_WAKE_TIME:         DU8     ?;
+
+TASK_CODE_HEAP:         DU8     ?;
+TASK_DATA_HEAP:         DU8     ?;
+
+TASK_NEXT_LTF:          DU8     ?;
+TASK_LAST_LTF:          DU8     ?;
+TASK_WIN_LEFT:          DU8     ?;
+TASK_WIN_RIGHT:         DU8     ?;
+TASK_WIN_TOP:           DU8     ?;
+TASK_WIN_BOTTOM:        DU8     ?;
+
+TASK_CUR_PARTITION:     DU8     ?;
+TASK_CUR_DIR:           DU8     ?;
+
+TASK_PARENT_TASK:       DU8     ?;
+TASK_NEXT_TASK:         DU8     ?;      //ABSOLUTE ADDRESS OF NEXT TASK
+TASK_LAST_TASK:         DU8     ?;      //ABSOLUTE ADDRESS OF LAST TASK
+TASK_NEXT_INPUT_FILTER_TASK:    DU8     ?;
+TASK_LAST_INPUT_FILTER_TASK:    DU8     ?;
+TASK_NEXT_SIBLING_TASK: DU8     ?;
+TASK_LAST_SIBLING_TASK: DU8     ?;
+TASK_NEXT_CHILD_TASK:   DU8     ?;
+TASK_LAST_CHILD_TASK:   DU8     ?;
+
+TASK_NEXT_KEY_DEV:      DU8     ?;
+TASK_LAST_KEY_DEV:      DU8     ?;
+
+//These are derived
+TASK_WIN_WIDTH:         DU8     ?;
+TASK_WIN_HEIGHT:        DU8     ?;
+TASK_WIN_PIXEL_LEFT:    DU8     ?;
+TASK_WIN_PIXEL_RIGHT:   DU8     ?;
+TASK_WIN_PIXEL_WIDTH:   DU8     ?;
+TASK_WIN_PIXEL_TOP:     DU8     ?;
+TASK_WIN_PIXEL_BOTTOM:  DU8     ?;
+TASK_WIN_PIXEL_HEIGHT:  DU8     ?;
+TASK_WIN_BORDER_PIXEL_LEFT:     DU8     ?; //These are derived
+TASK_WIN_BORDER_PIXEL_RIGHT:    DU8     ?;
+TASK_WIN_BORDER_PIXEL_TOP:      DU8     ?;
+TASK_WIN_BORDER_PIXEL_BOTTOM:   DU8     ?;
+
+TASK_RIP:               DU8     ?;
+TASK_RFLAGS:            DU8     ?;
+TASK_RSP:               DU8     ?;
+TASK_RSI:               DU8     ?;
+TASK_RAX:               DU8     ?;
+TASK_RCX:               DU8     ?;
+TASK_RDX:               DU8     ?;
+TASK_RBX:               DU8     ?;
+TASK_RBP:               DU8     ?;
+TASK_RDI:               DU8     ?;
+TASK_R8:                DU8     ?;
+TASK_R9:                DU8     ?;
+TASK_R10:               DU8     ?;
+TASK_R11:               DU8     ?;
+TASK_R12:               DU8     ?;
+TASK_R13:               DU8     ?;
+TASK_R14:               DU8     ?;
+TASK_R15:               DU8     ?;
+TASK_GS:                DU8     ?;
+
+TASK_FPU_MMX:           DU8     ?;
+TASK_TIME_SLICE_START:  DU8     ?;
+TASK_TOTAL_TIME:        DU8     ?;
+TASK_PAUSE_START:       DU8     ?;
+TASK_PAUSE_TOTAL:       DU8     ?;
+TASK_SWAP_CNTER:        DU8     ?;
+
+TASK_UPDATE_WIN:        DU8     ?;
+TASK_DRAW_IT:           DU8     ?;
+TASK_TASK_TITLE:        DU1     TASK_TITLE_LEN+1 DUP (?);
+TASK_TASK_NAME:         DU1     TASK_NAME_LEN+1 DUP (?);
+TASK_WALLPAPER_DATA:    DU1     TASK_WALLPAPER_DATA_SIZE DUP (?);
+TASK_SCROLL_SPEED:      DU4     ?;
+TASK_TEXT_ATTR:         DU1     ?;
+TASK_BORDER_ATTR:       DU1     ?;
+                        DU2     ?;  //Unused
+TASK_STACK_BASE:        DU8     ?;
+TASK_STACK_SIZE:        DU8     ?;
+TASK_NEXT_EXCEPT:       DU8     ?;
+TASK_LAST_EXCEPT:       DU8     ?;
+TASK_EXCEPT_RBP:        DU8     ?;
+TASK_EXCEPT_ARGC:       DU8     ?;
+TASK_EXCEPT_ARGV:       DU8     ?;
+TASK_CATCH_EXCEPT:      DU1     ?;
+TASK_IGNORE_EXCEPT:     DU1     ?;
+                        DU1     6 DUP(?);
+TASK_BPT_LIST:          DU8     ?;
+TASK_NEXT_CTRL:         DU8     ?;
+TASK_LAST_CTRL:         DU8     ?;
+TASK_CUR_MENU:          DU8     ?;
+TASK_NEXT_SETTINGS:     DU8     ?;
+TASK_NEXT_ODE:          DU8     ?;
+TASK_LAST_ODE:          DU8     ?;
+TASK_LAST_ODE_TIME:     DU8     ?;
+TASK_HASH_TABLE:        DU8     ?;
+TASK_ACCT:              DU8     ?;
+
+TASK_NEXT_SERVANT_CMD:  DU8     ?;
+TASK_LAST_SERVANT_CMD:  DU8     ?;
+TASK_NEXT_MASTER_CMD:   DU8     ?;
+TASK_LAST_MASTER_CMD:   DU8     ?;
+
+TASK_NEXT_LEX:          DU8     ?;
+TASK_LAST_LEX:          DU8     ?;
+
+TASK_WIN_OLD_LEFT:      DU8     ?;
+TASK_WIN_OLD_RIGHT:     DU8     ?;
+TASK_WIN_OLD_TOP:       DU8     ?;
+TASK_WIN_OLD_BOTTOM:    DU8     ?;
+
+TASK_TASK_END_CB:       DU8     ?;
+TASK_SONG_TASK:         DU8     ?;
+TASK_ANIMATE_TASK:      DU8     ?;
+TASK_USER_NUM:          DU4     ?;
+TASK_FAULT_NUM:         DU4     ?;
+TASK_FAULT_ERR_CODE:    DU8     ?;
+TASK_ANSWERS:           DU8     4 DUP(?);
+TASK_ANSWERS_TYPES:     DU2     4 DUP(?);
+TASK_ANSWERS_DISPLAYED: DU8     ?;
+TASK_DBG:               DU8     ?;
+TASK_POPUP:             DU8     ?;
+TASK_HORZ_SCROLL:       DU1     32 DUP(?);
+TASK_VERT_SCROLL:       DU1     32 DUP(?);
+
+TASK_USER_DATA0:        DU8     ?;
+TASK_USER_DATA1:        DU8     ?;
+TASK_USER_DATA2:        DU8     ?;
+TASK_USER_DATA3:        DU8     ?;
+TASK_STRUCT_SIZE:
+        ENDS
+
+        STRUC 0
+HT_NEXT:                DU8     ?;
+HT_NEXT_ADDED:          DU8     ?;
+HT_LAST_ADDED:          DU8     ?;
+HT_MASK:                DU8     ?;
+HT_LOCKED_FLAGS:        DU8     ?;
+HT_BODY:                DU8     ?;
+        ENDS
+
+        STRUC 0
+HTE_NEXT:               DU8     ?;
+HTE_NEXT_ADDED:         DU8     ?;
+HTE_LAST_ADDED:         DU8     ?;
+HTE_STR:                DU8     ?;
+HTE_TYPE:               DU4     ?;
+HTE_USE_CNT:            DU4     ?;
+HTE_SRC_LINK:           DU8     ?;
+HTE_INDEX:              DU8     ?;
+HTE_DEBUG:              DU8     ?;
+HTE_INDENT:             DU8     ?;
+HTE_IMPORT_NAME:        DU8     ?;
+HTE_LIST:               DU8     ?;
+HTE_VAL:                DU8     ?;
+        ENDS
+
+        STRUC 0
+SP_R15:         DU8     ?;
+SP_R14:         DU8     ?;
+SP_R13:         DU8     ?;
+SP_R12:         DU8     ?;
+SP_R11:         DU8     ?;
+SP_R10:         DU8     ?;
+SP_R9:          DU8     ?;
+SP_R8:          DU8     ?;
+SP_RDI:         DU8     ?;
+SP_RSI:         DU8     ?;
+SP_RBP:         DU8     ?;
+SP_RBX:         DU8     ?;
+SP_RDX:         DU8     ?;
+SP_RCX:         DU8     ?;
+SP_RAX:         DU8     ?;
+SP_STRUCT_SIZE:
+SP_RIP:         DU8     ?;
+SP_ARG1:        DU8     ?;
+SP_ARG2:        DU8     ?;
+SP_ARG3:        DU8     ?;
+SP_ARG4:        DU8     ?;
+SP_ARG5:        DU8     ?;
+SP_ARG6:        DU8     ?;
+SP_ARG7:        DU8     ?;
+SP_ARG8:        DU8     ?;
+SP_ARG9:        DU8     ?;
+SP_ARG10:       DU8     ?;
+SP_ARG11:       DU8     ?;
+SP_ARG12:       DU8     ?;
+        ENDS
+
+        STRUC 0
+SC_R11:         DU8     ?;
+SC_R10:         DU8     ?;
+SC_R9:          DU8     ?;
+SC_R8:          DU8     ?;
+SC_RBP:         DU8     ?;
+SC_RBX:         DU8     ?;
+SC_RDX:         DU8     ?;
+SC_RCX:         DU8     ?;
+SC_RAX:         DU8     ?;
+SC_STRUCT_SIZE:
+SC_RIP:         DU8     ?;
+SC_ARG1:        DU8     ?;
+SC_ARG2:        DU8     ?;
+SC_ARG3:        DU8     ?;
+SC_ARG4:        DU8     ?;
+SC_ARG5:        DU8     ?;
+SC_ARG6:        DU8     ?;
+SC_ARG7:        DU8     ?;
+SC_ARG8:        DU8     ?;
+SC_ARG9:        DU8     ?;
+SC_ARG10:       DU8     ?;
+SC_ARG11:       DU8     ?;
+SC_ARG12:       DU8     ?;
+        ENDS
+
+        STRUC   0
+ATE_NEXT:       DU8     ?;
+ATE_BASECODE:   DU2     ?;
+ATE_CH:         DU1     ?,?;
+ATE_PAD2:       DU4     ?;
+ATE_STRUCT_SIZE:
+        ENDS
+
+        STRUC   0
+ACS_SRC_POS:            DU8     ?;
+ACS_SRC_SIZE:           DU8     ?;
+ACS_DST_POS:            DU8     ?;
+ACS_DST_SIZE:           DU8     ?;
+ACS_SRC_BUF:            DU8     ?;
+ACS_DST_BUF:            DU8     ?;
+ACS_MIN_BITS:           DU8     ?;
+ACS_MIN_TABLE_ENTRY:    DU8     ?;
+ACS_CUR_ENTRY:          DU8     ?;
+ACS_NEXT_ENTRY:         DU8     ?;
+ACS_CUR_BITS_IN_USE:    DU8     ?;
+ACS_NEXT_BITS_IN_USE:   DU8     ?;
+ACS_STACK_PTR:          DU8     ?;
+ACS_STACK_BASE:         DU8     ?;
+ACS_FREE_INDEX:         DU8     ?;
+ACS_FREE_LIMIT:         DU8     ?;
+ACS_SAVED_BASECODE:     DU8     ?;
+ACS_ENTRY_USED:         DU8     ?;
+ACS_LAST_CH:            DU8     ?;
+ACS_COMPRESS:           DU8     (ARC_MAX_TABLE_ENTRY+1)*2 DUP(?);
+ACS_HASH:               DU8     ARC_MAX_TABLE_ENTRY+1 DUP(?);
+ACS_STRUCT_SIZE:
+        ENDS
+
+        STRUC   0
+MP_JMP:                 DU4     ?;
+MP_SYS_TEMP_PTR:        DU8     ?;
+        ENDS
+
+        STRUC   0
+CPU_ADDRESS:    DU8     ?;
+CPU_NUM:                DU8     ?;
+CPU_CPU_FLAGS:          DU8     ?;
+CPU_STARTUP_RIP:        DU8     ?;
+CPU_IDLE_POINT_HITS:    DU8     ?;
+CPU_IDLE_FACTOR:        DU8     ?;
+CPU_TOTAL_JIFFIES:      DU8     ?;
+CPU_NO_PREEMPT_HITS:    DU8     ?;
+CPU_NO_PREEMPT_FACTOR:  DU8     ?;
+CPU_LOW_POWER_START:    DU8     ?;
+CPU_LOW_POWER_CYCLES:   DU8     ?;
+CPU_SETH_TASK:          DU8     ?;
+CPU_SWAP_LOOP_TASK:     DU8     ?;
+CPU_IDLE_TASK:          DU8     ?;
+CPU_CODE_BP:            DU8     ?;
+CPU_DATA_BP:            DU8     ?;
+CPU_CMD_CTRL:           DU1     sizeof(MPCmdCtrl) DUP(?);
+CPU_IDT:                DU8     ?;
+CPU_TR:                 DU8     ?;
+CPU_SWAP_CNTER:         DU8     ?;
+CPU_TIMER_IRQ_CHAIN:    DU8     ?;
+CPU_DYING_TASK_LIST:    DU8     ?;
+CPU_TSS:                DU8     ?;
+CPU_WALLPAPER_DATA:     DU1     CPU_WALLPAPER_DATA_SIZE DUP (?);
+CPU_START_STACK:        DU8     8 DUP(?);
+CPU_START_STACK_TOP:
+CPU_STRUCT_SIZE:
+        ENDS
+
+        STRUC 0
+BP_LOCKED_FLAGS:        DU8     ?;
+BP_SIZE:                DU8     ?;
+BP_MEM_FREE_LIST:       DU8     ?;
+BP_MEM_FREE_2MEG_LIST:  DU8     ?;
+BP_FREE_PAGE_HASH:      DU8     FREE_PAGE_HASH_SIZE DUP(?);
+BP_FREE_PAGE_HASH2:     DU8     64 DUP(?);
+BP_STRUCT_SIZE:
+        ENDS
+
+        STRUC 0
+HC_BP:                  DU8     ?;
+HC_SIGNATURE:           DU4     ?,?;
+HC_LOCKED_FLAGS:        DU8     ?;
+HC_FLAGS:               DU8     ?;
+HC_MEM_TASK:            DU8     ?;
+HC_NEXT_MEM_BLK:        DU8     ?;
+HC_LAST_MEM_BLK:        DU8     ?;
+HC_MALLOC_FREE_LIST:    DU8     ?;
+HC_NEXT_UM:             DU8     ?;
+HC_LAST_UM:             DU8     ?;
+HC_HEAP_HASH:           DU1     HEAP_HASH_SIZE DUP(?);
+HC_STRUCT_SIZE:
+        ENDS
+
+
+        STRUC 0
+MB_NEXT:        DU8     ?;
+MB_LAST:        DU8     ?;
+MB_SIGNATURE:   DU4     ?;
+MB_SIZE:        DU4     ?;
+MB_STRUCT_SIZE:
+        ENDS
+
+
+#if _CFG_HEAP_DBG
+        STRUC 0         //AVAILABLE TO MALLOC MEM
+UUM_HEAP_CTRL:  DU8     ?;
+UUM_CALLER1:    DU8     ?;
+UUM_CALLER2:    DU8     ?;
+UUM_NEXT:       DU8     ?;
+UUM_SIZE:       DU8     ?;
+UUM_STRUCT_SIZE:
+        ENDS
+
+        STRUC 0
+UM_HEAP_CTRL:   DU8     ?;
+UM_CALLER1:     DU8     ?;
+UM_CALLER2:     DU8     ?;
+UM_NEXT:        DU8     ?;
+UM_LAST:        DU8     ?;
+UM_SIZE:        DU8     ?;
+UM_START:       DU1     ?;
+        ENDS
+#else
+        STRUC 0         //AVAILABLE TO MALLOC MEM
+UUM_HEAP_CTRL:
+UUM_NEXT:       DU8     ?;
+UUM_SIZE:       DU8     ?;
+UUM_STRUCT_SIZE:
+        ENDS
+
+        STRUC 0
+UM_HEAP_CTRL:   DU8     ?;
+UM_NEXT:
+UM_LAST:
+UM_SIZE:        DU8     ?;
+UM_START:       DU1     ?;
+        ENDS
+#endif
+</pre><div class="archive-note">Historical capture: 2010-01-31. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head></html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "org.darkcodelabs.losethos",
+      "sha256_cert_fingerprints": [
+        "7B:4B:62:BF:DE:AE:36:7C:5D:1C:B7:C6:EC:5E:0B:5A:B7:A2:12:21:E3:F7:83:B8:F5:D9:3B:A1:1F:EC:0A:C8"
+      ]
+    }
+  }
+]

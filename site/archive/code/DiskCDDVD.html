@@ -1,0 +1,591 @@
+<html>
+<head><meta charset="utf-8"/>
+<style>
+</style>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+#help_index "File/CD DVD"
+
+U0 FillU2Palindrome(U2Palindrome *dst,U2 w)
+{
+  dst-&gt;big=BigEndianU2(w);
+  dst-&gt;little=w;
+}
+
+U0 FillU4Palindrome(U4Palindrome *dst,U8 d)
+{
+  dst-&gt;big=BigEndianU4(d);
+  dst-&gt;little=d;
+}
+
+
+class CCdUserData
+{
+  U8 loc,path_entry_num,
+        short_dir_blks,long_dir_blks;
+};
+
+U8 CDFileCreateDo(LTFile *out_file,LTDirEntry *tempm,
+                    ISO1DirEntry *tempi,ISO1DirEntry *tempi2,
+                    U8 *cur_blk,
+                    LTDirEntry *parent,BoolI1 write)
+{
+  CCdUserData *tempc;
+  LTDirEntry *tempm1,*tempm2;
+  LTFile *in_file;
+  U1 *buf=MAlloc(CD_BLK_SIZE),*ptr1,*ptr2;
+  ISO1DirEntry *dir_blk_buf=CAlloc(CD_BLK_SIZE*128),
+              *de=dir_blk_buf,*de1;
+  ISO1DirEntry *dir_blk_buf2=CAlloc(CD_BLK_SIZE*128),
+              *de2=dir_blk_buf2,*de12;
+  U8 i,n;
+
+  tempc=parent-&gt;user_data;
+
+  de-&gt;len=sizeof(ISO1DirEntry)-1;
+  de-&gt;ext_attr_len=0;
+  FillU2Palindrome(&amp;de-&gt;vol_seq_num,1);
+  LTDate2ISO1(&amp;de-&gt;date,tempm-&gt;datetime);
+  de-&gt;flags=ISO1_ATTR_DIR;
+  de-&gt;name_len=1;
+  de-&gt;name=0;
+  de-&gt;len+=de-&gt;name_len;
+  de&gt;&lt;(U1 *)+=de-&gt;len;
+
+  de-&gt;len=sizeof(ISO1DirEntry)-1;
+  de-&gt;ext_attr_len=0;
+  FillU4Palindrome(&amp;de-&gt;loc,tempc-&gt;loc);
+  FillU4Palindrome(&amp;de-&gt;size,tempc-&gt;short_dir_blks*CD_BLK_SIZE);
+  FillU2Palindrome(&amp;de-&gt;vol_seq_num,1);
+  LTDate2ISO1(&amp;de-&gt;date,parent-&gt;datetime);
+  de-&gt;flags=ISO1_ATTR_DIR;
+  de-&gt;name_len=1;
+  de-&gt;name=1;
+  de-&gt;len+=de-&gt;name_len;
+  de&gt;&lt;(U1 *)+=de-&gt;len;
+
+  de2-&gt;len=sizeof(ISO1DirEntry)-1;
+  de2-&gt;ext_attr_len=0;
+  FillU2Palindrome(&amp;de2-&gt;vol_seq_num,1);
+  LTDate2ISO1(&amp;de2-&gt;date,tempm-&gt;datetime);
+  de2-&gt;flags=ISO1_ATTR_DIR;
+  de2-&gt;name_len=1;
+  de2-&gt;name=0;
+  de2-&gt;len=de2-&gt;len+de2-&gt;name_len;
+  de2&gt;&lt;(U1 *)+=de2-&gt;len;
+
+  de2-&gt;len=sizeof(ISO1DirEntry)-1;
+  de2-&gt;ext_attr_len=0;
+  FillU4Palindrome(&amp;de2-&gt;loc,tempc-&gt;loc+tempc-&gt;short_dir_blks);
+  FillU4Palindrome(&amp;de2-&gt;size,tempc-&gt;long_dir_blks*CD_BLK_SIZE);
+  FillU2Palindrome(&amp;de2-&gt;vol_seq_num,1);
+  LTDate2ISO1(&amp;de2-&gt;date,parent-&gt;datetime);
+  de2-&gt;flags=ISO1_ATTR_DIR;
+  de2-&gt;name_len=1;
+  de2-&gt;name=1;
+  de2-&gt;len+=de2-&gt;name_len;
+  de2&gt;&lt;(U1 *)+=de2-&gt;len;
+
+  tempm1=tempm-&gt;sub;
+  while (tempm1) {
+    tempm2=tempm1-&gt;next;
+    if (!write) tempm1-&gt;user_data=CAlloc(sizeof(CCdUserData));
+    de1=de;
+    de12=de2;
+    if (tempm1-&gt;attr &amp; LT_ATTR_DIR) {
+      n=CDFileCreateDo(out_file,tempm1,de,de2,cur_blk,tempm,write);
+      de&gt;&lt;(U1 *)+=sizeof(ISO1DirEntry)-1+n;
+      de2&gt;&lt;(U1 *)+=sizeof(ISO1DirEntry)-1+n&lt;&lt;1;
+    } else {
+      tempc=tempm1-&gt;user_data;
+      de-&gt;len=sizeof(ISO1DirEntry)-1;
+      de-&gt;ext_attr_len=0;
+      FillU4Palindrome(&amp;de-&gt;loc,*cur_blk);
+      tempc-&gt;loc=*cur_blk;
+      if (write)
+        coutln *cur_blk,":",tempm1-&gt;full_name;
+      FillU4Palindrome(&amp;de-&gt;size,tempm1-&gt;size);
+      FillU2Palindrome(&amp;de-&gt;vol_seq_num,1);
+      LTDate2ISO1(&amp;de-&gt;date,tempm1-&gt;datetime);
+      de-&gt;flags=0;
+      de-&gt;name_len=StrLen(tempm1-&gt;name);
+      StrCpy(&amp;de-&gt;name,tempm1-&gt;name);
+      de-&gt;len=de-&gt;len+de-&gt;name_len;
+      de&gt;&lt;(U1 *)+=de-&gt;len;
+
+      de2-&gt;len=sizeof(ISO1DirEntry)-1;
+      de2-&gt;ext_attr_len=0;
+      FillU4Palindrome(&amp;de2-&gt;loc,*cur_blk);
+      FillU4Palindrome(&amp;de2-&gt;size,tempm1-&gt;size);
+      FillU2Palindrome(&amp;de2-&gt;vol_seq_num,1);
+      LTDate2ISO1(&amp;de2-&gt;date,tempm1-&gt;datetime);
+      de2-&gt;flags=0;
+      de2-&gt;name_len=StrLen(tempm1-&gt;name)&lt;&lt;1;
+      ptr1=&amp;de2-&gt;name;
+      ptr2=&amp;tempm1-&gt;name;
+      for (i=0;i&lt;de2-&gt;name_len;i=i+2) {
+        ptr1++;
+        *ptr1++=*ptr2++;
+      }
+      de2-&gt;len+=de2-&gt;name_len;
+      de2&gt;&lt;(U1 *)+=de2-&gt;len;
+
+      in_file=FOpen(tempm1-&gt;full_name,"r");
+      for (i=0;i&lt;(FSize(in_file)+CD_BLK_SIZE-1)/CD_BLK_SIZE;i++) {
+        n=4;
+        if ((i+1)&lt;&lt;2&gt;(FSize(in_file)+BLK_SIZE-1)&gt;&gt;BLK_SIZE_BITS) {
+          n=(FSize(in_file)+BLK_SIZE-1)&gt;&gt;BLK_SIZE_BITS%4;
+          MemSet(buf,0,CD_BLK_SIZE);
+        }
+        if (write) {
+          FRBlks(in_file,buf,i&lt;&lt;2,n);
+          FWBlks(out_file,buf,*cur_blk&lt;&lt;2,n);
+        }
+        *cur_blk+=1;
+      }
+      FClose(in_file);
+    }
+    if ((de1&gt;&lt;(U1 *)-dir_blk_buf&gt;&lt;(U1 *))/CD_BLK_SIZE!=
+        (de&gt;&lt;(U1 *) -dir_blk_buf&gt;&lt;(U1 *))/CD_BLK_SIZE) {
+      i=de1-&gt;len;
+      MemCpy(buf,de1,i);
+      MemSet(de1,0,i);
+      de=dir_blk_buf&gt;&lt;(U1 *)+(de&gt;&lt;(U1 *)-dir_blk_buf&gt;&lt;(U1 *))/CD_BLK_SIZE*CD_BLK_SIZE;
+      MemCpy(de,buf,i);
+      de&gt;&lt;(U1 *)+=i;
+    }
+    if ((de12&gt;&lt;(U1 *)-dir_blk_buf2&gt;&lt;(U1 *))/CD_BLK_SIZE!=
+        (de2&gt;&lt;(U1 *) -dir_blk_buf2&gt;&lt;(U1 *))/CD_BLK_SIZE) {
+      i=de12-&gt;len;
+      MemCpy(buf,de12,i);
+      MemSet(de12,0,i);
+      de2&gt;&lt;(U1 *)=dir_blk_buf2&gt;&lt;(U1 *)+(de2&gt;&lt;(U1 *)-dir_blk_buf2&gt;&lt;(U1 *))/CD_BLK_SIZE*CD_BLK_SIZE;
+      MemCpy(de2,buf,i);
+      de2&gt;&lt;(U1 *)+=i;
+    }
+    tempm1=tempm2;
+  }
+
+  tempc=tempm-&gt;user_data;
+
+  tempi-&gt;len=sizeof(ISO1DirEntry)-1;
+  tempi-&gt;ext_attr_len=0;
+  tempi-&gt;flags=ISO1_ATTR_DIR;
+  if (!tempm-&gt;name[0]) {
+    tempi-&gt;name_len=1;
+    tempi-&gt;name=1;
+  } else {
+    tempi-&gt;name_len=StrLen(tempm-&gt;name);
+    StrCpy(&amp;tempi-&gt;name,tempm-&gt;name);
+  }
+  tempi-&gt;len+=tempi-&gt;name_len;
+
+  n=de&gt;&lt;(U1 *)+1-dir_blk_buf&gt;&lt;(U1 *);
+  n=(n+CD_BLK_SIZE-1)/CD_BLK_SIZE;
+  FillU4Palindrome(&amp;tempi-&gt;size,n*CD_BLK_SIZE);
+  FillU4Palindrome(&amp;tempi-&gt;loc,*cur_blk);
+  tempc-&gt;short_dir_blks=n;
+  tempc-&gt;loc=*cur_blk;
+  FillU4Palindrome(&amp;dir_blk_buf-&gt;size,n*CD_BLK_SIZE);
+  FillU4Palindrome(&amp;dir_blk_buf-&gt;loc,*cur_blk);
+  FillU2Palindrome(&amp;tempi-&gt;vol_seq_num,1);
+  LTDate2ISO1(&amp;tempi-&gt;date,tempm-&gt;datetime);
+  if (write)
+    coutln *cur_blk,":",tempm-&gt;full_name;
+  if (write)
+    FWBlks(out_file,dir_blk_buf,*cur_blk&lt;&lt;2,n&lt;&lt;2);
+  *cur_blk+=n;
+
+  tempi2-&gt;len=sizeof(ISO1DirEntry)-1;
+  tempi2-&gt;ext_attr_len=0;
+  tempi2-&gt;flags=ISO1_ATTR_DIR;
+  if (!tempm-&gt;name[0]) {
+    tempi2-&gt;name_len=1;
+    tempi-&gt;name=1;
+  } else {
+    tempi2-&gt;name_len=StrLen(tempm-&gt;name)&lt;&lt;1;
+    ptr1=&amp;tempi2-&gt;name;
+    ptr2=&amp;tempm-&gt;name;
+    for (i=0;i&lt;tempi2-&gt;name_len;i=i+2) {
+      ptr1++;
+      *ptr1++=*ptr2++;
+    }
+  }
+  tempi2-&gt;len+=tempi2-&gt;name_len;
+  n=de2&gt;&lt;(U1 *)+1-dir_blk_buf2&gt;&lt;(U1 *);
+  n=(n+CD_BLK_SIZE-1)/CD_BLK_SIZE;
+  FillU4Palindrome(&amp;tempi2-&gt;size,n*CD_BLK_SIZE);
+  FillU4Palindrome(&amp;tempi2-&gt;loc,*cur_blk);
+  tempc-&gt;long_dir_blks=n;
+  FillU4Palindrome(&amp;dir_blk_buf2-&gt;size,n*CD_BLK_SIZE);
+  FillU4Palindrome(&amp;dir_blk_buf2-&gt;loc,*cur_blk);
+  FillU2Palindrome(&amp;tempi2-&gt;vol_seq_num,1);
+  LTDate2ISO1(&amp;tempi2-&gt;date,tempm-&gt;datetime);
+  if (write)
+    coutln *cur_blk,":",tempm-&gt;full_name;
+  if (write)
+    FWBlks(out_file,dir_blk_buf2,*cur_blk&lt;&lt;2,n&lt;&lt;2);
+  *cur_blk+=n;
+
+  Free(dir_blk_buf);
+  Free(dir_blk_buf2);
+  Free(buf);
+  return tempi-&gt;name_len;
+}
+
+U8 CDTableLen(LTDirEntry *tempm,U8 *size1,U8 *size2,U8 cur_depth)
+//returns depth
+{
+  LTDirEntry *tempm1=tempm-&gt;sub;
+  U8 max_depth=cur_depth,i;
+  while (tempm1) {
+    if (tempm1-&gt;attr &amp; LT_ATTR_DIR) {
+      *size1+=sizeof(ISO1PathTableEntry)-2+ (StrLen(tempm1-&gt;name)+1)&amp;-0x2;
+      *size2+=sizeof(ISO1PathTableEntry)-2+StrLen(tempm1-&gt;name)&lt;&lt;1;
+      i=CDTableLen(tempm1,size1,size2,cur_depth+1);
+      if (i&gt;max_depth) max_depth=i;
+    }
+    tempm1=tempm1-&gt;next;
+  }
+  return max_depth;
+}
+
+U0 CDFillPathTable(LTDirEntry *tempm,
+  ISO1PathTableEntry **itabbuf,ISO1PathTableEntry **itabbuf2,
+  U8 parent_entry_num,BoolI1 big_endian,U8 *first_free,I8 cur_level,I8 output_level)
+{
+  U1 *ptr1,*ptr2;
+  U8 i;
+  ISO1PathTableEntry *tabbuf=*itabbuf;
+  ISO1PathTableEntry *tabbuf2=*itabbuf2;
+  LTDirEntry *tempm1=tempm-&gt;sub,*tempm2;
+  CCdUserData *tempc;
+ 
+  if (cur_level==output_level) {
+    while (tempm1) {
+      if (tempm1-&gt;attr &amp; LT_ATTR_DIR) {
+        tempc=tempm1-&gt;user_data;
+        tempc-&gt;path_entry_num=*first_free;
+        tabbuf-&gt;name_len=StrLen(tempm1-&gt;name);
+        if (big_endian) {
+          tabbuf-&gt;blk=BigEndianU4(tempc-&gt;loc);
+          tabbuf-&gt;parent_entry_num=BigEndianU2(parent_entry_num);
+        } else {
+          tabbuf-&gt;blk=tempc-&gt;loc;
+          tabbuf-&gt;parent_entry_num=parent_entry_num;
+        }
+        StrCpy(&amp;tabbuf-&gt;name,tempm1-&gt;name);
+
+        tabbuf&gt;&lt;(U1 *)+=sizeof(ISO1PathTableEntry)-2+
+          (StrLen(tempm1-&gt;name)+1) &amp; -0x2;
+
+        tabbuf2-&gt;name_len=StrLen(tempm1-&gt;name)&lt;&lt;1;
+        if (big_endian) {
+          tabbuf2-&gt;blk=BigEndianU4(tempc-&gt;loc+tempc-&gt;short_dir_blks);
+          tabbuf2-&gt;parent_entry_num=BigEndianU2(parent_entry_num);
+        } else {
+          tabbuf2-&gt;blk=tempc-&gt;loc+tempc-&gt;short_dir_blks;
+          tabbuf2-&gt;parent_entry_num=parent_entry_num;
+        }
+        ptr1=&amp;tabbuf2-&gt;name;
+        ptr2=&amp;tempm1-&gt;name;
+        for (i=0;i&lt;tabbuf2-&gt;name_len;i=i+2) {
+          ptr1++;
+          *ptr1++=*ptr2++;
+        }
+        tabbuf2&gt;&lt;(U1 *)+=sizeof(ISO1PathTableEntry)-2+
+          StrLen(tempm1-&gt;name)&lt;&lt;1;
+        *first_free+=1;
+      }
+      tempm1=tempm1-&gt;next;
+    }
+    *itabbuf=tabbuf;
+    *itabbuf2=tabbuf2;
+  }
+  tempm1=tempm-&gt;sub;
+  while (tempm1) {
+    tempm2=tempm1-&gt;next;
+    if (tempm1-&gt;attr &amp; LT_ATTR_DIR) {
+      tempc=tempm1-&gt;user_data;
+      CDFillPathTable(tempm1,itabbuf,itabbuf2,tempc-&gt;path_entry_num,
+         big_endian,first_free,cur_level+1,output_level);
+    }
+    tempm1=tempm2;
+  }
+}
+
+class ElTorito
+{
+  U2 w[16];
+  U1 bootable; //88=bootable 00=not bootable
+  U1 media_type; //0=no emulation 4=hard disk
+  U2 load_seg; //0000-&gt;07C0
+  U1 sys_type;
+  U1 zero;
+  U2 sector_cnt;
+  U4 load_rba; //start address of virtual disk
+  U1 zero2[20];
+};
+
+
+
+/****
+I have the following code in my start-up script.
+
+'E' is my primary hard drive LoseThos partition
+
+'T' is my CD/DVD drive
+
+'Z' is a RAM temporary drive from which I make an ISO image.You could use a file partition instead of RAM.
+
+#define PROD_CDROM_CONFIG       "b10x20000\rt3\r\r\r\r\r"
+
+U0 BurnProductionCDImage()
+{
+  Cd("E:/LT");
+
+  //This enters my config
+  //for compiling OSMain.
+  Auto(PROD_CDROM_CONFIG);
+
+  InstallBoot('E','T');
+  Format('Z',TRUE,FALSE);
+  Drive('Z');
+  DelTree("/LT");
+  CopyTree("E:/LT","/LT");
+  DelTree("/Temp");
+  MkDir("/Temp");
+  DelTree("/0000Boot");
+  CopyTree("E:/0000Boot",
+    "/0000Boot");
+  CDFileCreate(default_iso_name,
+    'Z',CD_BOOT);
+  CDImageWrite('T',
+    default_iso_name);
+}
+
+Study my account examples My Technique and
+the recovery CD maker in  Recovery Disk Maker.
+****/
+
+public U8 CDFileCreate(U1 *filename,U1 src_drive,
+                          U1 *bootfile=NULL,I8 emulation=0)
+//See the above sample code
+//0=no emu 2=1.44meg 4=hard drive
+{
+  ISO1PriDesc *iso =CAlloc(CD_BLK_SIZE),
+                       *iso1=CAlloc(CD_BLK_SIZE),
+                       *iso2=CAlloc(CD_BLK_SIZE),
+                       *iso3=CAlloc(CD_BLK_SIZE);
+  LTDirEntry *rootdir=CAlloc(sizeof(LTDirEntry));
+  U8 cur_blk=0,bootfile_cd_blks=0,tabsize,tabsize2,first_free,max_depth;
+  U4 *d;
+  U1 mask[8];
+  U1 *filename2;
+  ElTorito *et=CAlloc(CD_BLK_SIZE);
+  U1 *zero_buf=CAlloc(CD_BLK_SIZE),
+     *bootfile_buf=NULL;
+  ISO1PathTableEntry *tabbuf=NULL,*tabbuf2=NULL,
+                    *itabbuf,*itabbuf2;
+  BoolI1 okay=TRUE;
+  U8 i,j;
+  LTFile *out_file=NULL;
+  ISO1DirEntry *tempi;
+  CCdUserData *tempc;
+
+  if (!filename)
+    filename=default_iso_name;
+  filename2=DefaultExtension(filename,"ISO");
+
+  SPrintF(mask,"%c:/*",src_drive);
+  if (bootfile) {
+    bootfile_buf=FileRead(bootfile,&amp;bootfile_cd_blks);
+    if (bootfile_cd_blks&gt;CD_BLK_SIZE*4) {
+      coutln ST_ERR_ST "Boot files limited to 0x2000 bytes";
+      goto done1;
+    }
+    bootfile_cd_blks=(bootfile_cd_blks+CD_BLK_SIZE-1)/CD_BLK_SIZE;
+  }
+  rootdir-&gt;attr=LT_ATTR_DIR;
+  rootdir-&gt;sub=FilesFind(mask,1&lt;&lt;FUf_RECURSE);
+  rootdir-&gt;datetime=GetCurTimeLTDate;
+  rootdir-&gt;user_data=CAlloc(sizeof(CCdUserData));
+  tempc=rootdir-&gt;user_data;
+  tempc-&gt;path_entry_num=1;
+
+  if (okay) {
+    cur_blk=CD_FILE_OFFSET&gt;&gt;2;
+    if (bootfile_buf)
+      //preboot and bootloader
+      cur_blk+=1+bootfile_cd_blks;
+    CDFileCreateDo(out_file,rootdir,
+        &amp;iso-&gt;root_dir_record,
+        &amp;iso2-&gt;root_dir_record,
+        &amp;cur_blk,rootdir,FALSE);
+    tabsize=sizeof(ISO1PathTableEntry);
+    tabsize2=sizeof(ISO1PathTableEntry);
+    max_depth=CDTableLen(rootdir,&amp;tabsize,&amp;tabsize2,1);
+    FillU4Palindrome(&amp;iso-&gt;path_table_size,tabsize);
+    FillU4Palindrome(&amp;iso2-&gt;path_table_size,tabsize2);
+    tabsize=(tabsize+CD_BLK_SIZE-1)/CD_BLK_SIZE;
+    cur_blk+=tabsize&lt;&lt;1;
+    tabsize2=(tabsize2+CD_BLK_SIZE-1)/CD_BLK_SIZE;
+    cur_blk+=tabsize2&lt;&lt;1;
+  }
+  if (okay) {
+    if (FileAttr(filename2) &amp; LT_ATTR_CONTIGUOUS)
+      out_file=FOpen(filename2,"wc",cur_blk&lt;&lt;2);
+    else
+      out_file=FOpen(filename2,"w",cur_blk&lt;&lt;2);
+    if (!out_file)
+      okay=FALSE;
+  }
+  if (okay) {
+    cur_blk=0;
+    while (cur_blk&lt;CD_FILE_OFFSET&gt;&gt;2) {
+      FWBlks(out_file,zero_buf,cur_blk&lt;&lt;2,4);
+      cur_blk++;
+    }
+    iso-&gt;type=ISO1T_PRI_VOL_DESC;
+    StrCpy(iso-&gt;id,"CD001");
+    iso-&gt;version=1;
+    FillU2Palindrome(&amp;iso-&gt;vol_set_size,1);
+    FillU2Palindrome(&amp;iso-&gt;vol_seq_num,1);
+    FillU2Palindrome(&amp;iso-&gt;log_block_size,CD_BLK_SIZE);
+    iso-&gt;file_structure_version=1;
+
+    iso2-&gt;type=ISO1T_SUPPLEMENTARY_DESC;
+    StrCpy(iso2-&gt;id,"CD001");
+    iso2-&gt;version=1;
+    FillU2Palindrome(&amp;iso2-&gt;vol_set_size,1);
+    FillU2Palindrome(&amp;iso2-&gt;vol_seq_num,1);
+    FillU2Palindrome(&amp;iso2-&gt;log_block_size,CD_BLK_SIZE);
+    iso2-&gt;file_structure_version=1;
+
+    iso1-&gt;type=ISO1T_BOOT_RECORD;
+    StrCpy(iso1-&gt;id,"CD001");
+    iso1-&gt;version=1;
+    StrCpy(iso1&gt;&lt;(U1 *)+7,"EL TORITO SPECIFICATION");
+
+    cur_blk=CD_FILE_OFFSET&gt;&gt;2;
+
+    if (bootfile_buf) {
+      d=iso1&gt;&lt;(U1 *)+0x47;
+      *d=cur_blk;
+      et-&gt;w[0]=1;
+      StrCpy(&amp;et-&gt;w[2],"LoseThos");
+      et-&gt;w[15]=0xAA55;
+      j=0;
+      for (i=0;i&lt;16;i++) //Checksum
+        j+=et-&gt;w[i];
+      et-&gt;w[14]=-j;
+      if (bootfile_buf)
+        et-&gt;bootable=0x88;
+      //0=no emu 2=1.44meg 4=hard drive
+      et-&gt;media_type=emulation;
+      et-&gt;sector_cnt=4;  //5 seems like the limit, 4 is safer
+      et-&gt;load_rba=cur_blk+1;
+//CDBOOT See CDBootFileCreate
+//See BootCdProbe().
+      coutln cur_blk,": Pre Boot Blk";
+      FWBlks(out_file,et,cur_blk&lt;&lt;2,4);
+      cur_blk++;
+
+      coutln cur_blk,": Boot Loader Blks";
+      FWBlks(out_file,bootfile_buf,cur_blk&lt;&lt;2,bootfile_cd_blks&lt;&lt;2);
+      cur_blk+=bootfile_cd_blks;
+    }
+
+    CDFileCreateDo(out_file,rootdir,
+        &amp;iso-&gt;root_dir_record,
+        &amp;iso2-&gt;root_dir_record,
+        &amp;cur_blk,rootdir,TRUE);
+
+    tabbuf=CAlloc(tabsize*CD_BLK_SIZE);
+    iso-&gt;type_l_path_table=cur_blk;
+    tabbuf-&gt;name_len=2;  //Fill-in adam entry
+    tempi=&amp;iso-&gt;root_dir_record;
+    tabbuf-&gt;blk=tempi-&gt;loc.little;
+    tabbuf-&gt;parent_entry_num=1;
+    tabbuf2=CAlloc(tabsize2*CD_BLK_SIZE);
+    iso2-&gt;type_l_path_table=cur_blk+tabsize;
+    tabbuf2-&gt;name_len=2;  //Fill-in adam entry
+    tempi=&amp;iso2-&gt;root_dir_record;
+    tabbuf2-&gt;blk=tempi-&gt;loc.little;
+    tabbuf2-&gt;parent_entry_num=1;
+    itabbuf=tabbuf+1;
+    itabbuf2=tabbuf2+1;
+    first_free=2;
+    for (i=1;i&lt;=max_depth;i++)
+      CDFillPathTable(rootdir,&amp;itabbuf,&amp;itabbuf2,
+        1,FALSE,&amp;first_free,1,i);
+    coutln cur_blk,": Path Table 0";
+    FWBlks(out_file,tabbuf,cur_blk&lt;&lt;2,tabsize&lt;&lt;2);
+    cur_blk+=tabsize;
+    coutln cur_blk,": Path Table 1";
+    FWBlks(out_file,tabbuf2,cur_blk&lt;&lt;2,tabsize2&lt;&lt;2);
+    cur_blk+=tabsize2;
+
+
+    MemSet(tabbuf,0,tabsize*CD_BLK_SIZE);
+    iso-&gt;type_m_path_table=BigEndianU4(cur_blk);
+    tabbuf-&gt;name_len=2;  //Fill-in adam entry
+    tempi=&amp;iso-&gt;root_dir_record;
+    tabbuf-&gt;blk=tempi-&gt;loc.big;
+    tabbuf-&gt;parent_entry_num=BigEndianU2(1);
+    MemSet(tabbuf2,0,tabsize2*CD_BLK_SIZE);
+    iso2-&gt;type_m_path_table=BigEndianU4(cur_blk+tabsize);
+    tabbuf2-&gt;name_len=2;  //Fill-in adam entry
+    tempi=&amp;iso2-&gt;root_dir_record;
+    tabbuf2-&gt;blk=tempi-&gt;loc.big;
+    tabbuf2-&gt;parent_entry_num=BigEndianU2(1);
+    itabbuf=tabbuf+1;
+    itabbuf2=tabbuf2+1;
+    first_free=2;
+    for (i=1;i&lt;=max_depth;i++)
+      CDFillPathTable(rootdir,&amp;itabbuf,&amp;itabbuf2,
+        1,TRUE,&amp;first_free,1,i);
+    coutln cur_blk,": Path Table 2";
+    FWBlks(out_file,tabbuf,cur_blk&lt;&lt;2,tabsize&lt;&lt;2);
+    cur_blk+=tabsize;
+    coutln cur_blk,": Path Table 3";
+    FWBlks(out_file,tabbuf2,cur_blk&lt;&lt;2,tabsize2&lt;&lt;2);
+    cur_blk+=tabsize2;
+
+    LTDirListDel(rootdir);  //TODO: Free user_data
+    FillU4Palindrome(&amp;iso-&gt;vol_space_size,cur_blk);
+    FillU4Palindrome(&amp;iso2-&gt;vol_space_size,cur_blk);
+    FWBlks(out_file,iso,16&lt;&lt;2,4);
+
+    iso3-&gt;type=ISO1T_TERMINATOR;
+    StrCpy(iso3-&gt;id,"CD001");
+    iso3-&gt;version=1;
+    if (bootfile_buf) {
+      FWBlks(out_file,iso1,17&lt;&lt;2,4);
+      FWBlks(out_file,iso2,18&lt;&lt;2,4);
+      FWBlks(out_file,iso3,19&lt;&lt;2,4);
+    } else {
+      FWBlks(out_file,iso2,17&lt;&lt;2,4);
+      FWBlks(out_file,iso3,18&lt;&lt;2,4);
+    }
+  } else
+    cur_blk=0;
+
+  FClose(out_file);
+  Free(tabbuf);
+  Free(tabbuf2);
+done1:
+  Free(bootfile_buf);
+  Free(filename2);
+  Free(et);
+  Free(zero_buf);
+  Free(iso);
+  Free(iso1);
+  Free(iso2);
+  Free(iso3);
+  return cur_blk;
+}
+#help_index ""
+</pre><div class="archive-note">Historical capture: 2010-01-31. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head></html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

@@ -1,0 +1,135 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="description"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="keywords"/>
+<meta content="LoseThos V7.05" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<a name="l1"></a><span class="cF0">                     </span><span class="cF5">Writing a PC Operating System, Part 1
+<a name="l2"></a>
+<a name="l3"></a>                                       by
+<a name="l4"></a>
+<a name="l5"></a>                                  Terry Davis
+<a name="l6"></a>
+<a name="l7"></a>                               </span><a href="/archive/index.html"><span class="cF5">Author of LoseThos</span></a><span class="cF0">
+<a name="l8"></a>
+<a name="l9"></a>
+<a name="l10"></a>
+<a name="l11"></a>
+<a name="l12"></a>
+<a name="l13"></a>The first step to writing an operating system is getting to "ring 0".  Ring 0 is 
+<a name="l14"></a>the CPU mode where you have full access to the computer.  </span><span class="cF2">Windows</span><span class="cF0"> and </span><span class="cF2">Linux</span><span class="cF0"> try 
+<a name="l15"></a>very hard to keep you from getting to ring 0, for security reasons.  In fact, 
+<a name="l16"></a>many people would tell you that an operating system's most important mission is 
+<a name="l17"></a>to keep you out of ring 0.  There are two, possibly three, ways to get to ring 
+<a name="l18"></a>0.  You can write code that runs at boot time, you can use an operating system 
+<a name="l19"></a>which has no protections, like </span><span class="cF2">DOS</span><span class="cF0"> or </span><span class="cF2">LoseThos</span><span class="cF0">, or you might be able to get 
+<a name="l20"></a>permission from </span><span class="cF2">Windows</span><span class="cF0"> or </span><span class="cF2">Linux</span><span class="cF0"> if you write some kind of driver kludge.  You 
+<a name="l21"></a>can probably search on the web for such a thing.
+<a name="l22"></a>
+<a name="l23"></a>I started LoseThos in 1993 when I was running </span><span class="cF2">DOS</span><span class="cF0">, so I had nothing preventing 
+<a name="l24"></a>me from making an operating system that launched like an application (never to 
+<a name="l25"></a>return).  When I resurrected the code and started working again in 2003, I had a 
+<a name="l26"></a>problem!  I solved my problem by installing </span><a href="http://www.freedos.org"><span class="cF2">FreeDOS</span></a><span class="cF0"> and merrily launching my 
+<a name="l27"></a>operating system just like any application.  When I began, it was all assembly 
+<a name="l28"></a>language and I used </span><span class="cF2">TASM</span><span class="cF0">, an assembler by Borland.
+<a name="l29"></a>
+<a name="l30"></a>You have to know a little assembly language to write an operating system because 
+<a name="l31"></a>you have to execute a few special instructions, here and there.  It's a horrible 
+<a name="l32"></a>shame that you have to know 16-bit real mode assembly language.  Real mode is 
+<a name="l33"></a>awful and archaic, but, unfortunately, systems boot in real mode.  You honestly 
+<a name="l34"></a>need just enough to get you to long (64-bit) mode.  Even 32-bit protected mode 
+<a name="l35"></a>is a shame to waste your time learning, but it's almost like 64-bit long-mode.  
+<a name="l36"></a>It's possible </span><span class="cF2">Atom</span><span class="cF0"> chips or something might regress to 32-bits.  Don't be 
+<a name="l37"></a>mislead by the people who suggest you worry about old hardware -- you've got 
+<a name="l38"></a>more than enough to deal with looking forward and by the time you finish your 
+<a name="l39"></a>operating system your current computer system will be old!
+<a name="l40"></a>
+<a name="l41"></a>Assembly is macho and impressive to beginners, but to seasoned programmers it's 
+<a name="l42"></a>silly, except when necessary.  You'll need to do a 16-bit boot loader, code to 
+<a name="l43"></a>switch to 32-bit, and, then, 64-bit mode and a few odds and ends.  You'd be 
+<a name="l44"></a>hard-pressed to find a 16-bit C compiler for the boot loader and there is a size 
+<a name="l45"></a>limit for boot loaders of 512 bytes, so hand assembly is pretty-much mandatory 
+<a name="l46"></a>for boot loaders.  All you need to know for boot loaders is BIOS </span><a href="http://www.ctyme.com/intr/rb-0708.htm"><span class="cF2">INT 13h</span></a><span class="cF0">, </span><span class="cF2">AH=42h</span><span class="cF0">
+<a name="l47"></a>.
+<a name="l48"></a>
+<a name="l49"></a>You might wish to start with the </span><span class="cF2">FreeDOS</span><span class="cF0"> approach.  Eventually, you'll want to 
+<a name="l50"></a>do a proper boot loader.  You'll soon discover that other operating systems 
+<a name="l51"></a>don't like you rewriting to the master boot record at block zero or writing to 
+<a name="l52"></a>the partition boot records at the start of each partition.  </span><span class="cF2">DOS</span><span class="cF0"> or </span><span class="cF2">LoseThos</span><span class="cF0"> will 
+<a name="l53"></a>readily allow you to write to block zero.  That's needed for hard-drive booting. 
+<a name="l54"></a> You'll need to do a CD-ROM ISO file before the hard-drive, probably.  (At this 
+<a name="l55"></a>stage in LoseThos development, I had a floppy drive, but times have changed.)  
+<a name="l56"></a>It's critical that you can back-up to CD-ROM or something else, especially when 
+<a name="l57"></a>developing disk code.  Burning CD-ROMs or making ISO files requires learning the 
+<a name="l58"></a>format for CD-ROMs.  You need to study the </span><a href="http://users.telenet.be/it3.consultants.bvba/handouts/ISO9960.html"><span class="cF2">ISO9660</span></a><span class="cF0"> file system and </span><a href="http://support.microsoft.com/default.aspx?scid=kb;EN-US;q167685"><span class="cF2">El Torito</span></a><span class="cF0"> 
+<a name="l59"></a>booting.  The boot block is around block number 16-20 and it's 2048 bytes 
+<a name="l60"></a>instead of 512.  LoseThos can make a bootable CD-ROM image.  See </span><a href="/archive/code/DskCDDVD.html#l365"><span class="cF4">CDFileCreate</span></a><span class="cF0"> 
+<a name="l61"></a>and </span><a href="/archive/code/InsBoot.html#l34"><span class="cF4">CDBootFileCreate</span></a><span class="cF0">.
+<a name="l62"></a>
+<a name="l63"></a>If you're thinking of USB memory drives, you can use BIOS calls, so I'm told, 
+<a name="l64"></a>but you'll face the monster challenge of doing a USB driver if you want to avoid 
+<a name="l65"></a>leaving 64-bit long mode to call the BIOS.
+<a name="l66"></a>
+<a name="l67"></a>Speaking of having enough to worry about looking forward, there is a new booting 
+<a name="l68"></a>convention that is starting, </span><a href="http://www.uefi.org/home/"><span class="cF2">UEFI</span></a><span class="cF0">.  Supposedly it will be backward compatible.  
+<a name="l69"></a>I don't know much about it, except it sucks for LoseThos because it requires PE 
+<a name="l70"></a>or ELF files and while my LoseThos compiler makes propriatery executables.
+<a name="l71"></a>
+<a name="l72"></a>LoseThos isn't really intended to make making other operating systems easy, but 
+<a name="l73"></a>it offers the feature of no protections.  However, its assembler has limited 
+<a name="l74"></a>16-bit support.  You can study LoseThos code, if you don't want to do it by 
+<a name="l75"></a>yourself.  LoseThos code is public domain, so there are no strings attached.
+<a name="l76"></a>
+<a name="l77"></a>CD-ROM Boot Sect:
+<a name="l78"></a></span><a href="/archive/code/BootCD.html#l78"><span class="cF4">::/LT/Opt/Boot/BootCD.SPZ</span></a><span class="cF0">
+<a name="l79"></a>
+<a name="l80"></a>Hard Drive Partition Boot Sect:
+<a name="l81"></a></span><a href="/archive/code/BootHD.html#l1"><span class="cF4">::/LT/Opt/Boot/BootHD.SPZ</span></a><span class="cF0">
+<a name="l82"></a>
+<a name="l83"></a>Master Boot Sect and Stage 2 Master Boot Loader:
+<a name="l84"></a></span><a href="/archive/code/BootMHD.html#l1"><span class="cF4">::/LT/Opt/Boot/BootMHD.SPZ</span></a><span class="cF0">
+<a name="l85"></a></span><a href="/archive/code/BootMHD2.html#l46"><span class="cF4">::/LT/Opt/Boot/BootMHD2.SPZ</span></a><span class="cF0">
+<a name="l86"></a>
+<a name="l87"></a>My boot loaders get patched with the Logical Block Addres (LBA) of my kernel 
+<a name="l88"></a>file and the size of the kernel file when I install my operating system.  
+<a name="l89"></a></span><a href="/archive/code/InsBoot.html#l184"><span class="cF4">InstallBoot</span></a><span class="cF0">().  My boot loaders don't mess around with file system details.  My 
+<a name="l90"></a>boot loaders hand-off ctrl to my kernel while in real 16-bit mode so my kernel 
+<a name="l91"></a>can make BIOS calls before switching to 32-bit, then 64-bit modes.
+<a name="l92"></a>
+<a name="l93"></a>See my kernel start-up code for details on making BIOS calls and switching to 
+<a name="l94"></a>64-bit mode:
+<a name="l95"></a></span><a href="/archive/code/OSStartUp.html#l1"><span class="cF4">::/LT/OSMain/OSStartUp.CPZ</span></a><span class="cF0">
+<a name="l96"></a>  
+<a name="l97"></a></span><span class="cF8">
+<a name="l98"></a>* "Windows" is a trademark of MicroSoft Corp.
+<a name="l99"></a>* "Linux" is probably a trademark owned by Linus Torvalds.
+<a name="l100"></a>* "FreeDOS" is a trademark of Jim Hall.
+<a name="l101"></a>* "TASM" is a trademark of Borland Corporation.
+<a name="l102"></a>* "Atom" is trademarks of Intel Corp.
+</span></pre><div class="archive-note">Historical capture: 2011-08-31. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

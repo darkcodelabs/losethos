@@ -1,0 +1,812 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="description"/>
+<meta content="64-Bit, Operating System, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="keywords"/>
+<meta content="LoseThos V6.10" name="generator"/>
+<style type="text/css">
+.cBLACK{color:rgb(0,0,0);}
+.cBLUE{color:rgb(0,0,168);}
+.cGREEN{color:rgb(0,168,0);}
+.cCYAN{color:rgb(0,168,168);}
+.cRED{color:rgb(168,0,0);}
+.cPURPLE{color:rgb(168,0,168);}
+.cBROWN{color:rgb(168,84,0);}
+.cLTGRAY{color:rgb(168,168,168);}
+.cDKGRAY{color:rgb(84,84,84);}
+.cLTBLUE{color:rgb(84,84,252);}
+.cLTGREEN{color:rgb(84,252,84);}
+.cLTCYAN{color:rgb(84,252,252);}
+.cLTRED{color:rgb(252,84,84);}
+.cLTPURPLE{color:rgb(252,84,252);}
+.cYELLOW{color:rgb(252,252,84);}
+.cWHITE{color:rgb(252,252,252);}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cPURPLE">                               <a href="/archive/doc/TrivialSolutions.html">Trivial Solutions</a>
+                        Happy Programmers Make Us Happy
+
+<a href="/archive/index.html">The LoseThos 64-bit PC Operating System</a>
+File:/LT/Demo/GameStarters/FlightSim.CPZ
+This, and all LoseThos files, are public domain.  Do whatever you like.
+
+
+</span><span class="cGREEN">//This program can be static compiled to a .BIZ or JIT.</span><span class="cBLACK">
+</span><span class="cGREEN">//If static compiling, override the finename extention warning.</span><span class="cBLACK">
+#</span><span class="cBLUE">ifstatic</span><span class="cBLACK">
+#</span><span class="cBLUE">include</span><span class="cBLACK"> </span><span class="cBROWN">"::/LT/OSMain/StaticAdam.HPZ"</span><span class="cBLACK">
+#</span><span class="cBLUE">endif</span><span class="cBLACK">
+
+</span><span class="cGREEN">//This might get turned into a game where you are an Eagle</span><span class="cBLACK">
+</span><span class="cGREEN">//and you dive for fish.</span><span class="cBLACK">
+
+
+
+</span><span class="cGREEN">//Keep these power of two so shift is used instead of multiply</span><span class="cBLACK">
+</span><span class="cGREEN">//to index arrays.</span><span class="cBLACK">
+#</span><span class="cBLUE">define</span><span class="cBLACK"> MAP_WIDTH               1024
+#</span><span class="cBLUE">define</span><span class="cBLACK"> MAP_HEIGHT              1024
+
+#</span><span class="cBLUE">define</span><span class="cBLACK"> MAP_SCALE               150
+#</span><span class="cBLUE">define</span><span class="cBLACK"> DISPLAY_SCALE           100
+#</span><span class="cBLUE">define</span><span class="cBLACK"> CONTROLS_SCALE          0.05
+
+</span><span class="cGREEN">//I think I did these so the heads-up showed intelligable numbers.</span><span class="cBLACK">
+</span><span class="cGREEN">//Scaling is a mess.</span><span class="cBLACK">
+#</span><span class="cBLUE">define</span><span class="cBLACK"> COORDINATE_SCALE        256
+#</span><span class="cBLUE">define</span><span class="cBLACK"> COORDINATE_BITS         8
+
+#</span><span class="cBLUE">define</span><span class="cBLACK"> WATER_ELEVATION         15
+#</span><span class="cBLUE">define</span><span class="cBLACK"> ROCK_ELEVATION          45
+#</span><span class="cBLUE">define</span><span class="cBLACK"> SNOW_ELEVATION          55
+
+</span><span class="cGREEN">//Too big makes off-screen draws take place.</span><span class="cBLACK">
+#</span><span class="cBLUE">define</span><span class="cBLACK"> MAX_PANEL_SIZE          16
+
+</span><span class="cBLUE">class</span><span class="cBLACK"> Panel
+{
+  Panel *next;
+  </span><span class="cBLUE">I4</span><span class="cBLACK"> n,   </span><span class="cGREEN">//num polygon sides</span><span class="cBLACK">
+     num; </span><span class="cGREEN">//panel number</span><span class="cBLACK">
+  P3I4 *points;
+  </span><span class="cBLUE">I8</span><span class="cBLACK"> color,cnt;
+};
+
+</span><span class="cBLUE">I8</span><span class="cBLACK"> critical_section_flag;
+</span><span class="cBLUE">U0</span><span class="cBLACK"> CriticalSectionStart()
+{
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (LBts</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;critical_section_flag,0</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+    Yield;
+}
+</span><span class="cBLUE">U0</span><span class="cBLACK"> CriticalSectionEnd()
+{
+  LBtr(&amp;critical_section_flag,0);
+}
+
+</span><span class="cGREEN">//These are not deallocated after the program ends,</span><span class="cBLACK">
+</span><span class="cGREEN">//but I did them this way for your benefit</span><span class="cBLACK">
+</span><span class="cGREEN">//so 2D array indexing is not done by hand.</span><span class="cBLACK">
+</span><span class="cGREEN">//You can type "FlightSim;" at the command line</span><span class="cBLACK">
+</span><span class="cGREEN">//to rerun without new allocations.</span><span class="cBLACK">
+</span><span class="cGREEN">//Normally, just spawn a popup task,</span><span class="cBLACK">
+</span><span class="cGREEN">//run it and kill it using an icon.</span><span class="cBLACK">
+#</span><span class="cBLUE">ifstatic</span><span class="cBLACK">
+#</span><span class="cBLUE">exe</span><span class="cBLACK"> {OptOn(OPTf_GLBLS_ON_DATA_HEAP);};
+#</span><span class="cBLUE">endif</span><span class="cBLACK">
+</span><span class="cBLUE">I2</span><span class="cBLACK">       elevations[MAP_HEIGHT][MAP_WIDTH];
+</span><span class="cBLUE">I4</span><span class="cBLACK">   normals[MAP_HEIGHT][MAP_WIDTH*2];
+Panel *panels[MAP_HEIGHT][MAP_WIDTH*2];
+#</span><span class="cBLUE">ifstatic</span><span class="cBLACK">
+#</span><span class="cBLUE">exe</span><span class="cBLACK"> {OptOff(OPTf_GLBLS_ON_DATA_HEAP);};
+#</span><span class="cBLUE">endif</span><span class="cBLACK">
+
+</span><span class="cBLUE">I8</span><span class="cBLACK"> num_panels;
+Panel *panel_root;
+</span><span class="cBLUE">U1</span><span class="cBLACK"> *panels_processed_bitmap;
+
+</span><span class="cBLUE">F8</span><span class="cBLACK"> v_grid_size,span_factor,phi,theta1,theta2,speed;
+
+</span><span class="cBLUE">I8</span><span class="cBLACK"> x,y,z;
+
+BoolI1 crashed=FALSE;
+
+</span><span class="cBLUE">class</span><span class="cBLACK"> MPCtrl {
+  </span><span class="cBLUE">I8</span><span class="cBLACK"> mp_cnt;
+  </span><span class="cBLUE">U8</span><span class="cBLACK"> do_update;
+  </span><span class="cBLUE">F8</span><span class="cBLACK"> update_done_t[MP_MAX_PROCESSORS];
+  </span><span class="cBLUE">U8</span><span class="cBLACK"> done_flags;
+  BoolI8 app_done;
+} mp;
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> FSTransform(GrBitMap *base,</span><span class="cBLUE">I8</span><span class="cBLACK"> *x,</span><span class="cBLUE">I8</span><span class="cBLACK"> *y,</span><span class="cBLUE">I8</span><span class="cBLACK"> *z)
+{
+  </span><span class="cBLUE">I8</span><span class="cBLACK"> zz;
+</span><span class="cGREEN">//I accidentally made the Z coordinate sign backward</span><span class="cBLACK">
+</span><span class="cGREEN">//from the fill-poly depth buf scheme, so it is negated at the end.</span><span class="cBLACK">
+</span><span class="cGREEN">//Negative Z coordinates are the ones we want plotted.</span><span class="cBLACK">
+  GrRot(base-&gt;r,x,y,z);
+
+</span><span class="cGREEN">//We don't want divide by zero or make too monstrous foreground objects.</span><span class="cBLACK">
+</span><span class="cGREEN">//The foreground object boundary is kinda crappy looking when</span><span class="cBLACK">
+</span><span class="cGREEN">//you point toward the ground.</span><span class="cBLACK">
+  *z=-*z;
+  zz=*z+50;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (zz&gt;0) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+</span><span class="cGREEN">//The divide causes "foreshortening" which makes the distance go to a vanishing point.</span><span class="cBLACK">
+    *x = *x * DISPLAY_SCALE/ zz;
+    *y = *y * DISPLAY_SCALE/ zz;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  *x+=base-&gt;x;
+  *y =base-&gt;y-*y;
+}
+
+
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> CalcNormals()
+{
+</span><span class="cGREEN">/*The idea is that there are two triangles</span><span class="cBLACK">
+</span><span class="cGREEN">forming every grid square and we find the normal</span><span class="cBLACK">
+</span><span class="cGREEN">vector with a curl.</span><span class="cBLACK">
+
+</span><span class="cGREEN"> i  j  k</span><span class="cBLACK">
+</span><span class="cGREEN"> 0  1  dz2</span><span class="cBLACK">
+</span><span class="cGREEN"> 1  0  dz1</span><span class="cBLACK">
+
+</span><span class="cGREEN">Normal:</span><span class="cBLACK">
+</span><span class="cGREEN">dz1*i + dz2*j - k</span><span class="cBLACK">
+
+</span><span class="cGREEN">  i   j   k</span><span class="cBLACK">
+</span><span class="cGREEN"> -1   0  -dz3</span><span class="cBLACK">
+</span><span class="cGREEN">  0  -1  -dz4</span><span class="cBLACK">
+
+</span><span class="cGREEN">Normal:</span><span class="cBLACK">
+</span><span class="cGREEN">-dz3*i - dz4*j + k</span><span class="cBLACK">
+
+</span><span class="cGREEN"> </span><span class="cBLACK">
+</span><span class="cGREEN">Basically, we want to combine grid</span><span class="cBLACK">
+</span><span class="cGREEN">locations with the same normals.  These</span><span class="cBLACK">
+</span><span class="cGREEN">are not unit vectors for one thing.</span><span class="cBLACK">
+
+</span><span class="cGREEN">What I came-up with is dz1/dz2 and dz3/dz4.</span><span class="cBLACK">
+
+</span><span class="cGREEN">It works pretty well.  It combines</span><span class="cBLACK">
+</span><span class="cGREEN">more than it should, but that's good</span><span class="cBLACK">
+</span><span class="cGREEN">because it would  result in too many</span><span class="cBLACK">
+</span><span class="cGREEN">panels.</span><span class="cBLACK">
+
+</span><span class="cGREEN">*/</span><span class="cBLACK">
+  </span><span class="cBLUE">I8</span><span class="cBLACK"> i,j,k,dz1,dz2;
+  </span><span class="cBLUE">for</span><span class="cBLACK"> (j=0;j&lt;MAP_HEIGHT-1;j++) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    k=0;
+    </span><span class="cBLUE">for</span><span class="cBLACK"> (i=0;i&lt;MAP_WIDTH-1;i++) {
+      dz1=elevations[j][i+1]-elevations[j][i];
+      dz2=elevations[j+1][i]-elevations[j][i];
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (dz2)
+        normals[j][k++]=dz1&lt;&lt;16/dz2;
+      </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (!dz1)
+          normals[j][k++]=0;
+        </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cBLUE">if</span><span class="cBLACK"> (dz1&gt;0)
+          normals[j][k++]=MAX_I4;
+        </span><span class="cBLUE">else</span><span class="cBLACK">
+          normals[j][k++]=MIN_I4;
+      </span><span class="cLTGRAY">}</span><span class="cBLACK">
+
+      dz1=elevations[j+1][i+1]-elevations[j][i+1];
+      dz2=elevations[j+1][i+1]-elevations[j+1][i];
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (dz2)
+        normals[j][k++]=dz1&lt;&lt;16/dz2;
+      </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (!dz1)
+          normals[j][k++]=0;
+        </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cBLUE">if</span><span class="cBLACK"> (dz1&gt;0)
+          normals[j][k++]=MAX_I4;
+        </span><span class="cBLUE">else</span><span class="cBLACK">
+          normals[j][k++]=MIN_I4;
+      </span><span class="cLTGRAY">}</span><span class="cBLACK">
+    }
+    normals[j][k++]=0;
+    normals[j][k++]=0;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  k=0;
+  </span><span class="cBLUE">for</span><span class="cBLACK"> (i=0;i&lt;MAP_WIDTH-1;i++) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    normals[j][k++]=0;
+    normals[j][k++]=0;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+}
+
+BoolI8 TestSameSlope(</span><span class="cBLUE">I8</span><span class="cBLACK"> x,</span><span class="cBLUE">I8</span><span class="cBLACK"> y,</span><span class="cBLUE">I8</span><span class="cBLACK"> w,</span><span class="cBLUE">I8</span><span class="cBLACK"> h)
+{
+  </span><span class="cBLUE">I8</span><span class="cBLACK"> k1,k2,xx,yy,s;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!</span><span class="cLTGRAY">(</span><span class="cBLACK">0&lt;=x &amp;&amp; x+w&lt;MAP_WIDTH &amp;&amp; 0&lt;=y &amp;&amp; y+h&lt;MAP_HEIGHT</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+    </span><span class="cBLUE">return</span><span class="cBLACK"> FALSE;
+    </span><span class="cGREEN">//Works well averaging the two slopes of two triangles.</span><span class="cBLACK">
+    </span><span class="cGREEN">//If it is too picky, we get too many panels.</span><span class="cBLACK">
+  s=normals[y][x*2]+normals[y][x*2+1];
+  </span><span class="cBLUE">for</span><span class="cBLACK"> (k2=0;k2&lt;h;k2++)
+    </span><span class="cBLUE">for</span><span class="cBLACK"> (k1=0;k1&lt;w;k1++) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+      xx=(x+k1)*2;
+      yy=y+k2;
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (normals[yy][xx]+normals[yy][xx+1]!=s)
+       </span><span class="cBLUE">return</span><span class="cBLACK"> FALSE;
+    </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  </span><span class="cBLUE">return</span><span class="cBLACK"> TRUE;
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> MPDoPanels(TaskStruct *task)
+{
+  </span><span class="cBLUE">I8</span><span class="cBLACK"> i,j,k,l,k1,k2,w,h,threshold,lo,hi;
+  BoolI1 cont;
+  Panel *tempp,*start_ptr=NULL,*end_ptr=NULL;
+  P3I4 *poly;
+  lo=Gs-&gt;num*(MAP_HEIGHT-1)/mp.mp_cnt;
+  hi=(Gs-&gt;num+1)*(MAP_HEIGHT-1)/mp.mp_cnt;
+  </span><span class="cBLUE">for</span><span class="cBLACK"> (threshold=8;threshold&gt;=1;threshold--)
+    </span><span class="cBLUE">for</span><span class="cBLACK"> (j=lo;j&lt;hi;j++) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+      k=0;
+      </span><span class="cBLUE">for</span><span class="cBLACK"> (i=0;i&lt;MAP_WIDTH-1;i++) {
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (!panels[j][k]) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+          w=1;
+          h=1;
+          </span><span class="cBLUE">do</span><span class="cBLACK"> {
+            cont=FALSE;
+            </span><span class="cBLUE">if</span><span class="cBLACK"> (w&lt;MAX_PANEL_SIZE &amp;&amp; TestSameSlope</span><span class="cLTGRAY">(</span><span class="cBLACK">i,j,w+1,h</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+              w++;
+              cont=TRUE;
+            </span><span class="cLTGRAY">}</span><span class="cBLACK">
+            </span><span class="cBLUE">if</span><span class="cBLACK"> (h&lt;MAX_PANEL_SIZE &amp;&amp; TestSameSlope</span><span class="cLTGRAY">(</span><span class="cBLACK">i,j,w,h+1</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+              h++;
+              cont=TRUE;
+            </span><span class="cLTGRAY">}</span><span class="cBLACK">
+          } </span><span class="cBLUE">while</span><span class="cBLACK"> (cont);
+          </span><span class="cBLUE">if</span><span class="cBLACK"> (w&gt;=threshold || h&gt;=threshold) {
+            tempp=CAlloc(</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">Panel</span><span class="cLTGRAY">)</span><span class="cBLACK">,task);
+            </span><span class="cBLUE">lock</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">tempp-&gt;num=num_panels++;</span><span class="cLTGRAY">}</span><span class="cBLACK">
+            l=elevations[j][i];
+            </span><span class="cBLUE">if</span><span class="cBLACK"> (l&lt;=WATER_ELEVATION*MAP_SCALE)
+              tempp-&gt;color=BLUE;
+            </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+              </span><span class="cBLUE">if</span><span class="cBLACK"> (RandI2&amp;1) {
+                </span><span class="cBLUE">if</span><span class="cBLACK"> (l&lt;ROCK_ELEVATION*MAP_SCALE)
+                  tempp-&gt;color=LTGREEN;
+                </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cBLUE">if</span><span class="cBLACK"> (l&lt;SNOW_ELEVATION*MAP_SCALE) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+                  </span><span class="cBLUE">if</span><span class="cBLACK"> (!</span><span class="cLTGRAY">(</span><span class="cBLACK">RandU2&amp;3</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+                    tempp-&gt;color=LTGRAY;
+                  </span><span class="cBLUE">else</span><span class="cBLACK">
+                    tempp-&gt;color=LTGREEN;
+                </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+                  </span><span class="cBLUE">if</span><span class="cBLACK"> (!</span><span class="cLTGRAY">(</span><span class="cBLACK">RandU2&amp;3</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+                    tempp-&gt;color=WHITE;
+                  </span><span class="cBLUE">else</span><span class="cBLACK">
+                    tempp-&gt;color=LTGRAY;
+                </span><span class="cLTGRAY">}</span><span class="cBLACK">
+              } </span><span class="cBLUE">else</span><span class="cBLACK"> {
+                </span><span class="cBLUE">if</span><span class="cBLACK"> (l&lt;ROCK_ELEVATION*MAP_SCALE)
+                  tempp-&gt;color=GREEN+LTGREEN&lt;&lt;16+ROPF_DITHER;
+                </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cBLUE">if</span><span class="cBLACK"> (l&lt;SNOW_ELEVATION*MAP_SCALE) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+                  </span><span class="cBLUE">if</span><span class="cBLACK"> (!</span><span class="cLTGRAY">(</span><span class="cBLACK">RandU2&amp;3</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+                    tempp-&gt;color=DKGRAY+LTGRAY&lt;&lt;16+ROPF_DITHER;
+                  </span><span class="cBLUE">else</span><span class="cBLACK">
+                    tempp-&gt;color=GREEN+LTGREEN&lt;&lt;16+ROPF_DITHER;
+                </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+                  </span><span class="cBLUE">if</span><span class="cBLACK"> (!</span><span class="cLTGRAY">(</span><span class="cBLACK">RandU2&amp;3</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+                    tempp-&gt;color=LTGRAY+WHITE&lt;&lt;16+ROPF_DITHER;
+                  </span><span class="cBLUE">else</span><span class="cBLACK">
+                    tempp-&gt;color=DKGRAY+LTGRAY&lt;&lt;16+ROPF_DITHER;
+                </span><span class="cLTGRAY">}</span><span class="cBLACK">
+              }
+            </span><span class="cLTGRAY">}</span><span class="cBLACK">
+            tempp-&gt;n=4;
+            poly=tempp-&gt;points=MAlloc(</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">P3I4</span><span class="cLTGRAY">)</span><span class="cBLACK">*tempp-&gt;n,task);
+            poly[0].x=MAP_SCALE*i;
+            poly[0].y=MAP_SCALE*j;
+            poly[0].z=elevations[j][i];
+            poly[1].x=MAP_SCALE*(i+w);
+            poly[1].y=MAP_SCALE*j;
+            poly[1].z=elevations[j][i+w];
+            poly[2].x=MAP_SCALE*(i+w);
+            poly[2].y=MAP_SCALE*(j+h);
+            poly[2].z=elevations[j+h][i+w];
+            poly[3].x=MAP_SCALE*i;
+            poly[3].y=MAP_SCALE*(j+h);
+            poly[3].z=elevations[j+h][i];
+            tempp-&gt;next=start_ptr;
+            start_ptr=tempp;
+            </span><span class="cBLUE">if</span><span class="cBLACK"> (!end_ptr)
+              end_ptr=tempp;
+            </span><span class="cBLUE">for</span><span class="cBLACK"> (k2=0;k2&lt;h;k2++)
+              </span><span class="cBLUE">for</span><span class="cBLACK"> (k1=0;k1&lt;w;k1++) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+                panels[j+k2][(i+k1)*2]=tempp;
+                panels[j+k2][(i+k1)*2+1]=tempp;
+              </span><span class="cLTGRAY">}</span><span class="cBLACK">
+          }
+        </span><span class="cLTGRAY">}</span><span class="cBLACK">
+        k+=2;
+      }
+    </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (end_ptr) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    CriticalSectionStart;
+    end_ptr-&gt;next=panel_root;
+    panel_root=start_ptr;
+    CriticalSectionEnd;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  LBts(&amp;mp.done_flags,Gs-&gt;num);
+}
+
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> InitMap()
+{
+</span><span class="cGREEN">//We make a topographic data structure "evevations[][]"</span><span class="cBLACK">
+</span><span class="cGREEN">//and convert it to panels.  The conversion to panels leaves</span><span class="cBLACK">
+</span><span class="cGREEN">//gaps the way I did it, but it looks good, except for sky leaking through</span><span class="cBLACK">
+</span><span class="cGREEN">//There is no wrong way to pick colors if it looks good, unless</span><span class="cBLACK">
+</span><span class="cGREEN">//you wanted to do lighting.</span><span class="cBLACK">
+
+</span><span class="cGREEN">//"panels[][]" holds the flat and sloped panels for each spot, while</span><span class="cBLACK">
+</span><span class="cGREEN">//"hstep_panels[][]" holds side panels in cases of step-like formations.</span><span class="cBLACK">
+</span><span class="cGREEN">//They require a separate array because a single "elevation[][]" spot can</span><span class="cBLACK">
+</span><span class="cGREEN">//have a panel on top and a panel on the side like stairs.</span><span class="cBLACK">
+
+  </span><span class="cBLUE">I8</span><span class="cBLACK"> i,j,l,k1,k2,x,y,xx,yy;
+  MemSet(elevations,0,</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">elevations</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+  MemSet(panels,0,</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">panels</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+  </span><span class="cBLUE">for</span><span class="cBLACK"> (i=0;i&lt;MAP_WIDTH*MAP_HEIGHT/128;i++) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    x=RandU4%MAP_WIDTH;
+    y=RandU4%MAP_HEIGHT;
+    j=1&lt;&lt;(RandU4%6);
+    l=0;
+    </span><span class="cBLUE">while</span><span class="cBLACK"> (j--) {
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (!l &amp;&amp; RandU2&lt;MAX_U2/4)
+        l=RandU2%(j+1);
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (l) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        </span><span class="cBLUE">for</span><span class="cBLACK"> (k1=-j;k1&lt;=j;k1++)
+          </span><span class="cBLUE">for</span><span class="cBLACK"> (k2=-j;k2&lt;=j;k2++) {
+            xx=x+k2; yy=y+k1;
+            </span><span class="cBLUE">if</span><span class="cBLACK"> (0&lt;=xx&lt;MAP_WIDTH &amp;&amp;
+                0&lt;=yy&lt;MAP_HEIGHT)
+              elevations[yy][xx]+=MAP_SCALE/2;
+          }
+          l--;
+      </span><span class="cLTGRAY">}</span><span class="cBLACK">
+    }
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+
+  xx=x/(MAP_SCALE*COORDINATE_SCALE);
+  yy=y/(MAP_SCALE*COORDINATE_SCALE);
+  z+=elevations[yy][xx]*COORDINATE_SCALE;
+
+  </span><span class="cBLUE">for</span><span class="cBLACK"> (j=0;j&lt;MAP_HEIGHT;j++)
+    </span><span class="cBLUE">for</span><span class="cBLACK"> (i=0;i&lt;MAP_WIDTH;i++)
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (elevations[j][i]&lt;WATER_ELEVATION*MAP_SCALE)
+        elevations[j][i]=WATER_ELEVATION*MAP_SCALE;
+
+
+  CalcNormals;
+
+  panel_root=NULL;
+  num_panels=0;
+
+  mp.done_flags=0;
+  </span><span class="cBLUE">for</span><span class="cBLACK"> (i=1;i&lt;mp.mp_cnt;i++)
+    MPSpawn(&amp;MPDoPanels,Fs,</span><span class="cBROWN">"Do Panels"</span><span class="cBLACK">,1&lt;&lt;i);
+  MPDoPanels(Fs);
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (mp.done_flags!=1&lt;&lt;mp.mp_cnt-1)
+    Yield;
+  panels_processed_bitmap=MAlloc(</span><span class="cLTGRAY">(</span><span class="cBLACK">num_panels+7</span><span class="cLTGRAY">)</span><span class="cBLACK">&gt;&gt;3);
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> PanelsDel()
+{
+  Panel *tempp=panel_root,*tempp1;
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (tempp) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    tempp1=tempp-&gt;next;
+    Free(tempp-&gt;points);
+    Free(tempp);
+    tempp=tempp1;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  Free(panels_processed_bitmap);
+}
+
+
+GrBitMap *main_base;
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> UpdateWin(TaskStruct *task)
+{
+  GrBitMap *base=GrAlias(gr_refreshed_base,task);
+  GrBlot(base,0,0,main_base);
+  GrDel(base);
+}
+
+
+</span><span class="cGREEN">/*</span><span class="cCYAN"></span><span class="cGREEN">/* Graphics Not Rendered in HTML */</span><span class="cBLACK">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span><span class="cGREEN">Cores render strips.  The strips are wider toward the horizon by span_factor</span><span class="cBLACK">
+</span><span class="cGREEN">and overlap +/- 15%. The cores check the panel map array</span><span class="cBLACK">
+</span><span class="cGREEN">and render the panel for each square and mark-it done.</span><span class="cBLACK">
+
+</span><span class="cGREEN">The depth buf is not locked in the graphic routines</span><span class="cBLACK">
+</span><span class="cGREEN">so we get some glitches.</span><span class="cBLACK">
+
+</span><span class="cGREEN">*/</span><span class="cBLACK">
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> MPDrawIt(TaskStruct *task,GrBitMap *base)
+{
+</span><span class="cGREEN">//This is identical to the previous routine but is run by core#1</span><span class="cBLACK">
+  </span><span class="cBLUE">I8</span><span class="cBLACK"> i,j,ww,hh,*s2w,x1,y1,z1, xx,yy,
+      xh,yh,zh, yh2,xh2, </span><span class="cBLUE">reg</span><span class="cBLACK"> x1w, </span><span class="cBLUE">reg</span><span class="cBLACK"> y1w, x1h,y1h,
+      x3,y3,z3,
+      cx=task-&gt;win_pixel_width&gt;&gt;1,
+      cy=task-&gt;win_pixel_height&gt;&gt;1;
+  </span><span class="cBLUE">F8</span><span class="cBLACK"> h_grid_size;
+  Panel </span><span class="cBLUE">reg</span><span class="cBLACK"> *tempp;
+
+  xx=x/(MAP_SCALE*COORDINATE_SCALE);
+  yy=y/(MAP_SCALE*COORDINATE_SCALE);
+
+  </span><span class="cGREEN">//World to screen coordinates</span><span class="cBLACK">
+  GrIdentEqu(base-&gt;r);
+  GrRotZEqu(base-&gt;r,theta2);
+  GrRotXEqu(base-&gt;r,phi);
+  GrRotZEqu(base-&gt;r,theta1);
+  GrSetRotMat(base,base-&gt;r);
+
+  </span><span class="cGREEN">//Screen to world coordinates</span><span class="cBLACK">
+
+</span><span class="cGREEN">//This gives us the vectors for stepping through the grid in</span><span class="cBLACK">
+</span><span class="cGREEN">//the direction the plane is facing. we step horizontally and vertically</span><span class="cBLACK">
+</span><span class="cGREEN">//and use the reciprocal slope principle</span><span class="cBLACK">        </span><span class="cGREEN">y=mx+b and y=(-1/m)x+b are perpendicular.</span><span class="cBLACK">
+
+  s2w=GrIdent;
+  GrRotZEqu(s2w,-theta1);
+  GrRotXEqu(s2w,-phi);
+  GrRotZEqu(s2w,-theta2);
+  xh=0;
+  yh=0;
+  zh=-256;
+  GrRot(s2w,&amp;xh,&amp;yh,&amp;zh);
+
+</span><span class="cGREEN">//The layer for core#1 is not cleared automatically</span><span class="cBLACK">
+</span><span class="cGREEN">//it is persistent.  I have carefully syncronized to the update</span><span class="cBLACK">
+</span><span class="cGREEN">//cycle initiated by core#0 to prevent flicker.</span><span class="cBLACK">
+
+  base-&gt;flags|=BMF_TRANSFORMATION;
+  base-&gt;transform=&amp;FSTransform;
+  base-&gt;x=cx;
+  base-&gt;y=cy;
+
+</span><span class="cGREEN">//base-&gt;x and the translation part of base-&gt;r are identical in effect,</span><span class="cBLACK">
+</span><span class="cGREEN">//but we use both to show-off.</span><span class="cBLACK">  </span><span class="cGREEN">We could add offsets together and use one or the other.</span><span class="cBLACK">
+
+  x1=-x&gt;&gt;COORDINATE_BITS;
+  y1=-y&gt;&gt;COORDINATE_BITS;
+  z1=-z&gt;&gt;COORDINATE_BITS;
+  GrRot(base-&gt;r,&amp;x1,&amp;y1,&amp;z1);
+  GrSetTranslation(base-&gt;r,x1,y1,z1);
+
+  </span><span class="cGREEN">//This is a refinement.</span><span class="cBLACK">
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (Abs</span><span class="cLTGRAY">(</span><span class="cBLACK">phi*180/pi</span><span class="cLTGRAY">)</span><span class="cBLACK">&gt;90) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    x3=0;
+    y3=-cy;
+    z3=0;
+    GrRot(s2w,&amp;x3,&amp;y3,&amp;z3);
+    xx+=x3;
+    yy+=y3;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+
+  h_grid_size=4.0*v_grid_size*(Gs-&gt;num+span_factor)/span_factor;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (Gs-&gt;num&amp;1) </span><span class="cLTGRAY">{</span><span class="cBLACK"> </span><span class="cGREEN">//alternate left-right,right-left</span><span class="cBLACK">
+    yh2=-yh;
+    xh2=-xh;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    yh2=yh;
+    xh2=xh;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+
+  ww=h_grid_size;
+  hh=1.30*v_grid_size; </span><span class="cGREEN">//Cores overlap 15% on each side of strip.</span><span class="cBLACK">
+  </span><span class="cGREEN">//Calc starting point.</span><span class="cBLACK">
+  x1h=xx&lt;&lt;8+0.5*yh2*h_grid_size+xh*v_grid_size*(Gs-&gt;num+1.15);
+  y1h=yy&lt;&lt;8-0.5*xh2*h_grid_size+yh*v_grid_size*(Gs-&gt;num+1.15);
+
+  xh=-xh; </span><span class="cGREEN">//Back to front to help with depth.</span><span class="cBLACK">
+  yh=-yh;
+
+  </span><span class="cGREEN">//Take half steps to cover whole grid.</span><span class="cBLACK">
+  xh&gt;&gt;=1;  yh&gt;&gt;=1;
+  xh2&gt;&gt;=1; yh2&gt;&gt;=1;
+  ww&lt;&lt;=1;
+  hh&lt;&lt;=1;
+
+  </span><span class="cBLUE">for</span><span class="cBLACK"> (j=0;j&lt;hh;j++) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    x1w=x1h;
+    y1w=y1h;
+    </span><span class="cBLUE">for</span><span class="cBLACK"> (i=0;i&lt;ww;i++) {
+      x1=x1w&gt;&gt;8; y1=y1w&gt;&gt;8;
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (0&lt;=x1&lt;MAP_WIDTH &amp;&amp; 0&lt;=y1&lt;MAP_HEIGHT) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+          </span><span class="cBLUE">if</span><span class="cBLACK"> (</span><span class="cLTGRAY">(</span><span class="cBLACK">tempp=panels[y1][x1*2]</span><span class="cLTGRAY">)</span><span class="cBLACK"> &amp;&amp; !LBts</span><span class="cLTGRAY">(</span><span class="cBLACK">panels_processed_bitmap,tempp-&gt;num</span><span class="cLTGRAY">)</span><span class="cBLACK">) {
+            base-&gt;color=tempp-&gt;color;
+            </span><span class="cBLUE">if</span><span class="cBLACK"> (tempp-&gt;cnt&gt;8*</span><span class="cLTGRAY">(</span><span class="cBLACK">1.1-Gs-&gt;idle_factor</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+              tempp-&gt;cnt=GrFillPoly3(base,tempp-&gt;n,tempp-&gt;points);
+            </span><span class="cBLUE">else</span><span class="cBLACK">
+              tempp-&gt;cnt++;
+          }
+      </span><span class="cLTGRAY">}</span><span class="cBLACK">
+      x1w-=yh2;
+      y1w+=xh2;
+    }
+    x1h+=xh;
+    y1h+=yh;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  Free(s2w);
+  mp.update_done_t[Gs-&gt;num]=tNP;
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> APFlightSimTask(TaskStruct *master_task)
+{
+  GrBitMap *base=GrAlias(main_base,master_task);
+  Preempt(ON);
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (!mp.app_done) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    LBts(&amp;Fs-&gt;task_flags,TASKf_IDLE);
+    </span><span class="cBLUE">while</span><span class="cBLACK"> (!LBtr</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;mp.do_update,Gs-&gt;num</span><span class="cLTGRAY">)</span><span class="cBLACK"> &amp;&amp; !mp.app_done)
+      Yield;
+    LBtr(&amp;Fs-&gt;task_flags,TASKf_IDLE);
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (!mp.app_done)
+      MPDrawIt(master_task,base);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+
+</span><span class="cGREEN">//We made an alias of this we don't want freed.</span><span class="cBLACK">
+  base-&gt;depth_buf=NULL;
+
+  GrDel(base);
+  LBts(&amp;mp.done_flags,Gs-&gt;num);
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> BSPFlightSim(GrBitMap *base)
+{
+  </span><span class="cBLUE">F8</span><span class="cBLACK"> t0,last_t;
+  </span><span class="cBLUE">I8</span><span class="cBLACK">  i,xx,yy,height,
+      cx=Fs-&gt;win_pixel_width&gt;&gt;1,
+      cy=Fs-&gt;win_pixel_height&gt;&gt;1;
+
+  t0=tNP;
+  MemSet(panels_processed_bitmap,0,</span><span class="cLTGRAY">(</span><span class="cBLACK">num_panels+7</span><span class="cLTGRAY">)</span><span class="cBLACK">&gt;&gt;3);
+  MemSet(mp.update_done_t,0,</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLUE">F8</span><span class="cLTGRAY">)</span><span class="cBLACK">*MP_MAX_PROCESSORS);
+  base-&gt;color=LTCYAN;
+  GrRect(base,0,0,base-&gt;width,base-&gt;height);
+  GrDepthBufReset(base);
+
+  </span><span class="cGREEN">//Signal all cores to start update</span><span class="cBLACK">
+  mp.do_update=1&lt;&lt;mp.mp_cnt-1-1;
+
+  xx=x/(MAP_SCALE*COORDINATE_SCALE);
+  yy=y/(MAP_SCALE*COORDINATE_SCALE);
+  height=z/COORDINATE_SCALE-elevations[yy][xx];
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (height&lt;0) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (!crashed) {
+      music_mute=1;
+      Snd(1000); </span><span class="cGREEN">//Signal plane crashed</span><span class="cBLACK">
+      crashed=TRUE;
+    }
+  </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (crashed) {
+      Snd(0);
+      music_mute=0;
+      crashed=FALSE;
+    }
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+
+  </span><span class="cGREEN">//Wait for all cores to start</span><span class="cBLACK">
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (mp.do_update)
+    Yield;
+
+  MPDrawIt(Fs,base);
+
+  </span><span class="cGREEN">//Wait for all cores to complete.</span><span class="cBLACK">
+  LBts(&amp;Fs-&gt;task_flags,TASKf_IDLE);
+  </span><span class="cBLUE">for</span><span class="cBLACK"> (i=1;i&lt;mp.mp_cnt;i++)
+    </span><span class="cBLUE">while</span><span class="cBLACK"> (!mp.update_done_t[i])
+      Yield;
+  LBtr(&amp;Fs-&gt;task_flags,TASKf_IDLE);
+
+  base-&gt;pen_width=2;
+  base-&gt;color=BLACK;
+  base-&gt;flags&amp;=~BMF_TRANSFORMATION;
+  GrLine3(base,cx+5,cy,0,cx-5,cy,0);
+  GrLine3(base,cx,cy+5,0,cx,cy-5,0);
+  GrPrintF(base,0,0,</span><span class="cBROWN">"Theta1:%5.1f Phi:%5.1f Theta2:%5.1f Box:%5.1f"</span><span class="cBLACK">,
+      theta1*180/pi,phi*180/pi,theta2*180/pi,v_grid_size);
+  GrPrintF(base,0,FONT_HEIGHT,</span><span class="cBROWN">"x:%5.1f y:%5.1f z:%5.1f height:%3d"</span><span class="cBLACK">,
+      ToF8</span><span class="cLTGRAY">(</span><span class="cBLACK">x</span><span class="cLTGRAY">)</span><span class="cBLACK">/COORDINATE_SCALE,ToF8</span><span class="cLTGRAY">(</span><span class="cBLACK">y</span><span class="cLTGRAY">)</span><span class="cBLACK">/COORDINATE_SCALE,ToF8</span><span class="cLTGRAY">(</span><span class="cBLACK">z</span><span class="cLTGRAY">)</span><span class="cBLACK">/COORDINATE_SCALE,
+      height);
+
+  last_t=mp.update_done_t[0];
+  </span><span class="cBLUE">for</span><span class="cBLACK"> (i=1;i&lt;mp.mp_cnt;i++)
+    last_t=Max(last_t,mp.update_done_t[i]);
+
+  </span><span class="cGREEN">//Adjust size of updated grid.</span><span class="cBLACK">
+  v_grid_size  *=0.90+0.10*(0.65/Fs-&gt;win_max_refresh)/(last_t-t0);
+  </span><span class="cGREEN">//Regulate how much grid expands in the distance.</span><span class="cBLACK">
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (mp.mp_cnt&gt;1)
+    span_factor*=0.90+0.10*(mp.update_done_t[mp.mp_cnt-1]-t0)/(mp.update_done_t[0]-t0);
+
+  WinSync;
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> AnimateTask(</span><span class="cBLUE">U8</span><span class="cBLACK"> dummy=0)
+{
+  </span><span class="cBLUE">nounusedwarn</span><span class="cBLACK"> dummy;
+</span><span class="cGREEN">//This just steadily moves the airplane forward.</span><span class="cBLACK">
+  </span><span class="cBLUE">I8</span><span class="cBLACK"> *s2w,x1,y1,z1;
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (TRUE) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+  </span><span class="cGREEN">//Screen to world coordinates</span><span class="cBLACK">
+    s2w=GrIdent;
+    GrRotZEqu(s2w,-theta1);
+    GrRotXEqu(s2w,-phi);
+    GrRotZEqu(s2w,-theta2);
+    x1=0;y1=0;z1=-speed*COORDINATE_SCALE;
+    GrRot(s2w,&amp;x1,&amp;y1,&amp;z1);
+    x+=x1;
+    y+=y1;
+    z+=z1;
+    Free(s2w);
+    Sleep(1);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> MPEnd()
+{
+  mp.done_flags=0;
+  mp.app_done=TRUE;
+  </span><span class="cGREEN">//Wait for all cores to exit</span><span class="cBLACK">
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (mp.done_flags!=1&lt;&lt;mp.mp_cnt-1-1)
+    Yield;
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> TaskEndCB()
+{
+  MPEnd;
+  Exit;
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> SongTask(</span><span class="cBLUE">U8</span><span class="cBLACK"> dummy=0)
+{ </span><span class="cGREEN">//Song by Terry A. Davis</span><span class="cBLACK">
+  </span><span class="cBLUE">nounusedwarn</span><span class="cBLACK"> dummy;
+#</span><span class="cBLUE">ifstatic</span><span class="cBLACK">
+  Fs-&gt;task_end_cb=ExtFind(</span><span class="cBROWN">"SndTaskEndCB"</span><span class="cBLACK">);</span><span class="cGREEN">//(Cannot take address of an extern function.)</span><span class="cBLACK">
+#</span><span class="cBLUE">else</span><span class="cBLACK">
+  Fs-&gt;task_end_cb=&amp;SndTaskEndCB;
+#</span><span class="cBLUE">endif</span><span class="cBLACK">
+  MusicSettingsReset;
+  music_stacatto_factor=0.2;
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (TRUE) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    Play(</span><span class="cBROWN">"W13eBDEDBDEDFEEDFEED"</span><span class="cBLACK">);
+    Play(</span><span class="cBROWN">"BDEDBDEDFEEDFEED"</span><span class="cBLACK">);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> FlightSim(</span><span class="cBLUE">I8</span><span class="cBLACK"> _mp_cnt=MP_MAX_PROCESSORS)
+{
+  </span><span class="cBLUE">I8</span><span class="cBLACK"> i,ch,sc;
+  </span><span class="cBLUE">F8</span><span class="cBLACK"> pp,tt1,tt2;
+  main_base=GrNew(BMT_COLOR4,GR_WIDTH,GR_HEIGHT);
+
+  SettingsPush; </span><span class="cGREEN">//See </span><a href="/archive/code/TaskSettings.html"><span class="cRED">SettingsPush</span></a><span class="cBLACK">
+  </span><span class="cGREEN">//We really can't afford to run at 60Hz.</span><span class="cBLACK">      </span><span class="cGREEN">This is how often VGA</span><span class="cBLACK">
+  </span><span class="cGREEN">//memory is updated, not related to actual hardware refresh rates.</span><span class="cBLACK">
+
+  WordStat(OFF);
+  MenuPush(
+  </span><span class="cBROWN">"File {"</span><span class="cBLACK">
+  </span><span class="cBROWN">"  Abort(,CH_CTRLQ);"</span><span class="cBLACK">
+  </span><span class="cBROWN">"  Exit(,CH_ESC);"</span><span class="cBLACK">
+  </span><span class="cBROWN">"}"</span><span class="cBLACK">
+  </span><span class="cBROWN">"Play {"</span><span class="cBLACK">
+  </span><span class="cBROWN">"  Down(,,SC_CURSOR_UP);"</span><span class="cBLACK">
+  </span><span class="cBROWN">"  Up(,,SC_CURSOR_DOWN);"</span><span class="cBLACK">
+  </span><span class="cBROWN">"  Left(,,SC_CURSOR_LEFT);"</span><span class="cBLACK">
+  </span><span class="cBROWN">"  Right(,,SC_CURSOR_RIGHT);"</span><span class="cBLACK">
+      </span><span class="cBROWN">"}"</span><span class="cBLACK">
+      );
+  WinMax;
+  WinBorder(OFF);
+  </span><span class="cBLUE">coutln</span><span class="cBLACK"> </span><span class="cBROWN">"Initializing..."</span><span class="cBLACK">;
+  critical_section_flag=0;
+  Fs-&gt;song_task=Spawn(&amp;SongTask,NULL,</span><span class="cBROWN">"Song"</span><span class="cBLACK">,Fs);
+
+  MemSet(&amp;mp,0,</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">MPCtrl</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (_mp_cnt&lt;=mp_cnt)
+    mp.mp_cnt=_mp_cnt;
+  </span><span class="cBLUE">else</span><span class="cBLACK">
+    mp.mp_cnt=mp_cnt;
+  InitMap;
+
+  Fs-&gt;animate_task=Spawn(&amp;AnimateTask,NULL,</span><span class="cBROWN">"Animate"</span><span class="cBLACK">,Fs);
+
+  GrAllocDepthBuf(main_base);
+
+  Fs-&gt;win_max_refresh=30.0;
+
+  v_grid_size=64.0;
+  span_factor=1.0;
+  phi   =-90.0*pi/180.0;
+  theta1=  0.0*pi/180.0;
+  theta2=  0.0*pi/180.0;
+  speed =  2.5;
+
+  x=MAP_WIDTH&gt;&gt;1 *COORDINATE_SCALE*MAP_SCALE;
+  y=MAP_HEIGHT&gt;&gt;1*COORDINATE_SCALE*MAP_SCALE;
+  z=64           *COORDINATE_SCALE*MAP_SCALE;
+
+  </span><span class="cBLUE">for</span><span class="cBLACK"> (i=1;i&lt;mp.mp_cnt;i++)
+    MPSpawn(&amp;APFlightSimTask,Fs,</span><span class="cBROWN">"AP FlightSim"</span><span class="cBLACK">,1&lt;&lt;i);
+  Fs-&gt;task_end_cb=&amp;TaskEndCB;
+
+  Fs-&gt;update_win=&amp;UpdateWin;
+  </span><span class="cBLUE">try</span><span class="cBLACK"> </span><span class="cGREEN">//in case CTRL-ALT-C is pressed.</span><span class="cBLACK">
+    </span><span class="cBLUE">do</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (ScanKey</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;ch,&amp;sc</span><span class="cLTGRAY">)</span><span class="cBLACK">) {
+        pp=phi; tt1=theta1; tt2=theta2;
+        </span><span class="cBLUE">switch</span><span class="cBLACK"> (ch) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+          </span><span class="cBLUE">case</span><span class="cBLACK"> 0:
+            </span><span class="cBLUE">switch</span><span class="cBLACK"> (sc.u1[0]) {
+              </span><span class="cBLUE">case</span><span class="cBLACK"> SC_CURSOR_DOWN:
+                phi     +=-CONTROLS_SCALE*Cos(tt1);
+                theta2+=-CONTROLS_SCALE*Sin(tt1)*Sin(phi);
+                </span><span class="cBLUE">break</span><span class="cBLACK">;
+              </span><span class="cBLUE">case</span><span class="cBLACK"> SC_CURSOR_UP:
+                phi     -=-CONTROLS_SCALE*Cos(tt1);
+                theta2-=-CONTROLS_SCALE*Sin(tt1)*Sin(phi);
+                </span><span class="cBLUE">break</span><span class="cBLACK">;
+              </span><span class="cBLUE">case</span><span class="cBLACK"> SC_CURSOR_RIGHT:
+                theta1+=CONTROLS_SCALE;
+                </span><span class="cBLUE">break</span><span class="cBLACK">;
+              </span><span class="cBLUE">case</span><span class="cBLACK"> SC_CURSOR_LEFT:
+                theta1-=CONTROLS_SCALE;
+                </span><span class="cBLUE">break</span><span class="cBLACK">;
+            }
+            </span><span class="cBLUE">break</span><span class="cBLACK">;
+          </span><span class="cLTGRAY">}</span><span class="cBLACK">
+        theta1=Unwrap(theta1);
+        phi     =Unwrap(phi);
+        theta2=Unwrap(theta2);
+      } </span><span class="cBLUE">else</span><span class="cBLACK">
+        BSPFlightSim(main_base);
+    </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">while</span><span class="cBLACK"> (ch!=CH_CTRLQ &amp;&amp; ch!=CH_ESC);
+  </span><span class="cBLUE">catch</span><span class="cBLACK">
+    Fs-&gt;catch_except=TRUE;
+  SettingsPop;
+  MPEnd;
+  MenuPop;
+  PanelsDel;
+  GrDel(main_base);
+}
+
+FlightSim;
+</span></pre><div class="archive-note">Historical capture: 2010-06-13. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

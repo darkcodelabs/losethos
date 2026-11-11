@@ -1,0 +1,293 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="description"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="keywords"/>
+<meta content="LoseThos V6.19" name="generator"/>
+<style type="text/css">
+.cBLACK{color:rgb(0,0,0);}
+.cBLUE{color:rgb(0,0,168);}
+.cGREEN{color:rgb(0,168,0);}
+.cCYAN{color:rgb(0,168,168);}
+.cRED{color:rgb(168,0,0);}
+.cPURPLE{color:rgb(168,0,168);}
+.cBROWN{color:rgb(168,84,0);}
+.cLTGRAY{color:rgb(168,168,168);}
+.cDKGRAY{color:rgb(84,84,84);}
+.cLTBLUE{color:rgb(84,84,252);}
+.cLTGREEN{color:rgb(84,252,84);}
+.cLTCYAN{color:rgb(84,252,252);}
+.cLTRED{color:rgb(252,84,84);}
+.cLTPURPLE{color:rgb(252,84,252);}
+.cYELLOW{color:rgb(252,252,84);}
+.cWHITE{color:rgb(252,252,252);}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cPURPLE">                               <a href="/archive/doc/TrivialSolutions.html">Trivial Solutions</a>
+                    <a href="/archive/index.html">The LoseThos 64-bit PC Operating System</a>
+File:/LT/OSMain/OSMain.CPZ
+This, and all LoseThos files, are public domain.  Do whatever you like.
+God is watching; God is just; God is never out-done in generosity.  He talks!
+
+LoseThos code compiles with the 64-bit LoseThos compiler/assembler I wrote.
+Boot the LoseThos CD and you can compile it.  Not in Kansas anymore!
+
+<a href="/archive/code/FixedPoint.html">Click here for preliminary compiler information you need.</a>
+
+</span><a name="l1"></a><span class="cDKGRAY">Project: OSMain</span><span class="cBLACK">
+<a name="l2"></a>
+<a name="l3"></a></span><span class="cBLUE">U0</span><span class="cBLACK"> SysGlbls2Init()
+<a name="l4"></a>{
+<a name="l5"></a></span><span class="cGREEN">//Simple initializations go in </span><span class="cRED">SysGlblsInit</span><span class="cGREEN">.</span><span class="cBLACK">
+<a name="l6"></a>  </span><span class="cBLUE">I64</span><span class="cBLACK"> i,j;
+<a name="l7"></a>  </span><span class="cBLUE">U8</span><span class="cBLACK"> *m;
+<a name="l8"></a>
+<a name="l9"></a>  InDbg(ON);
+<a name="l10"></a>
+<a name="l11"></a>  reverse_bits_table=CAlloc(256);
+<a name="l12"></a>  </span><span class="cBLUE">for</span><span class="cBLACK"> (i=0;i&lt;256;i++)
+<a name="l13"></a>    </span><span class="cBLUE">for</span><span class="cBLACK"> (j=0;j&lt;8;j++)
+<a name="l14"></a>      </span><span class="cBLUE">if</span><span class="cBLACK"> (Bt</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;i,7-j</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+<a name="l15"></a>        LBts(reverse_bits_table+i,j);
+<a name="l16"></a>  set_bits_table=CAlloc(256);
+<a name="l17"></a>  </span><span class="cBLUE">for</span><span class="cBLACK"> (i=0;i&lt;256;i++)
+<a name="l18"></a>    </span><span class="cBLUE">for</span><span class="cBLACK"> (j=0;j&lt;8;j++)
+<a name="l19"></a>      </span><span class="cBLUE">if</span><span class="cBLACK"> (Bt</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;i,j</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+<a name="l20"></a>        set_bits_table[i]++;
+<a name="l21"></a>
+<a name="l22"></a>  ext=CAlloc(EXT_TABLE_SIZE*</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLUE">U0</span><span class="cBLACK"> *</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+<a name="l23"></a>  fp_ctrl_alt_let_cbs=CAlloc(26*</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLUE">U0</span><span class="cBLACK"> *</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+<a name="l24"></a>  ctrl_alt_let_descs=CAlloc(26*</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLUE">U8</span><span class="cBLACK"> *</span><span class="cLTGRAY">)</span><span class="cBLACK">);;
+<a name="l25"></a>  ctrl_alt_let_in_irq_flags=0;
+<a name="l26"></a>
+<a name="l27"></a>  StrCpy(sys_temp_filename,</span><span class="cBROWN">"HOME/Temp.TXZ"</span><span class="cBLACK">);
+<a name="l28"></a>  MemSet(&amp;sys_put_key_root,0,</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">KeyDevStruct</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+<a name="l29"></a>  sys_put_key_root.next=sys_put_key_root.last=&amp;sys_put_key_root;
+<a name="l30"></a>  KeyDevAdd(&amp;AKDInputFilterPutKey,&amp;AKDInputFilterPutS,0x40000000,FALSE);
+<a name="l31"></a>  KeyDevAdd(&amp;AKDTaskPutKey,&amp;AKDTaskPutS,0x50000000,TRUE);
+<a name="l32"></a>  KeyDevAdd(&amp;AKDRawDisplayPutKey,&amp;AKDRawDisplayPutS,0x60000000,FALSE);
+<a name="l33"></a>  #</span><span class="cBLUE">exe</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+<a name="l34"></a>    StreamPrintF(</span><span class="cBROWN">"sys_startup_acct=\"%s\";"</span><span class="cBLACK">,osmain_cfg-&gt;startup_acct);
+<a name="l35"></a>    StreamPrintF(</span><span class="cBROWN">"LTDCInit(%d);"</span><span class="cBLACK">,osmain_cfg-&gt;dsk_cache_size);
+<a name="l36"></a>  </span><span class="cLTGRAY">}</span><span class="cBLACK">;
+<a name="l37"></a>  pow10_I64=CAlloc(</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLUE">F64</span><span class="cLTGRAY">)</span><span class="cBLACK">*</span><span class="cLTGRAY">(</span><span class="cBLACK">308+308+1</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+<a name="l38"></a>  </span><span class="cBLUE">for</span><span class="cBLACK"> (i=-308;i&lt;309;i++)
+<a name="l39"></a>    pow10_I64[i+309]=Pow10(i);
+<a name="l40"></a>
+<a name="l41"></a></span><span class="cGREEN">//</span><span class="cDKGRAY">Independent Heap Ctrl Example</span><span class="cBLACK">
+<a name="l42"></a>  i=1; </span><span class="cGREEN">//Request 1 blk, we might get more.</span><span class="cBLACK">
+<a name="l43"></a>  m=AllocUncachedMemBlks(&amp;i,sys_code_bp);
+<a name="l44"></a>  sys_uncached_heap=IndependentHeapCtrlInit(m,i*0x200000/0x200);
+<a name="l45"></a>
+<a name="l46"></a>  </span><span class="cBLUE">for</span><span class="cBLACK"> (i=0;i&lt;NUM_PROGRESS_BARS;i++)
+<a name="l47"></a>    progress_descs[i]=AMAlloc(PROGRESS_DESC_LEN+1);
+<a name="l48"></a>  ProgressBarsReset;
+<a name="l49"></a>}
+<a name="l50"></a>
+<a name="l51"></a></span><span class="cBLUE">U0</span><span class="cBLACK"> SndInit()
+<a name="l52"></a>{
+<a name="l53"></a>  snd_dev=SD_PC_SPEAKER;
+<a name="l54"></a>  snd_vol=0.1;
+<a name="l55"></a>  snd_reverb_intensity=0.2;
+<a name="l56"></a>  snd_reverb_delay=0.3;
+<a name="l57"></a>  snd_record=FALSE;
+<a name="l58"></a>}
+<a name="l59"></a>
+<a name="l60"></a></span><span class="cBLUE">U0</span><span class="cBLACK"> GrInit()
+<a name="l61"></a>{
+<a name="l62"></a></span><span class="cGREEN">//See </span><a href="/archive/code/OSStartUp.html#l137"><span class="cRED">SYS_GR_MODE</span></a><span class="cBLACK">
+<a name="l63"></a></span><span class="cGREEN">//See </span><a href="/archive/code/GrConfig.html#l1"><span class="cRED">::/LT/Adam/Gr/GrConfig.APZ</span></a><span class="cBLACK">
+<a name="l64"></a>
+<a name="l65"></a>  sys_dc_col=0;
+<a name="l66"></a>  sys_dc_flags=0;
+<a name="l67"></a>  gr_font=sys_font_8x8;
+<a name="l68"></a>  </span><span class="cBLUE">if</span><span class="cBLACK"> (gr_mode==0x12) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+<a name="l69"></a>    text_mode=FALSE;
+<a name="l70"></a>    gr_width =640;
+<a name="l71"></a>    gr_height=480;
+<a name="l72"></a>    text_cols=gr_width/FONT_WIDTH;
+<a name="l73"></a>    text_rows=gr_height/FONT_HEIGHT;
+<a name="l74"></a>    OutU8(VGA_SC_INDEX,VGA_MAP_MASK);
+<a name="l75"></a>    OutU8(VGA_SC_DATA,0x0F);
+<a name="l76"></a>    MemSet(VGA_GRAPHIC_MEM_BASE,0,gr_width*gr_height&gt;&gt;3);
+<a name="l77"></a>    sys_dc_screen_image=CAlloc(gr_width*gr_height/8);
+<a name="l78"></a>  </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+<a name="l79"></a>    text_mode=TRUE;
+<a name="l80"></a>    gr_width =640;
+<a name="l81"></a>    gr_height=480;
+<a name="l82"></a>    text_cols=80;
+<a name="l83"></a>    text_rows=25;
+<a name="l84"></a>    MemSet(VGA_TEXT_MEM_BASE,0,text_rows*text_cols&lt;&lt;1);
+<a name="l85"></a>  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+<a name="l86"></a>}
+<a name="l87"></a>
+<a name="l88"></a>
+<a name="l89"></a></span><span class="cBLUE">U0</span><span class="cBLACK"> TimersInit()
+<a name="l90"></a>{
+<a name="l91"></a>  </span><span class="cBLUE">U64</span><span class="cBLACK"> i,*qq;
+<a name="l92"></a>  </span><span class="cBLUE">U32</span><span class="cBLACK"> *dd;
+<a name="l93"></a>
+<a name="l94"></a>  OutU8(0x43,0x34);
+<a name="l95"></a>  OutU8(0x40,SYS_TIMER0_PERIOD);
+<a name="l96"></a>  OutU8(0x40,SYS_TIMER0_PERIOD&gt;&gt;8);
+<a name="l97"></a>
+<a name="l98"></a></span><span class="cGREEN">// High Precision Event Timer</span><span class="cBLACK">
+<a name="l99"></a>
+<a name="l100"></a>  </span><span class="cBLUE">if</span><span class="cBLACK"> (PCIReadU16</span><span class="cLTGRAY">(</span><span class="cBLACK">0,31,0,0</span><span class="cLTGRAY">)</span><span class="cBLACK">==0x8086) </span><span class="cLTGRAY">{</span><span class="cBLACK"> </span><span class="cGREEN">//Intel?</span><span class="cBLACK">
+<a name="l101"></a>    </span><span class="cGREEN">//D31 F0, config 0xF0=RCBA of PCI-LPC Bridge</span><span class="cBLACK">
+<a name="l102"></a>    dd=PCIReadU32(0,31,0,0xF0)&gt;&lt;(</span><span class="cBLUE">U8</span><span class="cBLACK"> *)&amp;~0x3FFF+0x3404; </span><span class="cGREEN">//HPET config</span><span class="cBLACK">
+<a name="l103"></a>  </span><span class="cGREEN">//7</span><span class="cBLACK">   </span><span class="cGREEN">enable</span><span class="cBLACK">
+<a name="l104"></a>  </span><span class="cGREEN">//1:0 HPET is at 0xFED00000,0xFED01000, 0xFED02000 or 0xFED03000.</span><span class="cBLACK">
+<a name="l105"></a>    *dd=*dd&amp;3|0x80;
+<a name="l106"></a>  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+<a name="l107"></a>
+<a name="l108"></a>  qq=HPET_GCAP_ID;
+<a name="l109"></a>  i=*qq; </span><span class="cGREEN">//i.u32[1]= period in femtoS (10e-15)</span><span class="cBLACK">
+<a name="l110"></a>  </span><span class="cBLUE">if</span><span class="cBLACK"> (100000&lt;i.u32[1]&lt;1000000000) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+<a name="l111"></a>    HPET_freq    =1000000000000000/i.u32[1];
+<a name="l112"></a>    HPET_kHz_freq=1000000000000/i.u32[1];
+<a name="l113"></a>    qq=HPET_GEN_CONF;
+<a name="l114"></a>    *qq|=1; </span><span class="cGREEN">//Enable counting</span><span class="cBLACK">
+<a name="l115"></a>  </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+<a name="l116"></a>    HPET_freq=0;
+<a name="l117"></a>    HPET_kHz_freq=0;
+<a name="l118"></a>  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+<a name="l119"></a>}
+<a name="l120"></a>
+<a name="l121"></a></span><span class="cBLUE">U0</span><span class="cBLACK"> IntsInit()
+<a name="l122"></a>{
+<a name="l123"></a></span><span class="cGREEN">//Init 8259</span><span class="cBLACK">
+<a name="l124"></a>  OutU8(0x20,0x11); </span><span class="cGREEN">//IW1</span><span class="cBLACK">
+<a name="l125"></a>  OutU8(0xA0,0x11); </span><span class="cGREEN">//IW1</span><span class="cBLACK">
+<a name="l126"></a>  PortNop;
+<a name="l127"></a>  OutU8(0x21,0x20); </span><span class="cGREEN">//IW2</span><span class="cBLACK">
+<a name="l128"></a>  OutU8(0xA1,0x28); </span><span class="cGREEN">//IW2</span><span class="cBLACK">
+<a name="l129"></a>  PortNop;
+<a name="l130"></a>  OutU8(0x21,0x04); </span><span class="cGREEN">//IW3</span><span class="cBLACK">
+<a name="l131"></a>  OutU8(0xA1,0x02); </span><span class="cGREEN">//IW3</span><span class="cBLACK">
+<a name="l132"></a>  PortNop;
+<a name="l133"></a>  OutU8(0x21,0x0D); </span><span class="cGREEN">//IW4</span><span class="cBLACK">
+<a name="l134"></a>  OutU8(0xA1,0x09); </span><span class="cGREEN">//IW4</span><span class="cBLACK">
+<a name="l135"></a>  PortNop;
+<a name="l136"></a>  OutU8(0x21,0xFA); </span><span class="cGREEN">//Mask all but IRQ0 (timer) and IRQ2 Cascade</span><span class="cBLACK">
+<a name="l137"></a>  OutU8(0xA1,0xFF);
+<a name="l138"></a>  PortNop;
+<a name="l139"></a>}
+<a name="l140"></a>
+<a name="l141"></a></span><span class="cBLUE">U0</span><span class="cBLACK"> Reboot()
+<a name="l142"></a>{
+<a name="l143"></a>  </span><span class="cBLUE">U16</span><span class="cBLACK"> *d=0x472;
+<a name="l144"></a>  Cli;
+<a name="l145"></a>  </span><span class="cBLUE">if</span><span class="cBLACK"> (mp_cnt&gt;1)
+<a name="l146"></a>    MPHalt;
+<a name="l147"></a>  MemMarkPresent(d,TRUE);
+<a name="l148"></a>  *d=0;
+<a name="l149"></a>  OutU8(0x70,0x8F);
+<a name="l150"></a>  OutU8(0x71,0x00);
+<a name="l151"></a>  OutU8(0x70,0x00);
+<a name="l152"></a>  OutU8(0x92,InU8</span><span class="cLTGRAY">(</span><span class="cBLACK">0x92</span><span class="cLTGRAY">)</span><span class="cBLACK">|1);
+<a name="l153"></a>  SysHlt;
+<a name="l154"></a>}
+<a name="l155"></a>
+<a name="l156"></a></span><span class="cBLUE">U0</span><span class="cBLACK"> OSMain()
+<a name="l157"></a>{ </span><span class="cGREEN">//Continued from </span><a href="/archive/code/OSStartUp.html#l470"><span class="cRED">OSMain</span></a><span class="cBLACK">
+<a name="l158"></a>  adam_task=Fs;
+<a name="l159"></a>  HeapsInit;
+<a name="l160"></a>  LBts(&amp;sys_run_level,RLf_FULL_HEAP);
+<a name="l161"></a>  Fs-&gt;hash_table=HashTableNew(ADAM_HASH_SIZE,Fs);
+<a name="l162"></a>
+<a name="l163"></a>  SysGlblsInit;
+<a name="l164"></a>  SysGlbls2Init;
+<a name="l165"></a>  Mem32BitDevInit;
+<a name="l166"></a>  MemMarkPagesNotPresent;
+<a name="l167"></a>  LoadOSMainHeader;
+<a name="l168"></a>  GrInit;
+<a name="l169"></a>  SndInit;
+<a name="l170"></a>  StrCpy(Fs-&gt;task_name,</span><span class="cBROWN">"Adam Task CPU#0"</span><span class="cBLACK">);
+<a name="l171"></a>  StrCpy(Fs-&gt;task_title,Fs-&gt;task_name);
+<a name="l172"></a>  Fs-&gt;text_attr=WHITE&lt;&lt;4+PURPLE;
+<a name="l173"></a>  Fs-&gt;border_attr=WHITE&lt;&lt;4+LTPURPLE;
+<a name="l174"></a>  Fs-&gt;win_right=text_cols-2;
+<a name="l175"></a>  Fs-&gt;win_top++;
+<a name="l176"></a>  TaskDerivedValsUpdate;
+<a name="l177"></a>
+<a name="l178"></a>  LoadSysStrs;
+<a name="l179"></a>  MPInit;
+<a name="l180"></a>  IDTInit;
+<a name="l181"></a>
+<a name="l182"></a></span><span class="cGREEN">//Before this point use </span><a href="/archive/code/Misc1a.html#l346"><span class="cRED">Snd</span></a><span class="cGREEN">() and </span><a href="/archive/code/Misc1a.html#l257"><span class="cRED">BusyWait</span></a><span class="cGREEN">()</span><span class="cBLACK">
+<a name="l183"></a></span><span class="cGREEN">//to debug.  After this point, use </span><a href="/archive/code/Dbg1a.html#l181"><span class="cRED">DbgNum</span></a><span class="cGREEN">()</span><span class="cBLACK">
+<a name="l184"></a>  LBts(&amp;sys_run_level,RLf_RAW);
+<a name="l185"></a>
+<a name="l186"></a>  </span><span class="cBLUE">if</span><span class="cBLACK"> (BIOSTotalMem&lt;500*0x100000)
+<a name="l187"></a>    Dbg(</span><span class="cBROWN">"Requires 512 Meg of RAM Memory"</span><span class="cBLACK">);
+<a name="l188"></a>
+<a name="l189"></a>  TimersInit;
+<a name="l190"></a>  IntsInit;
+<a name="l191"></a>
+<a name="l192"></a>  </span><span class="cBLUE">coutln</span><span class="cBLACK"> </span><span class="cBROWN">"Enable IRQ's"</span><span class="cBLACK">;
+<a name="l193"></a>  SetFlags(SYS_NORMAL_RFLAGS);
+<a name="l194"></a>  LBts(&amp;sys_run_level,RLf_INTERRUPTS);
+<a name="l195"></a>
+<a name="l196"></a>  TimeStampFreqCal;
+<a name="l197"></a>
+<a name="l198"></a>  Preempt(ON);
+<a name="l199"></a>
+<a name="l200"></a>#</span><span class="cBLUE">exe</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+<a name="l201"></a>  </span><span class="cBLUE">if</span><span class="cBLACK"> (!osmain_cfg-&gt;opts[CFG_NO_MP])
+<a name="l202"></a>    StreamPutS(</span><span class="cBROWN">"coutln \"MultiCore Start\";"</span><span class="cBLACK">
+<a name="l203"></a>               </span><span class="cBROWN">"MPStart;"</span><span class="cBLACK">);
+<a name="l204"></a></span><span class="cLTGRAY">}</span><span class="cBLACK">;
+<a name="l205"></a>  LBts(&amp;sys_run_level,RLf_MP);
+<a name="l206"></a>
+<a name="l207"></a></span><span class="cGREEN">//  USBInitAll;</span><span class="cBLACK">
+<a name="l208"></a>
+<a name="l209"></a>  KbdMouseVarsInit;
+<a name="l210"></a>  IPVarsInit;
+<a name="l211"></a>  KbdInit;
+<a name="l212"></a>
+<a name="l213"></a>  </span><span class="cGREEN">//Just call directly if debugging</span><span class="cBLACK">
+<a name="l214"></a>  </span><span class="cGREEN">//MouseDriverInstall;</span><span class="cBLACK">
+<a name="l215"></a>  </span><span class="cBLUE">if</span><span class="cBLACK"> (mp_cnt&gt;1)
+<a name="l216"></a>    MPSpawn(&amp;MouseDriverInstall);
+<a name="l217"></a>  </span><span class="cBLUE">else</span><span class="cBLACK">
+<a name="l218"></a>    Spawn(&amp;MouseDriverInstall);
+<a name="l219"></a>
+<a name="l220"></a>  </span><span class="cBLUE">coutln</span><span class="cBLACK"> </span><span class="cBROWN">"BlkDevsInitAll"</span><span class="cBLACK">;
+<a name="l221"></a>  BlkDevsInitAll;
+<a name="l222"></a>  </span><span class="cBLUE">coutln</span><span class="cBLACK"> </span><span class="cBROWN">"BlkDevsInitAll Done"</span><span class="cBLACK">;
+<a name="l223"></a>#</span><span class="cBLUE">exe</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+<a name="l224"></a>  </span><span class="cBLUE">if</span><span class="cBLACK"> (osmain_cfg-&gt;cdrom_ports_pmt)
+<a name="l225"></a>    StreamPutS(</span><span class="cBROWN">"if (boot_drv_pmt) PutDefine(\"ST_CDROM_PORTS_PMT\");"</span><span class="cBLACK">);
+<a name="l226"></a></span><span class="cLTGRAY">}</span><span class="cBLACK">;
+<a name="l227"></a>  DrvDftSelect;
+<a name="l228"></a>  HomeDirReset;
+<a name="l229"></a>  LBts(&amp;sys_run_level,RLf_DSK);
+<a name="l230"></a>
+<a name="l231"></a>  </span><span class="cBLUE">coutln</span><span class="cBLACK"> </span><span class="cBROWN">"Loading Compiler"</span><span class="cBLACK">;
+<a name="l232"></a>  Cd(</span><span class="cBROWN">"/LT/Compiler"</span><span class="cBLACK">);
+<a name="l233"></a>  Load(</span><span class="cBROWN">"Compiler"</span><span class="cBLACK">,LDF_SILENT);
+<a name="l234"></a>  time_stamp_freq_initial=TimeStampFreqCal;
+<a name="l235"></a>  InDbg(OFF);
+<a name="l236"></a>  LBts(&amp;sys_run_level,RLf_COMPILER);
+<a name="l237"></a>
+<a name="l238"></a>  </span><span class="cBLUE">coutln</span><span class="cBLACK"> </span><span class="cBROWN">"Loading OSMain2"</span><span class="cBLACK">;
+<a name="l239"></a>  Cd(</span><span class="cBROWN">"/LT/OSMain2"</span><span class="cBLACK">);
+<a name="l240"></a>  </span><span class="cGREEN">//This runs the start-up scripts.</span><span class="cBLACK">
+<a name="l241"></a>  </span><span class="cGREEN">//See </span><span class="cRED">OSMain2</span><span class="cGREEN">().</span><span class="cBLACK">
+<a name="l242"></a>  Load(</span><span class="cBROWN">"OSMain2"</span><span class="cBLACK">,LDF_SILENT);
+<a name="l243"></a>
+<a name="l244"></a>  LBts(&amp;sys_run_level,RLf_ADAM_SERVER);
+<a name="l245"></a>  ServantTaskCont; </span><span class="cGREEN">//Never to return</span><span class="cBLACK">
+<a name="l246"></a>}
+<a name="l247"></a>
+<a name="l248"></a></span><span class="cBLUE">asm</span><span class="cBLACK"> {   </span><span class="cBLUE">ALIGN</span><span class="cBLACK">   16,OC_NOP
+<a name="l249"></a>SYS_OSMAIN_END::}
+</span></pre><div class="archive-note">Historical capture: 2010-11-23. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

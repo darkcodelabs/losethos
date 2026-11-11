@@ -1,0 +1,57 @@
+:root{color-scheme:light;font-family:monospace;color:#000;background:#fcfcfc}*{box-sizing:border-box}body{margin:0}a{color:#0000a8}button{font:inherit;padding:.65em 1em;border:2px outset #ddd;background:#eee;color:#000;cursor:pointer}button:disabled{cursor:default;color:#777}button:focus-visible,a:focus-visible{outline:3px solid #a85400;outline-offset:3px}.memorial{font:14px/1.5 monospace;border-bottom:2px solid #0000a8;padding:12px 20px;background:#eee;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.memorial p{margin:0}.power{display:inline-block;background:#0000a8;color:white;padding:10px 18px;text-decoration:none;border:2px outset #888}.machine{max-width:900px;margin:auto;padding:24px;line-height:1.5}.machine h1{color:#0000a8}canvas{background:black;width:100%;max-width:800px;image-rendering:pixelated;outline:1px solid #aaa}canvas:focus{outline:3px solid #0000a8}canvas:fullscreen{width:100%;height:100%;object-fit:contain;background:#000}pre{white-space:pre-wrap;overflow-wrap:anywhere}footer{margin-top:32px;border-top:1px solid #aaa;padding-top:16px}.lineage{padding:20px;max-width:1000px;font:14px/1.7 monospace}.archive-note{padding:12px;background:#eee;font:14px/1.5 monospace}#log{max-height:240px;overflow:auto;font-size:12px}@media(max-width:600px){.machine{padding:16px}}
+
+body>pre{max-width:100%;overflow-x:auto}
+
+/* Added browser computer windows; historical page styles stay separate. */
+.boot-desktop{padding:12px;background:#fff;color:#000080;font:bold 15px/1.45 "Courier New",Courier,monospace}
+.boot-desktop .desktop{display:grid;grid-template-columns:350px minmax(0,1fr);gap:12px;max-width:1500px;margin:auto;align-items:start}
+.boot-desktop .window{min-width:0;background:#fff;border:3px double #000080}
+.boot-desktop .titlebar{background:#000080;color:#fff;text-align:center;padding:1px 4px;overflow-wrap:anywhere}
+.boot-desktop .content{padding:12px}
+.boot-desktop .power{width:100%;background:#000080;color:#fff;border:2px solid #000080;padding:14px 12px;text-align:left;font-size:20px;font-weight:bold}
+.boot-desktop .power:hover:not(:disabled){background:#0000cc}
+.boot-desktop .power:disabled{opacity:.6}
+.boot-desktop .subtitle{color:#000;margin:12px 0 18px}
+.boot-desktop .links{display:flex;flex-direction:column;align-items:start;gap:13px}
+.boot-desktop .links a{color:#0000ee;font-size:16px}
+.boot-desktop .links a:visited{color:purple}
+.boot-desktop .meta{margin-top:22px;font-size:13px}
+.boot-desktop .comment,.boot-desktop .help{color:#008000}
+.boot-desktop .warning{color:#800000}
+.boot-desktop .computer .content{padding:4px}
+.boot-desktop canvas{display:block;width:100%;max-width:none;height:auto;aspect-ratio:4/3;border:1px solid #000080;outline:none}
+.boot-desktop canvas:fullscreen{height:100%;border:0}
+.boot-desktop .controls{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.boot-desktop .controls button{color:#000080;background:#fff;border:2px outset #b0b0b0;padding:4px 8px;min-height:29px}
+.boot-desktop .controls button:hover:not(:disabled){background:#ddddff}
+.boot-desktop .controls button:active:not(:disabled){border-style:inset}
+.boot-desktop .controls button:disabled{color:#888}
+.boot-desktop :is(button,a,canvas,summary):focus-visible{outline:2px dashed #800000;outline-offset:2px}
+.boot-desktop .statusline{margin-top:8px;border-top:2px solid #000080;padding-top:5px;font-size:13px}
+.boot-desktop .bootlog{margin-top:10px;font-size:12px;border-top:1px solid #000080;padding-top:6px}
+.boot-desktop summary{cursor:pointer}
+.boot-desktop #log{margin:8px 0 0;padding:8px;border:1px solid #000080;max-height:160px;font:12px/1.4 "Courier New",Courier,monospace}
+.boot-desktop .help{margin:10px 0 0;font-size:12px;line-height:1.5}
+@media(max-width:850px){.boot-desktop .desktop{grid-template-columns:1fr}}
+@media(max-width:480px){.boot-desktop{padding:5px;font-size:13px}.boot-desktop .content{padding:8px}}
+
+.boot-desktop #touch-controls{margin-top:8px;border-top:1px solid #000080;padding-top:6px}
+.boot-desktop #touch-pad{position:relative;touch-action:none;user-select:none;min-height:100px;margin-top:8px;padding:12px;border:3px double #000080;background:#f0f0ff;text-align:center}
+.boot-desktop #keyboard-panel{margin-top:10px}
+.boot-desktop #keyboard-input{display:block;width:100%;font:inherit;color:#000080;border:1px solid #000080;background:#fff;font-size:16px}
+.boot-desktop #touch-controls button{touch-action:none;min-height:44px}
+.boot-desktop button[aria-pressed="true"]{background:#000080;color:#fff}
+@media(pointer:fine){.boot-desktop #touch-controls{display:none}}
+
+/* Keep the computer controls usable inside mobile fullscreen. */
+.boot-desktop .navigation-keys{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-top:6px}
+.boot-desktop .navigation-keys button{padding:8px 3px;min-height:44px;color:#000080;background:#fff;border:2px outset #b0b0b0;touch-action:manipulation}
+.boot-desktop .mouse-buttons button{flex:1}
+.boot-desktop #touch-pad{min-height:72px;padding:10px;font-size:12px}
+.boot-desktop #power-screen{background:#000080;color:white}
+.boot-desktop .computer:fullscreen{height:100dvh;overflow:auto;background:#fff;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+.boot-desktop .computer:fullscreen canvas{max-height:56dvh;object-fit:contain;background:#000}
+.boot-desktop .computer:fullscreen .help,.boot-desktop .computer:fullscreen .bootlog,.boot-desktop .computer:fullscreen #install-app{display:none}
+.boot-desktop .computer:fullscreen .statusline{margin:5px 0;font-size:11px}
+@media(pointer:coarse){.boot-desktop .computer-toolbar button{min-height:44px;flex:1;padding:5px;font-size:12px}.boot-desktop #touch-controls{margin-top:5px;padding-top:5px}.boot-desktop .controls{margin-top:5px}.boot-desktop .computer .help{font-size:11px}}
+@media(orientation:landscape) and (pointer:coarse){.boot-desktop .computer:fullscreen .content{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:5px}.boot-desktop .computer:fullscreen canvas{grid-column:1;grid-row:1 / span 3;height:calc(100dvh - 45px);max-height:none}.boot-desktop .computer:fullscreen .computer-toolbar,.boot-desktop .computer:fullscreen #touch-controls,.boot-desktop .computer:fullscreen .statusline{grid-column:2}.boot-desktop .computer:fullscreen #touch-pad{min-height:55px}}

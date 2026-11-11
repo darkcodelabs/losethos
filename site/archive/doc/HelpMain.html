@@ -1,0 +1,218 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V7.07" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<a name="l1"></a><span class="cF0">                         </span><span class="cF5">The LoseThos Operating System</span><span class="cF0">
+<a name="l2"></a>                               </span><a href="/archive/doc/TrivialSolutions.html#l1"><span class="cF4">Trivial Solutions</span></a><span class="cF0">
+<a name="l3"></a>
+<a name="l4"></a></span><span class="cF4">Quick start--Command Line Usage</span><span class="cF0">
+<a name="l5"></a>
+<a name="l6"></a></span><a href="/archive/doc/Welcome.html#l1"><span class="cF4">Welcome</span></a><span class="cF0">
+<a name="l7"></a></span><a href="/archive/doc/Features.html#l1"><span class="cF4">Features</span></a><span class="cF0">
+<a name="l8"></a></span><a href="/archive/doc/Constitution.html#l1"><span class="cF4">LoseThos Constitution</span></a><span class="cF0">
+<a name="l9"></a></span><a href="/archive/doc/Strategy.html#l1"><span class="cF4">Strategic Decisions</span></a><span class="cF0">
+<a name="l10"></a></span><a href="/archive/doc/Requirements.html#l1"><span class="cF4">Requirements</span></a><span class="cF0">
+<a name="l11"></a></span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/doc/Mysteries.html#l1"><span class="cF4">Mysteries Explained</span></a><span class="cF0">
+<a name="l12"></a></span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/doc/Confuse.html#l1"><span class="cF4">Clearing Confusions</span></a><span class="cF0">
+<a name="l13"></a></span><a href="/archive/doc/Bugs.html#l1"><span class="cF4">Bug Stat</span></a><span class="cF0">
+<a name="l14"></a></span><a href="/archive/doc/ChangeLog.html#l1"><span class="cF4">ChangeLog</span></a><span class="cF0">
+<a name="l15"></a></span><a href="/archive/doc/Differences.html#l1"><span class="cF4">Differences from C/C++</span></a><span class="cF0">
+<a name="l16"></a></span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/doc/Directives.html#l1"><span class="cF4">Compiler Directives</span></a><span class="cF0">
+<a name="l17"></a></span><a href="/archive/doc/HelpIndex.html#l1"><span class="cF4">Help Index</span></a><span class="cF0">
+<a name="l18"></a></span><a href="/archive/doc/DemoIndex.html#l1"><span class="cF4">Demo Index</span></a><span class="cF0">
+<a name="l19"></a>        
+<a name="l20"></a></span><span class="cF5">-] Level 1: USER HELP</span><span class="cF0">
+<a name="l21"></a>  
+<a name="l22"></a>  </span><span class="cF5">-] Keyboard Ctrls</span><span class="cF0">
+<a name="l23"></a>    </span><span class="cF9">Enter</span><span class="cF0">       Right-click menu
+<a name="l24"></a>    </span><span class="cF9">Space Bar</span><span class="cF0">   Edit (view)
+<a name="l25"></a>    </span><span class="cF9">Esc</span><span class="cF0">         Save and exit
+<a name="l26"></a>    </span><span class="cF9">Shift-Esc</span><span class="cF0">   Abort
+<a name="l27"></a>    </span><span class="cF9">Windows Key</span><span class="cF0"> Personal Menu
+<a name="l28"></a>    </span><span class="cF9">Shift-Windows </span><span class="cF0">Pull-down Menu
+<a name="l29"></a>    
+<a name="l30"></a>    Other keys: </span><span class="cF9">Key Map</span><span class="cF0">
+<a name="l31"></a>    
+<a name="l32"></a>  </span><span class="cF5">-] Mouse Ctrls</span><span class="cF0">
+<a name="l33"></a>    </span><span class="cF9">Right-Click</span><span class="cF0"> Right-click menu
+<a name="l34"></a>    </span><span class="cF9">Left-Click</span><span class="cF0">  Edit (view)
+<a name="l35"></a>    </span><span class="cF9">Double-Left</span><span class="cF0"> Save and exit
+<a name="l36"></a>    </span><span class="cF9">Double-Right</span><span class="cF0"> Abort
+<a name="l37"></a>    </span><span class="cF9">Top of Screen</span><span class="cF0"> Pull-down menu
+<a name="l38"></a>  
+<a name="l39"></a>  </span><span class="cF4">Typical Cmd Line</span><span class="cF0">
+<a name="l40"></a>  </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/doc/Glossary.html#l1"><span class="cF4">Glossary</span></a><span class="cF0">
+<a name="l41"></a>  </span><a href="/archive/doc/LTZ.html#l1"><span class="cF4">LTZ Window's Utility</span></a><span class="cF0">
+<a name="l42"></a>  </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/doc/Tips.html#l1"><span class="cF4">Tips on Using LoseThos</span></a><span class="cF0">
+<a name="l43"></a>  </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/doc/Quirks.html#l1"><span class="cF4">LoseThos Quirks</span></a><span class="cF0">
+<a name="l44"></a>  
+<a name="l45"></a>  </span><span class="cF3"></span><span class="cF2">/* Graphics Not Rendered in HTML */</span><span class="cF0">   This button on the wall paper
+<a name="l46"></a>        starts a terminal window.
+<a name="l47"></a>  
+<a name="l48"></a>  </span><span class="cF5">-] DIRECTORY STRUCTURE</span><span class="cF0">
+<a name="l49"></a>    </span><span class="cF2">/LT/Accts</span><span class="cF0"> Each subdirectory is an acct.  When you boot, you can select an 
+<a name="l50"></a>    acct to login to, unless you compile OSMain soas to pick one.  Your acct 
+<a name="l51"></a>    directory is your </span><span class="cF2">HOME</span><span class="cF0"> directory and all your user data should be placed in 
+<a name="l52"></a>    here to ease backing-up your data.  When you Install an application it will 
+<a name="l53"></a>    create a subdirectory of your </span><span class="cF2">HOME</span><span class="cF0"> directory for storage.
+<a name="l54"></a>    
+<a name="l55"></a>    </span><span class="cF2">/LT/Apps</span><span class="cF0"> Applications are placed in subdirectories of </span><span class="cF2">/LT/Apps</span><span class="cF0">.  
+<a name="l56"></a>    Applications should have a file called </span><span class="cF2">Install.CPZ</span><span class="cF0"> which will install the 
+<a name="l57"></a>    app for the current user acct.  The file, </span><span class="cF2">Load.CPZ</span><span class="cF0"> will load the application 
+<a name="l58"></a>    into mem.  The file, </span><span class="cF2">Run.CPZ</span><span class="cF0">, will usually load and execute the app.  To add 
+<a name="l59"></a>    an app to your personal menu, use </span><span class="cF2">&lt;CTRL-L&gt;</span><span class="cF0">, insert a macro with the PopUp 
+<a name="l60"></a>    option checked and invoke the </span><span class="cF2">Run.CPZ</span><span class="cF0"> file.
+<a name="l61"></a>    
+<a name="l62"></a>    </span><span class="cF2">/LT/Demo</span><span class="cF0"> Here you can find lots of sample code to do various things.
+<a name="l63"></a>    
+<a name="l64"></a>    </span><span class="cF2">/LT/Doc</span><span class="cF0"> Here you can find documentation.
+<a name="l65"></a>    
+<a name="l66"></a>    </span><span class="cF2">/LT/OSMain</span><span class="cF0"> The core of the operating system is found here.  Since priviledge 
+<a name="l67"></a>    levels are not used, calling it a "kernel" would be confusing, but that's 
+<a name="l68"></a>    what it is.  It is statically compiled by </span><a href="/archive/code/InsBoot.html#l185"><span class="cF4">InstallBoot</span></a><span class="cF0">().  It is loaded by 
+<a name="l69"></a>    the boot loader and must fit in 640K.  An effort is made to limit what goes 
+<a name="l70"></a>    into </span><span class="cF2">OSMain</span><span class="cF0"> so that it never exceeds the 640K limit.  </span><span class="cF2">OSMain2</span><span class="cF0"> has stuff 
+<a name="l71"></a>    which must be statically compiled but is not needed in </span><span class="cF2">OSMain</span><span class="cF0">.
+<a name="l72"></a>    
+<a name="l73"></a>    </span><span class="cF2">/LT/OSMain2</span><span class="cF0"> Part 2 of the operating system core is found here.  It is 
+<a name="l74"></a>    statically compiled by </span><a href="/archive/code/InsBoot.html#l185"><span class="cF4">InstallBoot</span></a><span class="cF0">().  It contains stuff which is statically 
+<a name="l75"></a>    compiled but not needed in the 640K area.  Just enough is statically 
+<a name="l76"></a>    compiled in the </span><span class="cF2">OSMain</span><span class="cF0">, </span><span class="cF2">OSMain2</span><span class="cF0">, and </span><span class="cF2">Compiler</span><span class="cF0"> modules so that you can fix a 
+<a name="l77"></a>    start-up script error with the </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/code/EdLite.html#l60"><span class="cF4">EdLite</span></a><span class="cF0"> and reboot.  Everything else is </span><span class="cF2">JIT</span><span class="cF0"> 
+<a name="l78"></a>    compiled beginning with </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/code/Adam1.html#l4"><span class="cF4">::/LT/OSMain/Adam1.APZ</span></a><span class="cF0">.
+<a name="l79"></a>    
+<a name="l80"></a>    </span><span class="cF2">/LT/Compiler</span><span class="cF0"> The compiler module src code is found here.  The compiler is 
+<a name="l81"></a>    statically compiled to produce a binary file which is loaded at boot.  It is 
+<a name="l82"></a>    also statically compiled by </span><a href="/archive/code/InsBoot.html#l185"><span class="cF4">InstallBoot</span></a><span class="cF0">().
+<a name="l83"></a>    </span><span class="cF2">
+<a name="l84"></a>    /LT/Adam</span><span class="cF0"> The non-kernel part of the operating system is found here.  It is 
+<a name="l85"></a>    JIT compiled during boot.
+<a name="l86"></a>    
+<a name="l87"></a>  </span><span class="cF5">-] DOLLAR SIGN CMDS</span><span class="cF0">
+<a name="l88"></a>    </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/doc/Dollar.html#l1"><span class="cF4">Dollar Sign Cmds</span></a><span class="cF0"> are rich-text cmds.  The editor, compiler, assembler and 
+<a name="l89"></a>    operating system are seamlessly equiped to handle LoseThos rich text.  Cmds 
+<a name="l90"></a>    like </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/code/Dsk1b.html#l238"><span class="cF4">Dir</span></a><span class="cF0">() and </span><span class="cF4">Grep</span><span class="cF0">() can output links to the cmd line.
+<a name="l91"></a>    
+<a name="l92"></a>  </span><span class="cF5">-] CMD PROMPT</span><span class="cF0">
+<a name="l93"></a>    The LoseThos cmd line interface is based on C/C++. Explore the ".CPZ" files. 
+<a name="l94"></a>     A cmd which takes no args may be executed by typing the name and a 
+<a name="l95"></a>    semicolon.  Cmds with args require placing the arg in parentheses like a 
+<a name="l96"></a>    function call.
+<a name="l97"></a>    
+<a name="l98"></a>    
+<a name="l99"></a>    </span><span class="cF9">Dir("*");</span><span class="cF0"> will list files in the current directory.
+<a name="l100"></a>    
+<a name="l101"></a>    </span><span class="cF9">Dir;</span><span class="cF0"> uses default of "*".
+<a name="l102"></a>    
+<a name="l103"></a>    </span><span class="cF9">Cd("::/LT/Apps");</span><span class="cF0"> will change directories.
+<a name="l104"></a>    
+<a name="l105"></a>    Directories are referenced with "/" not "\".  The Boot drive is referred to 
+<a name="l106"></a>    with "</span><span class="cF2">::</span><span class="cF0">".  Other drives are referred to by a letter and a colon.  Your user 
+<a name="l107"></a>    acct directory is referred to with "</span><span class="cF2">HOME</span><span class="cF0">".
+<a name="l108"></a>    
+<a name="l109"></a>    If a file is not found in one directory, all it's parents are searched. 
+<a name="l110"></a>    
+<a name="l111"></a>    </span><span class="cF9">Ed("FILENAME.TXZ");</span><span class="cF0"> Invokes the editor.  See </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/doc/Ed.html#l1"><span class="cF4">Editor cmds</span></a><span class="cF0">.  Note that editor 
+<a name="l112"></a>    cmds work practically everywhere--like at the cmd prompt or within help.
+<a name="l113"></a>    
+<a name="l114"></a>    Some cmds like </span><span class="cF4">Grep</span><span class="cF0">() take a "find_files_mask".  They begin with the name of 
+<a name="l115"></a>    a dir tree and end with a list of filename masks.  See </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/code/DskStr.html#l34"><span class="cF4">FilesFindMatch</span></a><span class="cF0">().
+<a name="l116"></a>    
+<a name="l117"></a>    </span><span class="cF9">Grep("pattern","/LT/Demo/*.CPZ;*.TXZ;");</span><span class="cF0">
+<a name="l118"></a>    
+<a name="l119"></a>    Be aware of </span><a href="/archive/code/Adam1a.html#l2012"><span class="cF4">TEXT_FILE_MASK</span></a><span class="cF0"> and </span><a href="/archive/code/Adam1a.html#l2011"><span class="cF4">SRC_FILE_MASK</span></a><span class="cF0">.
+<a name="l120"></a>    
+<a name="l121"></a>    
+<a name="l122"></a>  </span><span class="cF5">-] BURNING CD-ROMs/DVDs</span><span class="cF0">
+<a name="l123"></a>    0) Prepare a partition (drive) with the files you wish to burn.
+<a name="l124"></a>    1) Use </span><a href="/archive/code/DskCDDVD.html#l376"><span class="cF4">CDFileCreate</span></a><span class="cF0">() to make an ISO image file of a partition.
+<a name="l125"></a>    2) Use </span><a href="/archive/code/Dsk1c.html#l287"><span class="cF4">CDImageWrite</span></a><span class="cF0">() to burn an ISO file onto a CD or DVD.
+<a name="l126"></a>    
+<a name="l127"></a>    Note:  You can create a </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/doc/Glossary.html#l12"><span class="cF4">Temp (File Partition)</span></a><span class="cF0"> on an ordinary partition, copy 
+<a name="l128"></a>    files into it, create an image and burn it.
+<a name="l129"></a>    
+<a name="l130"></a>    </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/doc/FileMgr.html#l94"><span class="cF4">Bootable CD-ROMs</span></a><span class="cF0"> 
+<a name="l131"></a>  
+<a name="l132"></a></span><span class="cF5">-] Level 2: ADMIN HELP</span><span class="cF0">
+<a name="l133"></a>  
+<a name="l134"></a>  </span><span class="cF5">-] ADDING DRVS</span><span class="cF0">
+<a name="l135"></a>    Use </span><a href="/archive/code/DskAddDev.html#l198"><span class="cF4">Mount</span></a><span class="cF0">() to mount disk drives.  
+<a name="l136"></a>    
+<a name="l137"></a>    See </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/doc/Glossary.html#l12"><span class="cF4">Temp File Partition</span></a><span class="cF0"> for a special type of "drive".
+<a name="l138"></a>  
+<a name="l139"></a>  </span><a href="/archive/doc/Install.html#l1"><span class="cF4">Installing</span></a><span class="cF0">
+<a name="l140"></a>  </span><a href="/archive/doc/GuideLines.html#l1"><span class="cF4">Acct Files</span></a><span class="cF0">
+<a name="l141"></a>  
+<a name="l142"></a>  </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/code/Adam1.html#l4"><span class="cF4">::/LT/OSMain/Adam1.APZ</span></a><span class="cF0"> the LoseThos equivalent of the </span><span class="cF2">AUTOEXEC.BAT</span><span class="cF0">.
+<a name="l143"></a>  
+<a name="l144"></a></span><span class="cF5">-] Level 3: PROGRAMMER HELP</span><span class="cF0">
+<a name="l145"></a>  
+<a name="l146"></a>  </span><a href="/archive/doc/GuideLines.html#l1"><span class="cF4">Guidelines</span></a><span class="cF0">
+<a name="l147"></a>  </span><a href="/archive/doc/Differences.html#l1"><span class="cF4">Differences from C/C++</span></a><span class="cF0">
+<a name="l148"></a>  </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/doc/Graphics.html#l1"><span class="cF4">Graphics</span></a><span class="cF0">
+<a name="l149"></a>  </span><a href="/archive/doc/MultiTasking.html#l1"><span class="cF4">Multitasking</span></a><span class="cF0">
+<a name="l150"></a>  </span><span class="cF4">Ltf Documents</span><span class="cF0">
+<a name="l151"></a>  </span><span class="cF5">-] Programming Lessons</span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/code/AndNotMod.html#l1"><span class="cF4">::/LT/Demo/Lectures/AndNotMod.CPZ</span></a><span class="cF0">
+<a name="l152"></a>    </span><a href="/archive/code/FixedPoint.html#l1"><span class="cF4">::/LT/Demo/Lectures/FixedPoint.CPZ</span></a><span class="cF0">
+<a name="l153"></a>    </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/code/Uncached.html#l1"><span class="cF4">::/LT/Demo/Lectures/Uncached.CPZ</span></a><span class="cF0">
+<a name="l154"></a>    </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/code/Optimization.html#l1"><span class="cF4">::/LT/Demo/Lectures/Optimization.CPZ</span></a><span class="cF0">
+<a name="l155"></a>    </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/code/ScreenMemory.html#l1"><span class="cF4">::/LT/Demo/Lectures/ScreenMemory.CPZ</span></a><span class="cF0">
+<a name="l156"></a>    </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/code/GraphicsCPULoad.html#l1"><span class="cF4">::/LT/Demo/Lectures/GraphicsCPULoad.CPZ</span></a><span class="cF0">
+<a name="l157"></a>    </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/code/InterruptDemo.html#l1"><span class="cF4">::/LT/Demo/Lectures/InterruptDemo.CPZ</span></a><span class="cF0">
+<a name="l158"></a>    </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/code/Spinning.html#l1"><span class="cF4">::/LT/Demo/Lectures/Spinning.CPZ</span></a><span class="cF0">
+<a name="l159"></a>   
+<a name="l160"></a>  
+<a name="l161"></a></span><span class="cF5">-] Level 4: SYSTEM PROGRAMMER HELP</span><span class="cF0">
+<a name="l162"></a>  
+<a name="l163"></a>  </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/doc/SysPgmGuide.html#l1"><span class="cF4">System Programming Guide-Lines</span></a><span class="cF0">
+<a name="l164"></a>  </span><a href="/archive/code/Hash1a.html#l1"><span class="cF4">Hash Tables</span></a><span class="cF0">
+<a name="l165"></a>  </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/doc/KeyBoard.html#l79"><span class="cF4">Keyboard Handling</span></a><span class="cF0">
+<a name="l166"></a>  </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/code/GrNew.html#l120"><span class="cF4">GrBitMap internal format</span></a><span class="cF0">
+<a name="l167"></a>  </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/code/PageTableEntries1.html#l1"><span class="cF4">Page Table Entries 1</span></a><span class="cF0">
+<a name="l168"></a>  </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/code/PageTableEntries2.html#l1"><span class="cF4">Page Table Entries 2</span></a><span class="cF0">
+<a name="l169"></a>  </span><a href="/archive/code/PCIInterrupts.html#l73"><span class="cF4">PCIInterrupts.CPZ</span></a><span class="cF0">
+<a name="l170"></a>  </span><span class="cF4">MemRep</span><span class="cF0">
+<a name="l171"></a>  </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/code/WallPaper.html#l150"><span class="cF4">WallPaper.APZ</span></a><span class="cF0">
+<a name="l172"></a>  </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/doc/NewFileSystem.html#l1"><span class="cF4">Adding a New File System</span></a><span class="cF0">
+<a name="l173"></a>  
+<a name="l174"></a>  </span><span class="cF5">-] Scheduler</span><span class="cF0">
+<a name="l175"></a>    </span><a href="/archive/code/Scheduler.html#l1"><span class="cF4">Scheduler.CPZ</span></a><span class="cF0">
+<a name="l176"></a>  </span><span class="cF5">-] Ltf</span><span class="cF0">
+<a name="l177"></a>    </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/code/Ltf.html#l43"><span class="cF4">Ltf</span></a><span class="cF0">
+<a name="l178"></a>  </span><span class="cF5">-] Graphic Library</span><span class="cF0">
+<a name="l179"></a>    </span><a href="/archive/code/MiniGrLib.html#l1"><span class="cF4">MiniGrLib</span></a><span class="cF0">
+<a name="l180"></a>  </span><span class="cF5">-] Compiler</span><span class="cF0">
+<a name="l181"></a>    </span><a href="https://web.archive.org/web/20111026203008/http://www.losethos.com/code/MiniCompiler.html#l224"><span class="cF4">MiniCompiler</span></a><span class="cF0">
+<a name="l182"></a>    </span><a href="/archive/code/BackEnd.html#l1"><span class="cF4">Backend</span></a><span class="cF0">
+<a name="l183"></a>    
+<a name="l184"></a>  
+<a name="l185"></a>
+</span></pre><div class="archive-note">Historical capture: 2011-10-26. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

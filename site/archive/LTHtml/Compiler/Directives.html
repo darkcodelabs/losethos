@@ -1,0 +1,151 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>Directives</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V8.00" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cF5">                               <a href="/archive/LTHtml/Doc/TrivialSolutions.html">Trivial Solutions</a>
+                    <a href="/archive/index.html">The LoseThos 64-bit PC Operating System</a>
+File:/LT/Compiler/Directives.CPZ
+This, and all LoseThos files, are public domain.  Do whatever you like.
+God is watching; God is just; God is never out-done in generosity.  He talks!
+
+LoseThos code compiles with the 64-bit LoseThos compiler/assembler I wrote.
+Boot the LoseThos CD and you can compile it.  Not in Kansas anymore!
+
+<a href="/archive/LTHtml/Demo/Lectures/FixedPoint.html">Click here for preliminary compiler information you need.</a>
+
+</span><a name="l1"></a><span class="cF8">Project: Compiler.SPZ</span><span class="cF0">
+<a name="l2"></a>
+<a name="l3"></a>BoolI64 OptEqu(</span><span class="cF1">U64</span><span class="cF0"> num,BoolI8 val) {
+<a name="l4"></a>  </span><span class="cF1">return</span><span class="cF0"> BEqu(&amp;Fs-&gt;last_lex-&gt;opts,num,val);
+<a name="l5"></a>}
+<a name="l6"></a>
+<a name="l7"></a></span><span class="cF2">//Turn on compiler option</span><span class="cF0">
+<a name="l8"></a>BoolI64 OptOn(</span><span class="cF1">U64</span><span class="cF0"> num) {
+<a name="l9"></a>  </span><span class="cF1">return</span><span class="cF0"> OptEqu(num,ON);
+<a name="l10"></a>}
+<a name="l11"></a>
+<a name="l12"></a></span><span class="cF2">//Turn off compiler option</span><span class="cF0">
+<a name="l13"></a>BoolI64 OptOff(</span><span class="cF1">U64</span><span class="cF0"> num) {
+<a name="l14"></a>  </span><span class="cF1">return</span><span class="cF0"> OptEqu(num,OFF);
+<a name="l15"></a>}
+<a name="l16"></a>
+<a name="l17"></a></span><span class="cF2">//Get state of compiler option</span><span class="cF0">
+<a name="l18"></a>BoolI64 GetOpt(</span><span class="cF1">U64</span><span class="cF0"> num) {
+<a name="l19"></a>  </span><span class="cF1">return</span><span class="cF0"> Bt(&amp;Fs-&gt;last_lex-&gt;opts,num);
+<a name="l20"></a>}
+<a name="l21"></a>
+<a name="l22"></a>BoolI64 Externs2Imports(BoolI8 val) {
+<a name="l23"></a>  </span><span class="cF1">return</span><span class="cF0"> OptEqu(OPTf_EXTERNS_TO_IMPORTS,val);
+<a name="l24"></a>}
+<a name="l25"></a>
+<a name="l26"></a></span><span class="cF2">//Private syms are accessible but</span><span class="cF0">
+<a name="l27"></a></span><span class="cF2">//don't show-up in reports</span><span class="cF0">
+<a name="l28"></a>BoolI64 KeepPrivate(BoolI8 val) {
+<a name="l29"></a>  </span><span class="cF1">return</span><span class="cF0"> OptEqu(OPTf_KEEP_PRIVATE,val);
+<a name="l30"></a>}
+<a name="l31"></a>
+<a name="l32"></a></span><span class="cF2">//Displays intermediate code as it is being added</span><span class="cF0">
+<a name="l33"></a>BoolI64 PTrace(BoolI8 val) {
+<a name="l34"></a>  </span><span class="cF1">return</span><span class="cF0"> OptEqu(OPTf_PARSE_TRACE,val);
+<a name="l35"></a>}
+<a name="l36"></a>
+<a name="l37"></a></span><span class="cF2">//Displays intermediate code after passes through optimization</span><span class="cF0">
+<a name="l38"></a>BoolI64 OTrace(BoolI8 val) {
+<a name="l39"></a>  </span><span class="cF1">return</span><span class="cF0"> OptEqu(OPTf_OPT_TRACE,val);
+<a name="l40"></a>}
+<a name="l41"></a>
+<a name="l42"></a></span><span class="cF2">//Ctrls which optimizer passes are displayed</span><span class="cF0">
+<a name="l43"></a></span><span class="cF1">U64</span><span class="cF0"> OPassTraceMask(</span><span class="cF1">U64</span><span class="cF0"> i=0b1001111101) {
+<a name="l44"></a>  </span><span class="cF1">U64</span><span class="cF0"> old=Fs-&gt;last_lex-&gt;pass_trace_mask;
+<a name="l45"></a>  Fs-&gt;last_lex-&gt;pass_trace_mask=i;
+<a name="l46"></a>  </span><span class="cF1">return</span><span class="cF0"> old;
+<a name="l47"></a>}
+<a name="l48"></a>
+<a name="l49"></a>
+<a name="l50"></a></span><span class="cF2">//Displays assembly code output</span><span class="cF0">
+<a name="l51"></a>BoolI64 CTrace(BoolI8 val) {
+<a name="l52"></a>  </span><span class="cF1">return</span><span class="cF0"> OptEqu(OPTf_COMPILE_TRACE,val);
+<a name="l53"></a>}
+<a name="l54"></a>
+<a name="l55"></a></span><span class="cF2">//Displays lexical analyser's output</span><span class="cF0">
+<a name="l56"></a>BoolI64 LTrace(BoolI8 val) {
+<a name="l57"></a>  </span><span class="cF1">return</span><span class="cF0"> OptEqu(OPTf_LEX_TRACE,val);
+<a name="l58"></a>}
+<a name="l59"></a>
+<a name="l60"></a>BoolI64 NoRegVar(BoolI8 val) {
+<a name="l61"></a>  </span><span class="cF1">return</span><span class="cF0"> OptEqu(OPTf_NO_REG_VAR,val);
+<a name="l62"></a>}
+<a name="l63"></a>
+<a name="l64"></a></span><span class="cF2">//Displays text as it is being compiled</span><span class="cF0">
+<a name="l65"></a>BoolI64 Echo(BoolI8 val) {
+<a name="l66"></a>  </span><span class="cF1">return</span><span class="cF0"> OptEqu(OPTf_ECHO,val);
+<a name="l67"></a>}
+<a name="l68"></a>
+<a name="l69"></a>BoolI64 IsReplaceSyms() {
+<a name="l70"></a>  </span><span class="cF1">return</span><span class="cF0"> GetOpt(OPTf_REPLACE_SYMS);
+<a name="l71"></a>}
+<a name="l72"></a>
+<a name="l73"></a>BoolI64 SysEcho(BoolI8 val) {
+<a name="l74"></a>  </span><span class="cF1">return</span><span class="cF0"> OptEqu(OPTf_ECHO,val);
+<a name="l75"></a>}
+<a name="l76"></a>
+<a name="l77"></a></span><span class="cF1">U0</span><span class="cF0"> ImportHashTable(SysHashTable *src)
+<a name="l78"></a>{ </span><span class="cF2">//called from #exe {} in static modules</span><span class="cF0">
+<a name="l79"></a></span><span class="cF2">// See </span><a href="https://web.archive.org/web/20120303144754/http://www.losethos.com/LTHtml/OSMain/StaticAdam.html"><span class="cF4">::/LT/OSMain/StaticAdam.HPZ</span></a><span class="cF2"> and </span><a href="/archive/LTHtml/Demo/OldSchool/Demo2/Compatibility2.html"><span class="cF4">::/LT/Demo/OldSchool/Demo2/Compatibility2.SPP</span></a><span class="cF2">.</span><span class="cF0">
+<a name="l80"></a>  LexStruct *lx=Fs-&gt;last_lex;
+<a name="l81"></a>  </span><span class="cF1">if</span><span class="cF0"> (lx==&amp;Fs-&gt;next_lex) </span><span class="cF7">{</span><span class="cF0">
+<a name="l82"></a>    PutErr;
+<a name="l83"></a>    </span><span class="cF6">"Not Compiling\n"</span><span class="cF0">;
+<a name="l84"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l85"></a>  </span><span class="cF1">if</span><span class="cF0"> (!</span><span class="cF7">(</span><span class="cF0">lx-&gt;flags&amp;LF_EXE_BLK</span><span class="cF7">)</span><span class="cF0">)
+<a name="l86"></a>    PrsExcept(lx,</span><span class="cF6">"ST_IMPORT_HASH_TABLE_NOT_ALLOWED"</span><span class="cF0">);
+<a name="l87"></a>  </span><span class="cF1">while</span><span class="cF0"> (src) </span><span class="cF7">{</span><span class="cF0">
+<a name="l88"></a>    </span><span class="cF1">if</span><span class="cF0"> (lx-&gt;stream_parent_glbl_hash_table)
+<a name="l89"></a>      HashTableImport(src,lx-&gt;stream_parent_glbl_hash_table);
+<a name="l90"></a>    </span><span class="cF1">else</span><span class="cF0">
+<a name="l91"></a>      HashTableImport(src,lx-&gt;glbl_hash_table);
+<a name="l92"></a>    src=src-&gt;next;
+<a name="l93"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l94"></a>}
+<a name="l95"></a>
+<a name="l96"></a></span><span class="cF1">I64</span><span class="cF0"> IncludeDepth()
+<a name="l97"></a>{
+<a name="l98"></a>  LexStruct *lx=Fs-&gt;last_lex;
+<a name="l99"></a>  </span><span class="cF1">return</span><span class="cF0"> lx-&gt;cur_lfn-&amp;lx-&gt;lfns;
+<a name="l100"></a>}
+<a name="l101"></a>
+<a name="l102"></a>BoolI64 CmdLineExit()
+<a name="l103"></a>{
+<a name="l104"></a>  LexStruct *lx=Fs-&gt;last_lex;
+<a name="l105"></a>  </span><span class="cF1">return</span><span class="cF0"> Btr(&amp;lx-&gt;flags,Lf_PROMPT);
+<a name="l106"></a>}
+<a name="l107"></a>
+</span></pre><div class="archive-note">Historical capture: 2012-03-03. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

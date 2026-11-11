@@ -1,0 +1,108 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V7.07" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<a name="l1"></a><span class="cF0">                                    </span><span class="cF5">Bug Stat</span><span class="cF0">
+<a name="l2"></a>
+<a name="l3"></a></span><span class="cF2">#000021 Introduced:00/00/0000 Fixed:10/10/2011</span><span class="cF0">
+<a name="l4"></a>Graphics routines did not work with </span><span class="cF4">-&gt;brush</span><span class="cF0"> when </span><span class="cF4">-&gt;pen_width</span><span class="cF0"> was big.
+<a name="l5"></a>
+<a name="l6"></a></span><span class="cF2">#000020 Introduced:03/06/2011 Fixed:10/9/2011</span><span class="cF0">
+<a name="l7"></a></span><span class="cF4">&lt;CTRL-R&gt;</span><span class="cF0"> menu was broken so that clicking "Vect Object Menu", exited.
+<a name="l8"></a>
+<a name="l9"></a></span><span class="cF2">#000019 Introduced:00/00/0000 Fixed:9/8/2011</span><span class="cF0">
+<a name="l10"></a></span><a href="https://web.archive.org/web/20111026193338/http://www.losethos.com/code/ToHtml.html#l4"><span class="cF4">ToHtml</span></a><span class="cF0">() and </span><span class="cF4">ToTXT</span><span class="cF0">() were not handling backward column movement well.
+<a name="l11"></a>
+<a name="l12"></a></span><span class="cF2">#000018 Introduced:00/00/0000 Fixed:8/14/2011</span><span class="cF0">
+<a name="l13"></a>Compiler was not doing 64-bit arithmetic where it was spec'ed to.
+<a name="l14"></a>
+<a name="l15"></a></span><span class="cF2">#000017 Introduced:00/00/0000 Fixed:8/14/2011</span><span class="cF0">
+<a name="l16"></a>Compiler was falsely optimizing SIGNED MODULO operator to AND for powers of two.
+<a name="l17"></a>
+<a name="l18"></a></span><span class="cF2">#000016 Introduced:00/00/0000 Fixed:1/22/2011</span><span class="cF0">
+<a name="l19"></a>ATAPI start-up probe hung because timeout wasn't implemented right.  This 
+<a name="l20"></a>possible used to work.
+<a name="l21"></a>
+<a name="l22"></a></span><span class="cF2">#000015 Introduced:00/00/0000 Fixed:1/22/2011</span><span class="cF0">
+<a name="l23"></a>A pending IRQ left-over from BIOS code might have crashed LoseThos when it 
+<a name="l24"></a>enabled interrupts.  Now, stub IRQ handlers should absorb a pending IRQ.
+<a name="l25"></a>
+<a name="l26"></a></span><span class="cF2">#000014 Introduced:00/00/0000 Fixed:1/22/2011</span><span class="cF0">
+<a name="l27"></a>Fmt() FAT32 didn't set partition type in master boot record!
+<a name="l28"></a>
+<a name="l29"></a></span><span class="cF2">#000013 Introduced:00/00/0000 Fixed:1/11/2011</span><span class="cF0">
+<a name="l30"></a>Bible links to Genesis didn't work.
+<a name="l31"></a>
+<a name="l32"></a></span><span class="cF2">#000012 Introduced:00/00/0000 Fixed:12/5/2010</span><span class="cF0">
+<a name="l33"></a></span><a href="/archive/code/MultiProc.html#l88"><span class="cF4">TssNew</span></a><span class="cF0">() used to truncate the tss addr to 32-bits!  I'm not sure how it worked 
+<a name="l34"></a>before!
+<a name="l35"></a>
+<a name="l36"></a></span><span class="cF2">#000011 Introduced:11/18/2010 Fixed:11/19/2010</span><span class="cF0">
+<a name="l37"></a>The fix to </span><a href="https://web.archive.org/web/20111026193338/http://www.losethos.com/code/DskStr.html#l12"><span class="cF4">FileExtRem</span></a><span class="cF0">() made a new bug, for a day preventing booting!  Sorry!
+<a name="l38"></a>
+<a name="l39"></a></span><span class="cF2">#000010 Introduced:10/11/2010 Fixed:11/18/2010</span><span class="cF0">
+<a name="l40"></a></span><a href="https://web.archive.org/web/20111026193338/http://www.losethos.com/code/DskStr.html#l12"><span class="cF4">FileExtRem</span></a><span class="cF0">() removed all if no extension.
+<a name="l41"></a>
+<a name="l42"></a></span><span class="cF2">#000009 Introduced:00/00/0000 Fixed:11/16/2010</span><span class="cF0">
+<a name="l43"></a>ATA Hard disk code checked an unnecessary stat bit.  It prevented Virtual Box 
+<a name="l44"></a>from writing to the hard disk.
+<a name="l45"></a>
+<a name="l46"></a></span><span class="cF2">#000008 Introduced:00/00/0000 Fixed:11/04/2010</span><span class="cF0">
+<a name="l47"></a>Compiler: += / -= of immediate values on non-64bit variables.
+<a name="l48"></a>
+<a name="l49"></a></span><span class="cF2">#000007 Introduced:00/00/0000 Fixed:09/14/2010</span><span class="cF0">
+<a name="l50"></a>VMWare sometimes crashed on quick reboot.  I think it was because the timer 
+<a name="l51"></a>interrupt could occur between start-up of MP and initialization of MP.  Core 
+<a name="l52"></a>zero would forward an interrupt to an uninitialized core.
+<a name="l53"></a>
+<a name="l54"></a></span><span class="cF2">#000006 Introduced:06/15/2010 Fixed:09/01/2010</span><span class="cF0">
+<a name="l55"></a>Compiler crashed on return out of </span><span class="cF2">try{}</span><span class="cF0"> or </span><span class="cF2">catch{}</span><span class="cF0">.
+<a name="l56"></a>
+<a name="l57"></a></span><span class="cF2">#000005 Introduced:00/00/0000 Fixed:08/28/2010</span><span class="cF0">
+<a name="l58"></a>Compiler loaded args into reg variables using 64-bit </span><span class="cF2">MOV</span><span class="cF0"> even for smaller sizes.
+<a name="l59"></a>
+<a name="l60"></a></span><span class="cF2">#000004 Introduced:05/20/2010 Fixed:06/05/2010</span><span class="cF0">
+<a name="l61"></a></span><a href="https://web.archive.org/web/20111026193338/http://www.losethos.com/code/Message.html#l139"><span class="cF4">GetKey</span></a><span class="cF0">() was not handling pop-up windows properly.  As a result, the tour and 
+<a name="l62"></a>autofile operations were broken.
+<a name="l63"></a>
+<a name="l64"></a></span><span class="cF2">#000003 Introduced:05/20/2010 Fixed:06/05/2010</span><span class="cF0">
+<a name="l65"></a></span><a href="https://web.archive.org/web/20111026193338/http://www.losethos.com/code/Message.html#l139"><span class="cF4">GetKey</span></a><span class="cF0">() was turning-off preemption in its call to echo with </span><a href="/archive/code/Display.html#l247"><span class="cF4">PutKey</span></a><span class="cF0">().  This had 
+<a name="l66"></a>the effect of running all terminal window right-clicked #included programs with 
+<a name="l67"></a>preemption off. 
+<a name="l68"></a>
+<a name="l69"></a></span><span class="cF2">#000002 Introduced:00/00/2009 Fixed:06/05/2010</span><span class="cF0">
+<a name="l70"></a>Compiler optimization was screwing-up code like this:
+<a name="l71"></a>  </span><span class="cF5">while (*dst++=*src++);
+<a name="l72"></a>
+<a name="l73"></a>
+<a name="l74"></a></span><span class="cF2">#000001 Introduced:00/00/0000 Fixed:05/14/2010</span><span class="cF0">
+<a name="l75"></a></span><a href="/archive/code/SPrintF2.html#l490"><span class="cF4">PrintF</span></a><span class="cF0">()'s "%g", "%e", and "%n" horribly broken, due to rounding.
+</span></pre><div class="archive-note">Historical capture: 2011-10-26. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

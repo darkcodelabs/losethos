@@ -1,0 +1,519 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>InsBoot</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V8.00" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cF5">                               <a href="/archive/LTHtml/Doc/TrivialSolutions.html">Trivial Solutions</a>
+                    <a href="/archive/index.html">The LoseThos 64-bit PC Operating System</a>
+File:/LT/Adam/Boot/InsBoot.APZ
+This, and all LoseThos files, are public domain.  Do whatever you like.
+God is watching; God is just; God is never out-done in generosity.  He talks!
+
+LoseThos code compiles with the 64-bit LoseThos compiler/assembler I wrote.
+Boot the LoseThos CD and you can compile it.  Not in Kansas anymore!
+
+<a href="/archive/LTHtml/Demo/Lectures/FixedPoint.html">Click here for preliminary compiler information you need.</a>
+
+</span><a name="l1"></a><span class="cF0">#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Install"</span><span class="cF0">
+<a name="l2"></a></span><span class="cF2">//See </span><a href="/archive/LTHtml/Doc/Install.html"><span class="cF4">Install Documentation</span></a><span class="cF2"> or </span><a href="https://web.archive.org/web/20120303011813/http://www.losethos.com/LTHtml/Doc/Upgrade.html"><span class="cF4">Upgrading Documentation</span></a><span class="cF2">.</span><span class="cF0">
+<a name="l3"></a>
+<a name="l4"></a></span><span class="cF2">//OSMain module: OS.BIZ</span><span class="cF0">
+<a name="l5"></a>#</span><span class="cF1">define</span><span class="cF0"> BOOT_BIC        </span><span class="cF6">"Boot.BIC"</span><span class="cF0">
+<a name="l6"></a></span><span class="cF2">//First dir on CD.  First file must be Boot.BIC (on CD-ROMs).</span><span class="cF0">
+<a name="l7"></a>#</span><span class="cF1">define</span><span class="cF0"> BOOT_DIR        </span><span class="cF6">"/0000Boot"</span><span class="cF0">
+<a name="l8"></a></span><span class="cF2">//Stage 2 of master boot loader: BootMHD2.BIZ</span><span class="cF0">
+<a name="l9"></a>#</span><span class="cF1">define</span><span class="cF0"> BOOTLOADER_BIC  </span><span class="cF6">"/0000Boot/BootLoader.BIC"</span><span class="cF0">
+<a name="l10"></a></span><span class="cF2">//Old master boot record</span><span class="cF0">
+<a name="l11"></a>#</span><span class="cF1">define</span><span class="cF0"> OLDMBR_BIC      </span><span class="cF6">"/0000Boot/OldMBR.BIC"</span><span class="cF0">
+<a name="l12"></a></span><span class="cF2">//patched version of BootCD.BIZ</span><span class="cF0">
+<a name="l13"></a>#</span><span class="cF1">define</span><span class="cF0"> CDBOOT_BIZ      </span><span class="cF6">"/0000Boot/CDBoot.BIZ"</span><span class="cF0">
+<a name="l14"></a>
+<a name="l15"></a></span><span class="cF1">if</span><span class="cF0"> (IsDrvWritable) {
+<a name="l16"></a>  </span><span class="cF6">"BootCD  "</span><span class="cF0">;Cmp(</span><span class="cF6">"BootCD"</span><span class="cF0">);
+<a name="l17"></a>  </span><span class="cF6">"BootHD  "</span><span class="cF0">;Cmp(</span><span class="cF6">"BootHD"</span><span class="cF0">);
+<a name="l18"></a>  </span><span class="cF6">"BootMHD "</span><span class="cF0">;Cmp(</span><span class="cF6">"BootMHD"</span><span class="cF0">);
+<a name="l19"></a>  </span><span class="cF6">"BootMHD2"</span><span class="cF0">;Cmp(</span><span class="cF6">"BootMHD2"</span><span class="cF0">);
+<a name="l20"></a>  MkDir(</span><span class="cF6">"/Temp"</span><span class="cF0">); </span><span class="cF2">//Good to have a Temp</span><span class="cF0">
+<a name="l21"></a>}
+<a name="l22"></a>
+<a name="l23"></a>Load(</span><span class="cF6">"BootCD"</span><span class="cF0">,LDF_NO_ABSS);
+<a name="l24"></a>Load(</span><span class="cF6">"BootHD"</span><span class="cF0">,LDF_NO_ABSS);
+<a name="l25"></a>Load(</span><span class="cF6">"BootMHD"</span><span class="cF0">,LDF_NO_ABSS);
+<a name="l26"></a>Load(</span><span class="cF6">"BootMHD2"</span><span class="cF0">,LDF_NO_ABSS);
+<a name="l27"></a>
+<a name="l28"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Install;File/Install Related;File/CD DVD"</span><span class="cF0">
+<a name="l29"></a></span><span class="cF1">public</span><span class="cF0"> BoolI64 CDBootFileCreate()
+<a name="l30"></a>{
+<a name="l31"></a>  </span><span class="cF1">U8</span><span class="cF0"> *br;
+<a name="l32"></a>  </span><span class="cF1">U64</span><span class="cF0"> d,size=FileSize(BOOT_DIR </span><span class="cF6">"/"</span><span class="cF0"> BOOT_BIC);
+<a name="l33"></a>  </span><span class="cF1">U16</span><span class="cF0"> *_w;
+<a name="l34"></a>
+<a name="l35"></a>  br=CAlloc(CD_BOOT_LOADER_SIZE);
+<a name="l36"></a>  _w=BCD_BLK_CNT;
+<a name="l37"></a>  *_w=(size+CD_BLK_SIZE-1)/CD_BLK_SIZE;
+<a name="l38"></a>
+<a name="l39"></a>  </span><span class="cF2">//After preboot + CDBoot.BIZ comes Boot.BIC</span><span class="cF0">
+<a name="l40"></a>  </span><span class="cF2">//</span><a href="https://web.archive.org/web/20120303011813/http://www.losethos.com/LTHtml/Adam/DskCDDVD.html#l498"><span class="cF4">CDBOOT</span></a><span class="cF0">
+<a name="l41"></a>
+<a name="l42"></a>  </span><span class="cF2">//No emulation</span><span class="cF0">
+<a name="l43"></a>  </span><span class="cF2">//This trick assumes OSMain is first file in first Dir.</span><span class="cF0">
+<a name="l44"></a>  d=1+(CD_FILE_OFFSET+CD_BOOT_LOADER_SIZE/BLK_SIZE)/(CD_BLK_SIZE&gt;&gt;BLK_SIZE_BITS);
+<a name="l45"></a>  _w=BCD_BLK_LO;
+<a name="l46"></a>  *_w=d.u16[0];
+<a name="l47"></a>  _w=BCD_BLK_HI;
+<a name="l48"></a>  *_w=d.u16[1];
+<a name="l49"></a>
+<a name="l50"></a>  MemCpy(br,BCD_START,BCD_END-BCD_START);
+<a name="l51"></a>  FileWrite(CDBOOT_BIZ,br,CD_BOOT_LOADER_SIZE);
+<a name="l52"></a>  Free(br);
+<a name="l53"></a>  </span><span class="cF1">return</span><span class="cF0"> TRUE;
+<a name="l54"></a>}
+<a name="l55"></a>
+<a name="l56"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Call"</span><span class="cF0">
+<a name="l57"></a></span><span class="cF1">asm</span><span class="cF0"> {
+<a name="l58"></a></span><span class="cF1">USE64</span><span class="cF0">
+<a name="l59"></a>_HI_CALL::
+<a name="l60"></a>        </span><span class="cF1">ENTER</span><span class="cF0">   0
+<a name="l61"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">RAX</span><span class="cF0">,</span><span class="cF1">U64</span><span class="cF0"> 16[</span><span class="cFC">RBP</span><span class="cF0">]
+<a name="l62"></a>        </span><span class="cF1">OR</span><span class="cF0">      </span><span class="cFC">RAX</span><span class="cF0">,</span><span class="cFC">RAX</span><span class="cF0">
+<a name="l63"></a>        </span><span class="cF1">JZ</span><span class="cF0">      @@05
+<a name="l64"></a>        </span><span class="cF1">CALL</span><span class="cF0">    </span><span class="cFC">RAX</span><span class="cF0">
+<a name="l65"></a>@@05:   </span><span class="cF1">LEAVE</span><span class="cF0">
+<a name="l66"></a>        </span><span class="cF1">RET1</span><span class="cF0">    8
+<a name="l67"></a>}
+<a name="l68"></a></span><span class="cF1">LTextern</span><span class="cF0"> _HI_CALL </span><span class="cF1">U64</span><span class="cF0"> HiCall(</span><span class="cF1">U0</span><span class="cF0"> *s);
+<a name="l69"></a>
+<a name="l70"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Boot"</span><span class="cF0">
+<a name="l71"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">U0</span><span class="cF0"> Boot(</span><span class="cF1">U8</span><span class="cF0"> *filename)
+<a name="l72"></a></span><span class="cF2">//Soft Reboot (no hardware rst)</span><span class="cF0">
+<a name="l73"></a></span><span class="cF2">//Specify the OSMain binary file you</span><span class="cF0">
+<a name="l74"></a></span><span class="cF2">//wish to boot.</span><span class="cF0">
+<a name="l75"></a>{
+<a name="l76"></a>  </span><span class="cF1">U64</span><span class="cF0"> size;
+<a name="l77"></a>  OSMainStruct  *hi_image,*lo_image=sys_boot_base-</span><span class="cF1">sizeof</span><span class="cF0">(BinFileHeaderStruct),
+<a name="l78"></a>                </span><span class="cF1">reg</span><span class="cF0"> *shutdown,*hi_image2;
+<a name="l79"></a>
+<a name="l80"></a>  </span><span class="cF1">if</span><span class="cF0"> (!</span><span class="cF7">(</span><span class="cF0">hi_image2=FileRead(filename,&amp;size)</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF1">return</span><span class="cF0">;
+<a name="l81"></a>  </span><span class="cF1">switch</span><span class="cF0"> (snd_dev) </span><span class="cF7">{</span><span class="cF0">
+<a name="l82"></a>    </span><span class="cF1">case</span><span class="cF0"> SD_PC_SPEAKER:
+<a name="l83"></a>      </span><span class="cF1">break</span><span class="cF0">;
+<a name="l84"></a>    </span><span class="cF1">case</span><span class="cF0"> SD_HD_AUDIO:
+<a name="l85"></a>      CallExtStr(</span><span class="cF6">"HDAudioEnd"</span><span class="cF0">,TRUE);
+<a name="l86"></a>      </span><span class="cF1">break</span><span class="cF0">;
+<a name="l87"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l88"></a>
+<a name="l89"></a>  shutdown=MAlloc(SYS_RESTART_OSMAIN_END-SYS_RESTART_OSMAIN,Fs-&gt;code_heap);
+<a name="l90"></a>  hi_image=MAlloc(size,Fs-&gt;code_heap);
+<a name="l91"></a>  MemCpy(hi_image,hi_image2,size);
+<a name="l92"></a>  Free(hi_image2);
+<a name="l93"></a>
+<a name="l94"></a>  hi_image-&gt;boot_base=lo_image&gt;&lt;(</span><span class="cF1">U8</span><span class="cF0"> *)+</span><span class="cF1">sizeof</span><span class="cF0">(BinFileHeaderStruct);
+<a name="l95"></a>  hi_image-&gt;boot_patch_table_base=lo_image&gt;&lt;(</span><span class="cF1">U8</span><span class="cF0"> *)+hi_image-&gt;h.loader_patch_table_offset;
+<a name="l96"></a>  MemCpy(&amp;hi_image-&gt;sys_mem_E801,&amp;lo_image-&gt;sys_mem_E801,2*2);
+<a name="l97"></a>  MemCpy(&amp;hi_image-&gt;sys_mem_E820,&amp;lo_image-&gt;sys_mem_E820,NUM_MEM_E820_ENTRIES*MEM_E820_ENTRY_SIZE);
+<a name="l98"></a>  hi_image-&gt;sys_gr_mode=lo_image-&gt;sys_gr_mode;
+<a name="l99"></a>  hi_image-&gt;sys_pci_busses=lo_image-&gt;sys_pci_busses;
+<a name="l100"></a>  hi_image-&gt;boot_code=BOOT_CODE_RAM;
+<a name="l101"></a>
+<a name="l102"></a>  Cli;
+<a name="l103"></a>  </span><span class="cF1">if</span><span class="cF0"> (mp_cnt&gt;1)
+<a name="l104"></a>    MPHalt;
+<a name="l105"></a>
+<a name="l106"></a>  MemCpy(shutdown,SYS_RESTART_OSMAIN,SYS_RESTART_OSMAIN_END-SYS_RESTART_OSMAIN);
+<a name="l107"></a>  MemCpy(&amp;hi_image-&gt;sys_gdttab,&amp;lo_image-&gt;sys_gdttab,</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF0">GdtTabStruct</span><span class="cF7">)</span><span class="cF0">*MAXGDT);
+<a name="l108"></a>  MemCpy(lo_image,hi_image,size);
+<a name="l109"></a>  HiCall(shutdown);
+<a name="l110"></a>}
+<a name="l111"></a>
+<a name="l112"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Install"</span><span class="cF0">
+<a name="l113"></a></span><span class="cF1">U0</span><span class="cF0"> InstallLTDir(</span><span class="cF1">U8</span><span class="cF0"> src,</span><span class="cF1">U8</span><span class="cF0"> dst)
+<a name="l114"></a>{
+<a name="l115"></a>  </span><span class="cF1">U8</span><span class="cF0"> buf_s[64],buf_d[64];
+<a name="l116"></a>  </span><span class="cF1">if</span><span class="cF0"> (src==dst) </span><span class="cF1">return</span><span class="cF0">;
+<a name="l117"></a>  SPrintF(buf_s,</span><span class="cF6">"%c:/LT"</span><span class="cF0">,src);
+<a name="l118"></a>  SPrintF(buf_d,</span><span class="cF6">"%c:/LT"</span><span class="cF0">,dst);
+<a name="l119"></a>  DelTree(buf_d);
+<a name="l120"></a>  CopyTree(buf_s,buf_d);
+<a name="l121"></a>}
+<a name="l122"></a>
+<a name="l123"></a></span><span class="cF1">U8</span><span class="cF0"> ChkWritable(</span><span class="cF1">U8</span><span class="cF0"> drv_let=0)
+<a name="l124"></a>{
+<a name="l125"></a>  BoolI8 cont=TRUE;
+<a name="l126"></a>  </span><span class="cF1">U8</span><span class="cF0"> writable_drv=drv_let;
+<a name="l127"></a>  LTPrt *p;
+<a name="l128"></a>  LTBlkDev *bdev;
+<a name="l129"></a>  </span><span class="cF1">if</span><span class="cF0"> (!IsDrvWritable</span><span class="cF7">(</span><span class="cF0">drv_let</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF7">{</span><span class="cF0">
+<a name="l130"></a>    </span><span class="cF6">''</span><span class="cF0"> drv_let;
+<a name="l131"></a>    </span><span class="cF6">": Drive is read-only.\n"</span><span class="cF0">;
+<a name="l132"></a>    </span><span class="cF1">do</span><span class="cF0"> {
+<a name="l133"></a>      </span><span class="cF6">"Enter RAM drive (usually 'B') for temporary files:"</span><span class="cF0">;
+<a name="l134"></a>      writable_drv=ToUpper(GetChar);
+<a name="l135"></a>      NewLine;
+<a name="l136"></a>      p=Drv2Prt(writable_drv);
+<a name="l137"></a>      bdev=p-&gt;bdev;
+<a name="l138"></a>      </span><span class="cF1">if</span><span class="cF0"> (bdev-&gt;type!=LTBDT_RAM ||
+<a name="l139"></a>          !IsDrvWritable</span><span class="cF7">(</span><span class="cF0">writable_drv</span><span class="cF7">)</span><span class="cF0">)
+<a name="l140"></a>        </span><span class="cF6">"Not A RAM Drive\n"</span><span class="cF0">;
+<a name="l141"></a>      </span><span class="cF1">else</span><span class="cF0">
+<a name="l142"></a>        cont=FALSE;
+<a name="l143"></a>    } </span><span class="cF1">while</span><span class="cF0"> (cont);
+<a name="l144"></a>    Fmt(writable_drv,FALSE,FALSE);
+<a name="l145"></a>    InstallLTDir(drv_let,writable_drv);
+<a name="l146"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l147"></a>  </span><span class="cF1">return</span><span class="cF0"> writable_drv;
+<a name="l148"></a>}
+<a name="l149"></a>
+<a name="l150"></a>
+<a name="l151"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Install"</span><span class="cF0">
+<a name="l152"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">U0</span><span class="cF0"> MakeAll()
+<a name="l153"></a></span><span class="cF2">//Call from </span><a href="/archive/LTHtml/Adam/Boot/InsBoot.html#l168"><span class="cF4">InstallBoot</span></a><span class="cF2">()  because loader must be patched with block address.</span><span class="cF0">
+<a name="l154"></a>
+<a name="l155"></a></span><span class="cF2">//These 3 modules (and bootloaders at top) are the only statically</span><span class="cF0">
+<a name="l156"></a></span><span class="cF2">//compiled code in LoseThos.  Everything else is JIT.</span><span class="cF0">
+<a name="l157"></a></span><span class="cF2">//You are doing it wrong if you make statically compiled code.</span><span class="cF0">
+<a name="l158"></a>
+<a name="l159"></a>{
+<a name="l160"></a>  Cd(</span><span class="cF6">"/LT/Compiler"</span><span class="cF0">);
+<a name="l161"></a>  </span><span class="cF1">if</span><span class="cF0"> (Cmp</span><span class="cF7">(</span><span class="cF6">"Compiler"</span><span class="cF0">,</span><span class="cF6">"Compiler"</span><span class="cF0">,NULL,</span><span class="cF6">':'</span><span class="cF7">)</span><span class="cF0">)
+<a name="l162"></a>    throw;
+<a name="l163"></a>  Cd(</span><span class="cF6">"/LT/OSMain"</span><span class="cF0">);
+<a name="l164"></a>  </span><span class="cF1">if</span><span class="cF0"> (Cmp</span><span class="cF7">(</span><span class="cF6">"OS"</span><span class="cF0">,</span><span class="cF6">"OS"</span><span class="cF0">,NULL,</span><span class="cF6">':'</span><span class="cF7">)</span><span class="cF0">)
+<a name="l165"></a>    throw;
+<a name="l166"></a>}
+<a name="l167"></a>
+<a name="l168"></a></span><span class="cF1">public</span><span class="cF0"> BoolI64 InstallBoot(</span><span class="cF1">U8</span><span class="cF0"> src_drv,</span><span class="cF1">U8</span><span class="cF0"> dst_drv=0)
+<a name="l169"></a>{
+<a name="l170"></a></span><span class="cF2">//Normally, you just supply a src_drv.</span><span class="cF0">  </span><span class="cF2">It will compile</span><span class="cF0">
+<a name="l171"></a></span><span class="cF2">//the code on that drive and update the boot sect.</span><span class="cF0">
+<a name="l172"></a>
+<a name="l173"></a></span><span class="cF2">//If you are making a bootable CD-ROM you supply a dst_drv.</span><span class="cF0">
+<a name="l174"></a></span><span class="cF2">//See </span><a href="https://web.archive.org/web/20120303011813/http://www.losethos.com/LTHtml/Doc/FileMgr.html#l94"><span class="cF4">Bootable CD-ROMs</span></a><span class="cF0">
+<a name="l175"></a>
+<a name="l176"></a></span><span class="cF2">//See </span><a href="/archive/LTHtml/Doc/Install.html"><span class="cF4">Install Documentation</span></a><span class="cF0">
+<a name="l177"></a>
+<a name="l178"></a></span><span class="cF2">//Study my account examples my technique </span><a href="https://web.archive.org/web/20120303011813/http://www.losethos.com/LTHtml/Demo/AcctExample/TSAdam.html"><span class="cF4">Cfg Strs</span></a><span class="cF2"> </span><a href="https://web.archive.org/web/20120303011813/http://www.losethos.com/LTHtml/Demo/AcctExample/TSDistribute.html"><span class="cF4">Update Funs</span></a><span class="cF0">
+<a name="l179"></a>
+<a name="l180"></a>  BoolI8 result=FALSE;
+<a name="l181"></a>  LTBlkDev *bdev;
+<a name="l182"></a>  LTPrt *p;
+<a name="l183"></a>  FAT32BootStruct br;
+<a name="l184"></a>  LTDirEntry de;
+<a name="l185"></a>  </span><span class="cF1">U64</span><span class="cF0"> *qq,i;
+<a name="l186"></a>  </span><span class="cF1">U8</span><span class="cF0"> *_b;
+<a name="l187"></a>  </span><span class="cF1">U16</span><span class="cF0"> *_w;
+<a name="l188"></a>
+<a name="l189"></a>  </span><span class="cF1">try</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l190"></a>    </span><span class="cF1">if</span><span class="cF0"> (!src_drv) src_drv=Fs-&gt;cur_prt-&gt;drv_let;
+<a name="l191"></a>    </span><span class="cF1">if</span><span class="cF0"> (!dst_drv) dst_drv=src_drv;
+<a name="l192"></a>
+<a name="l193"></a>    </span><span class="cF2">//This passes a cfg arg for</span><span class="cF0">
+<a name="l194"></a>    </span><span class="cF2">//compilation of OSMain which is accessed</span><span class="cF0">
+<a name="l195"></a>    </span><span class="cF2">//within a #exe {} statement.</span><span class="cF0">
+<a name="l196"></a>    </span><span class="cF2">//See </span><a href="https://web.archive.org/web/20120303011813/http://www.losethos.com/LTHtml/OSMain/OSCfg.html#l157"><span class="cF4">InsBootDstDrv</span></a><span class="cF0">
+<a name="l197"></a>    </span><span class="cF2">//(There is no way to set compiler options.)</span><span class="cF0">
+<a name="l198"></a>    NamedFramePtrAdd(</span><span class="cF6">"InsBootDstDrv"</span><span class="cF0">,dst_drv);
+<a name="l199"></a>    src_drv=ChkWritable(src_drv);
+<a name="l200"></a>    </span><span class="cF1">if</span><span class="cF0"> (!Drv</span><span class="cF7">(</span><span class="cF0">src_drv</span><span class="cF7">)</span><span class="cF0">)
+<a name="l201"></a>      throw;
+<a name="l202"></a>    MakeAll;
+<a name="l203"></a>    Cd(</span><span class="cF6">"/"</span><span class="cF0">);
+<a name="l204"></a>
+<a name="l205"></a>    bdev=Drv2BlkDev(dst_drv);
+<a name="l206"></a>    p   =Drv2Prt   (dst_drv);
+<a name="l207"></a>    </span><span class="cF1">switch</span><span class="cF0"> (bdev-&gt;type) {
+<a name="l208"></a>      </span><span class="cF1">case</span><span class="cF0"> LTBDT_ATAPI:
+<a name="l209"></a>        Move(</span><span class="cF6">"/LT/OSMain/OS.BIZ"</span><span class="cF0">,BOOT_DIR </span><span class="cF6">"/"</span><span class="cF0"> BOOT_BIC);
+<a name="l210"></a>        CDBootFileCreate;
+<a name="l211"></a>        result=TRUE;
+<a name="l212"></a>        </span><span class="cF1">break</span><span class="cF0">;
+<a name="l213"></a>      </span><span class="cF1">case</span><span class="cF0"> LTBDT_RAM:
+<a name="l214"></a>      </span><span class="cF1">case</span><span class="cF0"> LTBDT_ATA:
+<a name="l215"></a>        Move(</span><span class="cF6">"/LT/OSMain/OS.BIZ"</span><span class="cF0">,BOOT_BIC);
+<a name="l216"></a>        </span><span class="cF1">if</span><span class="cF0"> (!FileFind</span><span class="cF7">(</span><span class="cF0">BOOT_BIC,&amp;de,FALSE,TRUE</span><span class="cF7">)</span><span class="cF0">)
+<a name="l217"></a>          </span><span class="cF6">"No Boot.BIC\n"</span><span class="cF0">;
+<a name="l218"></a>        </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l219"></a>          </span><span class="cF6">"Modifying partition boot record.\n"</span><span class="cF0">;
+<a name="l220"></a>          RBlks(p,&amp;br,p-&gt;</span><span class="cF1">offset</span><span class="cF0">,1);
+<a name="l221"></a>          br.jump_and_nop[0]=0xEB;
+<a name="l222"></a>          br.jump_and_nop[1]=0x58;
+<a name="l223"></a>          br.jump_and_nop[2]=0x90;
+<a name="l224"></a>          _w=BHD_BLK_CNT;
+<a name="l225"></a>          *_w=(de.size+BLK_SIZE-1)&gt;&gt;BLK_SIZE_BITS;
+<a name="l226"></a>          qq=BHD_DAP_BLK;
+<a name="l227"></a>          *qq=p-&gt;data+de.cluster*p-&gt;spc;
+<a name="l228"></a>          _b=BHD_CODE;
+<a name="l229"></a>          </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;BHD_END-BHD_CODE;i++)
+<a name="l230"></a>            br.code[i]=_b[i];
+<a name="l231"></a>          </span><span class="cF1">for</span><span class="cF0"> (;i&lt;420;i++)
+<a name="l232"></a>            br.code[i]=0;
+<a name="l233"></a>          WBlks(p,&amp;br,p-&gt;</span><span class="cF1">offset</span><span class="cF0">,1);
+<a name="l234"></a>          result=TRUE;
+<a name="l235"></a>        </span><span class="cF7">}</span><span class="cF0">
+<a name="l236"></a>        </span><span class="cF1">break</span><span class="cF0">;
+<a name="l237"></a>    }
+<a name="l238"></a>  </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">catch</span><span class="cF0">
+<a name="l239"></a>    CatchAll;
+<a name="l240"></a>  NamedFramePtrDel(</span><span class="cF6">"InsBootDstDrv"</span><span class="cF0">);
+<a name="l241"></a>  </span><span class="cF1">return</span><span class="cF0"> result;
+<a name="l242"></a>}
+<a name="l243"></a>
+<a name="l244"></a>
+<a name="l245"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">U0</span><span class="cF0"> OldMasterBootRead(</span><span class="cF1">U8</span><span class="cF0"> src_drv,</span><span class="cF1">U8</span><span class="cF0"> dst_drv)
+<a name="l246"></a>{
+<a name="l247"></a>  LTBlkDev *bdev;
+<a name="l248"></a>  LTPrt *p,*p2;
+<a name="l249"></a>  MasterBootStruct mbr;
+<a name="l250"></a> 
+<a name="l251"></a>  bdev=Drv2BlkDev(src_drv);
+<a name="l252"></a>  </span><span class="cF1">try</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l253"></a>    </span><span class="cF1">while</span><span class="cF0"> (bdev-&gt;non_lt_drv) { </span><span class="cF2">//I think this would be insane, actually.</span><span class="cF0">
+<a name="l254"></a>      p2=Drv2Prt(bdev-&gt;non_lt_drv);
+<a name="l255"></a>      bdev=Drv2BlkDev(Prt2Drv</span><span class="cF7">(</span><span class="cF0">p2</span><span class="cF7">)</span><span class="cF0">);
+<a name="l256"></a>    }
+<a name="l257"></a>  </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">catch</span><span class="cF0">
+<a name="l258"></a>    Fs-&gt;catch_except=TRUE;
+<a name="l259"></a>  Drv(dst_drv);
+<a name="l260"></a>  p=Fs-&gt;cur_prt;
+<a name="l261"></a>  </span><span class="cF1">if</span><span class="cF0"> (p-&gt;type!=PT_LT &amp;&amp; p-&gt;type!=PT_FAT32)
+<a name="l262"></a>    PutDefineErr(</span><span class="cF6">"ST_NOT_LT"</span><span class="cF0">);
+<a name="l263"></a>  </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l264"></a>    </span><span class="cF2">//Bypass partition bounds-checking</span><span class="cF0">
+<a name="l265"></a>    BlkDevLock(bdev);
+<a name="l266"></a>    ATAReadBlks(bdev,&amp;mbr,0,1);
+<a name="l267"></a>    BlkDevUnlock(bdev);
+<a name="l268"></a>
+<a name="l269"></a>    Drv(dst_drv);
+<a name="l270"></a>    MkDir(BOOT_DIR);
+<a name="l271"></a>    FileWrite(OLDMBR_BIC,&amp;mbr,BLK_SIZE);
+<a name="l272"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l273"></a>}
+<a name="l274"></a>
+<a name="l275"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">U0</span><span class="cF0"> OldMasterBootWrite(</span><span class="cF1">U8</span><span class="cF0"> src_drv,</span><span class="cF1">U8</span><span class="cF0"> dst_drv)
+<a name="l276"></a>{
+<a name="l277"></a>  LTBlkDev *bdev;
+<a name="l278"></a>  MasterBootStruct *mbr;
+<a name="l279"></a>  LTPrt *p2;
+<a name="l280"></a>  bdev=Drv2BlkDev(dst_drv);
+<a name="l281"></a>  </span><span class="cF1">try</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l282"></a>    </span><span class="cF1">while</span><span class="cF0"> (bdev-&gt;non_lt_drv) { </span><span class="cF2">//I think this would be insane, actually.</span><span class="cF0">
+<a name="l283"></a>      p2=Drv2Prt(bdev-&gt;non_lt_drv);
+<a name="l284"></a>      bdev=Drv2BlkDev(Prt2Drv</span><span class="cF7">(</span><span class="cF0">p2</span><span class="cF7">)</span><span class="cF0">);
+<a name="l285"></a>    }
+<a name="l286"></a>  </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">catch</span><span class="cF0">
+<a name="l287"></a>    Fs-&gt;catch_except=TRUE;
+<a name="l288"></a>  Drv(src_drv);
+<a name="l289"></a>  mbr=FileRead(OLDMBR_BIC);
+<a name="l290"></a>  </span><span class="cF1">if</span><span class="cF0"> (mbr) </span><span class="cF7">{</span><span class="cF0">
+<a name="l291"></a>    </span><span class="cF2">//Bypass partition bounds-checking</span><span class="cF0">
+<a name="l292"></a>    BlkDevLock(bdev);
+<a name="l293"></a>    ATAWriteBlks(bdev,mbr,0,1);
+<a name="l294"></a>    BlkDevUnlock(bdev);
+<a name="l295"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l296"></a>  Free(mbr);
+<a name="l297"></a>}
+<a name="l298"></a>
+<a name="l299"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">U0</span><span class="cF0"> MasterBootZero(</span><span class="cF1">U8</span><span class="cF0"> dst_drv)
+<a name="l300"></a>{
+<a name="l301"></a></span><span class="cF2">//This is dangerous!!</span><span class="cF0">
+<a name="l302"></a></span><span class="cF2">//The LoseThos parter doesn't play well</span><span class="cF0">
+<a name="l303"></a></span><span class="cF2">//with other operating systems at this time and you need</span><span class="cF0">
+<a name="l304"></a></span><span class="cF2">//to do this on a drive partitioned by LoseThos</span><span class="cF0">
+<a name="l305"></a></span><span class="cF2">//if you wish to partition with another operating system.</span><span class="cF0">
+<a name="l306"></a>  LTBlkDev *bdev;
+<a name="l307"></a>  MasterBootStruct mbr;
+<a name="l308"></a>  LTPrt *p2;
+<a name="l309"></a>  bdev=Drv2BlkDev(dst_drv);
+<a name="l310"></a>  </span><span class="cF1">try</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l311"></a>    </span><span class="cF1">while</span><span class="cF0"> (bdev-&gt;non_lt_drv) { </span><span class="cF2">//I think this would be insane, actually.</span><span class="cF0">
+<a name="l312"></a>      p2=Drv2Prt(bdev-&gt;non_lt_drv);
+<a name="l313"></a>      bdev=Drv2BlkDev(Prt2Drv</span><span class="cF7">(</span><span class="cF0">p2</span><span class="cF7">)</span><span class="cF0">);
+<a name="l314"></a>    }
+<a name="l315"></a>  </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">catch</span><span class="cF0">
+<a name="l316"></a>    Fs-&gt;catch_except=TRUE;
+<a name="l317"></a>  MemSet(&amp;mbr,0,BLK_SIZE);
+<a name="l318"></a>
+<a name="l319"></a>  </span><span class="cF2">//Bypass partition bounds-checking</span><span class="cF0">
+<a name="l320"></a>  BlkDevLock(bdev);
+<a name="l321"></a>  ATAWriteBlks(bdev,&amp;mbr,0,1);
+<a name="l322"></a>  BlkDevUnlock(bdev);
+<a name="l323"></a>}
+<a name="l324"></a>
+<a name="l325"></a></span><span class="cF1">public</span><span class="cF0"> BoolI64 InstallMasterBoot(</span><span class="cF1">U8</span><span class="cF0"> drv_let,</span><span class="cF1">U8</span><span class="cF0"> *drv_list=NULL)
+<a name="l326"></a>{
+<a name="l327"></a>  BoolI8 result=FALSE;
+<a name="l328"></a>  LTBlkDev *bdev,*bd1;
+<a name="l329"></a>  LTPrt *p,*p1,*p2;
+<a name="l330"></a>  MasterBootStruct mbr;
+<a name="l331"></a>  LTDirEntry de;
+<a name="l332"></a>  </span><span class="cF1">U64</span><span class="cF0"> i,j,size,*qq;
+<a name="l333"></a>  </span><span class="cF1">U8</span><span class="cF0"> *_b;
+<a name="l334"></a>  </span><span class="cF1">U16</span><span class="cF0"> *_w;
+<a name="l335"></a>  </span><span class="cF1">U8</span><span class="cF0"> *menu_ptr,*ptr,ch,buf[128],buf2[128];
+<a name="l336"></a>
+<a name="l337"></a>  </span><span class="cF1">try</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l338"></a>    </span><span class="cF1">if</span><span class="cF0"> (drv_list)
+<a name="l339"></a>      StrCpy(buf2,drv_list);
+<a name="l340"></a>    </span><span class="cF1">else</span><span class="cF0"> {
+<a name="l341"></a>      j=0;
+<a name="l342"></a>      </span><span class="cF1">for</span><span class="cF0"> (i=</span><span class="cF6">'A'</span><span class="cF0">;i&lt;=</span><span class="cF6">'Z'</span><span class="cF0">;i++)
+<a name="l343"></a>        buf2[j++]=i;
+<a name="l344"></a>      buf2[j++]=0;
+<a name="l345"></a>    }
+<a name="l346"></a>
+<a name="l347"></a>    Drv(drv_let);
+<a name="l348"></a>    p=Fs-&gt;cur_prt;
+<a name="l349"></a>    </span><span class="cF1">if</span><span class="cF0"> (p-&gt;type!=PT_LT &amp;&amp; p-&gt;type!=PT_FAT32)
+<a name="l350"></a>      PutDefineErr(</span><span class="cF6">"ST_NOT_LT"</span><span class="cF0">);
+<a name="l351"></a>    </span><span class="cF1">else</span><span class="cF0"> {
+<a name="l352"></a>      bdev=Drv2BlkDev(drv_let);
+<a name="l353"></a>      </span><span class="cF1">try</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l354"></a>        </span><span class="cF1">while</span><span class="cF0"> (bdev-&gt;non_lt_drv) { </span><span class="cF2">//I think this would be insane, actually.</span><span class="cF0">
+<a name="l355"></a>          p2=Drv2Prt(bdev-&gt;non_lt_drv);
+<a name="l356"></a>          bdev=Drv2BlkDev(Prt2Drv</span><span class="cF7">(</span><span class="cF0">p2</span><span class="cF7">)</span><span class="cF0">);
+<a name="l357"></a>        }
+<a name="l358"></a>      </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">catch</span><span class="cF0">
+<a name="l359"></a>        Fs-&gt;catch_except=TRUE;
+<a name="l360"></a>      </span><span class="cF1">if</span><span class="cF0"> (!FileFind</span><span class="cF7">(</span><span class="cF0">OLDMBR_BIC,&amp;de,FALSE,TRUE</span><span class="cF7">)</span><span class="cF0">)
+<a name="l361"></a>        OldMasterBootRead(drv_let,drv_let);
+<a name="l362"></a>
+<a name="l363"></a>      qq=BMHD2_BLK_ARRAY;
+<a name="l364"></a>      MemSet(qq,0,</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF1">U64</span><span class="cF7">)</span><span class="cF0">*8);
+<a name="l365"></a>      menu_ptr=BMHD2_BOOT_MSG;
+<a name="l366"></a>      SPrintF(menu_ptr,</span><span class="cF6">"\n\r\n\rLoseThos Boot Loader\n\r\n\r"</span><span class="cF0">);
+<a name="l367"></a>      j=0;
+<a name="l368"></a>      </span><span class="cF1">if</span><span class="cF0"> (FileFind</span><span class="cF7">(</span><span class="cF0">OLDMBR_BIC,&amp;de,FALSE,TRUE</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF7">{</span><span class="cF0">
+<a name="l369"></a>        *qq++=p-&gt;data+de.cluster*p-&gt;spc;
+<a name="l370"></a>        StrCat(menu_ptr,</span><span class="cF6">"0. Old Boot Record\n\r"</span><span class="cF0">);
+<a name="l371"></a>        j++;
+<a name="l372"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l373"></a>
+<a name="l374"></a>      ptr=buf2;
+<a name="l375"></a>      </span><span class="cF1">while</span><span class="cF0"> (ch=*ptr++) </span><span class="cF7">{</span><span class="cF0">
+<a name="l376"></a>        </span><span class="cF1">try</span><span class="cF0">
+<a name="l377"></a>          p1=Drv2Prt(ch);
+<a name="l378"></a>        </span><span class="cF1">catch</span><span class="cF0"> {
+<a name="l379"></a>          Fs-&gt;catch_except=TRUE;
+<a name="l380"></a>          p1=NULL;
+<a name="l381"></a>        }
+<a name="l382"></a>        </span><span class="cF1">if</span><span class="cF0"> (p1) {
+<a name="l383"></a>          bd1=p1-&gt;bdev;
+<a name="l384"></a>          </span><span class="cF1">try</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l385"></a>            </span><span class="cF1">while</span><span class="cF0"> (bd1-&gt;non_lt_drv) { </span><span class="cF2">//I think this would be insane, actually.</span><span class="cF0">
+<a name="l386"></a>              p2=Drv2Prt(bd1-&gt;non_lt_drv);
+<a name="l387"></a>              bd1=Drv2BlkDev(Prt2Drv</span><span class="cF7">(</span><span class="cF0">p2</span><span class="cF7">)</span><span class="cF0">);
+<a name="l388"></a>            }
+<a name="l389"></a>          </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">catch</span><span class="cF0">
+<a name="l390"></a>            Fs-&gt;catch_except=TRUE;
+<a name="l391"></a>          </span><span class="cF1">if</span><span class="cF0"> (bd1==bdev) </span><span class="cF7">{</span><span class="cF0">
+<a name="l392"></a>            *qq=p1-&gt;</span><span class="cF1">offset</span><span class="cF0">;
+<a name="l393"></a>            </span><span class="cF6">"Drive %c:%16X\n"</span><span class="cF0">,Prt2Drv(p1),*qq;
+<a name="l394"></a>            SPrintF(buf,</span><span class="cF6">"%d. Drive %c\n\r"</span><span class="cF0">,j++,Prt2Drv</span><span class="cF7">(</span><span class="cF0">p1</span><span class="cF7">)</span><span class="cF0">);
+<a name="l395"></a>            StrCat(menu_ptr,buf);
+<a name="l396"></a>            qq++;
+<a name="l397"></a>          </span><span class="cF7">}</span><span class="cF0">
+<a name="l398"></a>        }
+<a name="l399"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l400"></a>      StrCat(menu_ptr,</span><span class="cF6">"\n\rSelection:"</span><span class="cF0">);
+<a name="l401"></a>
+<a name="l402"></a>      size=BMHD2_END-BMHD2_START;
+<a name="l403"></a>      FileWrite(BOOTLOADER_BIC,BMHD2_START,size);
+<a name="l404"></a>
+<a name="l405"></a>      </span><span class="cF1">if</span><span class="cF0"> (!FileFind</span><span class="cF7">(</span><span class="cF0">BOOTLOADER_BIC,&amp;de,FALSE,TRUE</span><span class="cF7">)</span><span class="cF0">)
+<a name="l406"></a>        </span><span class="cF6">"No Boot Loader Image\n"</span><span class="cF0">;
+<a name="l407"></a>      </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l408"></a>        _w=BMHD_BLK_CNT;
+<a name="l409"></a>        *_w=(size+BLK_SIZE-1)&gt;&gt;BLK_SIZE_BITS;
+<a name="l410"></a>        qq=BMHD_DAP_BLK;
+<a name="l411"></a>        *qq=p-&gt;data+de.cluster*p-&gt;spc;
+<a name="l412"></a>        _b=BMHD_CODE;
+<a name="l413"></a>        </span><span class="cF2">//Bypass partition bounds-checking</span><span class="cF0">
+<a name="l414"></a>        BlkDevLock(bdev);
+<a name="l415"></a>        ATAReadBlks(bdev,&amp;mbr,0,1);
+<a name="l416"></a>        </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;BMHD_END-BMHD_CODE;i++)
+<a name="l417"></a>          mbr.boot_code[i]=_b[i];
+<a name="l418"></a>        </span><span class="cF1">for</span><span class="cF0"> (;i&lt;440;i++)
+<a name="l419"></a>          mbr.boot_code[i]=0;
+<a name="l420"></a>        </span><span class="cF1">if</span><span class="cF0"> (!mbr.media_id)
+<a name="l421"></a>          mbr.media_id=RandU32;
+<a name="l422"></a>        mbr.zero=0;
+<a name="l423"></a>        mbr.signature=0xAA55;
+<a name="l424"></a>
+<a name="l425"></a>        ATAWriteBlks(bdev,&amp;mbr,0,1);
+<a name="l426"></a>        BlkDevUnlock(bdev);
+<a name="l427"></a>        result=TRUE;
+<a name="l428"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l429"></a>    }
+<a name="l430"></a>  </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">catch</span><span class="cF0">
+<a name="l431"></a>    CatchAll;
+<a name="l432"></a>  </span><span class="cF1">return</span><span class="cF0"> result;
+<a name="l433"></a>}
+<a name="l434"></a>
+<a name="l435"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Boot"</span><span class="cF0">
+<a name="l436"></a>
+<a name="l437"></a></span><span class="cF2">/*</span><span class="cF0">
+<a name="l438"></a></span><span class="cF2">These routines are intended for use when</span><span class="cF0">
+<a name="l439"></a></span><span class="cF2">booted to the production CD.  They</span><span class="cF0">
+<a name="l440"></a></span><span class="cF2">allow compiling and booting the RAM Drive 'B'.</span><span class="cF0">
+<a name="l441"></a>
+<a name="l442"></a></span><span class="cF2">These are good when you are trying to get</span><span class="cF0">
+<a name="l443"></a></span><span class="cF2">a new system working and you don't want to</span><span class="cF0">
+<a name="l444"></a></span><span class="cF2">burn a CD-ROM for each attempt.</span><span class="cF0">
+<a name="l445"></a>
+<a name="l446"></a></span><span class="cF2">If you alter the kernel, the RAM drive might</span><span class="cF0">
+<a name="l447"></a></span><span class="cF2">shift to a new location and data will not be</span><span class="cF0">
+<a name="l448"></a></span><span class="cF2">recognized.</span><span class="cF0">
+<a name="l449"></a></span><span class="cF2">*/</span><span class="cF0">
+<a name="l450"></a>
+<a name="l451"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">U0</span><span class="cF0"> CmpProdCDROM(</span><span class="cF1">U8</span><span class="cF0"> src_drv,</span><span class="cF1">U8</span><span class="cF0"> dst_drv=0)
+<a name="l452"></a>{
+<a name="l453"></a>  Auto(PROD_CDROM_CFG);
+<a name="l454"></a>  InstallBoot(src_drv,dst_drv);
+<a name="l455"></a>}
+<a name="l456"></a>
+<a name="l457"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">U0</span><span class="cF0"> Install2RAMDrv(</span><span class="cF1">U8</span><span class="cF0"> src_drv=</span><span class="cF6">'T'</span><span class="cF0">,</span><span class="cF1">U8</span><span class="cF0"> dst_drv=</span><span class="cF6">'B'</span><span class="cF0">)
+<a name="l458"></a>{
+<a name="l459"></a>  </span><span class="cF1">U8</span><span class="cF0"> buf_s[64],buf_d[64];
+<a name="l460"></a>  Fmt(dst_drv,TRUE,FALSE);
+<a name="l461"></a>  SPrintF(buf_s,</span><span class="cF6">"%C:/"</span><span class="cF0">,src_drv);
+<a name="l462"></a>  SPrintF(buf_d,</span><span class="cF6">"%C:/"</span><span class="cF0">,dst_drv);
+<a name="l463"></a>  CopyTree(buf_s,buf_d);
+<a name="l464"></a>  CmpProdCDROM(dst_drv);
+<a name="l465"></a>}
+<a name="l466"></a>
+<a name="l467"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">U0</span><span class="cF0"> Boot2RAMDrv(</span><span class="cF1">U8</span><span class="cF0"> drv_let=</span><span class="cF6">'B'</span><span class="cF0">)
+<a name="l468"></a>{
+<a name="l469"></a>  </span><span class="cF1">U8</span><span class="cF0"> buf[64];
+<a name="l470"></a>  CmpProdCDROM(drv_let);
+<a name="l471"></a>  SPrintF(buf,</span><span class="cF6">"%C:/Boot.BIC"</span><span class="cF0">,drv_let);
+<a name="l472"></a>  Boot(buf);
+<a name="l473"></a>}
+<a name="l474"></a>
+<a name="l475"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">""</span><span class="cF0">
+</span></pre><div class="archive-note">Historical capture: 2012-03-03. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

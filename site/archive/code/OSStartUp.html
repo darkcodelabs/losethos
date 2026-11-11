@@ -1,0 +1,533 @@
+<html>
+<head><meta charset="utf-8"/>
+<style>
+</style>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+Project: OSMain
+asm {
+USE16
+        JMP     U2 LOSETHOS_START2
+// ************************************
+//  ASM Global variables required for 16-bit start-up
+
+//Must match OSMainStruct
+        ALIGN   4,OC_NOP
+SYS_BOOT_BASE::         DU4     ?;      //Fixed offset from start used by reboot
+SYS_BOOT_HEADER_BASE::  DU4     ?;
+#exe {StreamPrintF("SYS_COMPILE_TIME:: DU8 0x%X;",GetCurTimeLTDate);}
+
+//See BootCdProbe
+#assert SYS_COMPILE_TIME+8+16&lt;CD_BLK_SIZE
+
+SYS_OS_32START::        DU4     INIT_OS;
+SYS_BOOT_CODE::         DU4     0xFF;
+SYS_MEM_E801::          DU2     0,0;
+SYS_MEM_E820::          DU1     NUM_MEM_E820_ENTRIES*MEM_E820_ENTRY_SIZE DUP (0);
+
+        ALIGN   16,OC_NOP
+SYS_GDTTAB:: //See SELECTORS
+GDT_NULL:               DU8     0,0;
+GDT_BOOT_DS:            DU8     0,0; //gets filled-in
+GDT_BOOT_CS:            DU8     0,0; //gets filled-in
+GDT_CS:                 DU8     0x00CF9A000000FFFF,0;
+GDT_CS64:               DU8     0x00209A0000000000,0;
+GDT_ZERO_DS:            DU8     0x00CF92000000FFFF,0;
+GDT_CPU_TRS:            DU1     MP_MAX_PROCESSORS*16 DUP(0); //gets filled-in
+
+SYS_GR_MODE::           DU2     0;
+SYS_PCI_BUSSES::        DU2     0;
+        ALIGN   8,OC_NOP
+SYS_ADAM_TASK::         DU1     TASK_STRUCT_SIZE DUP(0);
+SYS_ADAM_HC::           DU1     HC_STRUCT_SIZE DUP(0);
+SYS_TEMP_PTR::          DU4     0,0,0;
+SYS_RUN_LEVEL::         DU4     0;
+
+// ************************************
+//EBX is SYS_BOOT_CODE (value passed from boot blk)
+LOSETHOS_START2::
+        MOV     AX,(BOOT_RAM_LIMIT-BOOT_STK_SIZE)/16
+        MOV     SS,AX
+        MOV     SP,BOOT_STK_SIZE
+        PUSH    EBX             //will be SYS_BOOT_CODE
+        MOV     AX,VGA_TEXT_MEM_BASE/16
+        MOV     ES,AX
+        MOV     U4 ES:[0],'L'+0x1000+('T'+0x2000)&lt;&lt;16
+        MOV     U4 ES:[4],0
+
+//      MOV     ECX,1000000
+//      CALL    BUSY_WAIT
+
+        CALL    U2 GET_IP
+GET_IP:
+        POP     BX
+        SUB     BX,GET_IP
+        SHR     BX,4
+        MOV     AX,CS
+        ADD     AX,BX
+        PUSH    AX
+        PUSH    U2 LOSETHOS_START3
+        RETF
+LOSETHOS_START3::
+//XSUM OSMain
+        MOV     AX,CS
+        DEC     AX
+        MOV     DS,AX
+        XOR     ESI,ESI
+        MOV     ECX,U4 8[ESI]   //Get length
+        SHR     ECX,4
+        MOV     EBX,LT_XSUM
+@@2:    LODSD
+        XOR     EBX,EAX
+        LODSD
+        XOR     EBX,EAX
+        LODSD
+        XOR     EBX,EAX
+        LODSD
+        XOR     EBX,EAX
+        XOR     ESI,ESI
+        MOV     AX,DS
+        INC     AX
+        MOV     DS,AX
+        LOOP    @@2
+
+//If you debug, use text video mem
+        MOV     U4 ES:[4],'O'+65536*'K'+0xF000F000
+
+//      MOV     ECX,1000000
+//      CALL    BUSY_WAIT
+
+        OR      EBX,EBX
+        JZ      LOSETHOS_CONT_START
+
+//XSUM Error
+        MOV     U4 ES:[4],'X'+65536*'M'+0xF000F000
+
+//      MOV     ECX,1000000
+//      CALL    BUSY_WAIT
+
+@@3:    JMP     @@3
+
+BUSY_WAIT::
+@@1:    IN      AL,0x21
+        DEC     ECX
+        JNZ     @@1
+        RET
+// ************************************
+LOSETHOS_CONT_START:
+        STI
+        MOV     AX,CS
+        MOV     DS,AX
+
+        MOV     U4 [SYS_RUN_LEVEL],RLF_16BIT
+
+#exe {StreamPrintF("MOV BX,%d\r\n",osmain_cfg-&gt;new_gr_mode);};
+        MOV     U2 [SYS_GR_MODE],BX
+        MOV     AX,0x4F02
+#exe {
+  if (!osmain_cfg-&gt;opts[CFG_TEXT_MODE])
+    StreamPutS("INT 0x10");  //Enable VGA
+};
+        CMP     AX,0x004F
+        JE      @@10
+        MOV     U2 [SYS_GR_MODE],0 //failed
+@@10:
+
+/****
+//Enable mouse
+        MOV     AX,0xC200 //Enable
+        MOV     BX,0x0100
+        INT     0x15
+        MOV     AX,0xC201 //Reset
+        INT     0x15
+        MOV     AX,0xC200 //Enable
+        MOV     BX,0x0100
+        INT     0x15
+        MOV     AX,0xC202 //Sample
+        MOV     BX,0x0500 //100
+        INT     0x15
+        MOV     AX,0xC203 //Resolution
+        MOV     BX,0x0300 //8 per mm
+        INT     0x15
+        MOV     AX,0xC205 //pkt size
+        MOV     BX,0x0300
+        INT     0x15
+        MOV     AX,0xC200 //Enable
+        MOV     BX,0x0100
+        INT     0x15
+****/
+
+//Get mem maps
+        MOV     AX,0xE801
+        INT     0x15
+        MOV     U2 [SYS_MEM_E801],CX
+        MOV     U2 [SYS_MEM_E801+2],DX
+
+        MOV     CX,NUM_MEM_E820_ENTRIES-1 //Leave one to terminate
+        XOR     EBX,EBX
+        MOV     AX,DS
+        MOV     ES,AX
+        MOV     DI,SYS_MEM_E820
+@@20:   PUSH    CX
+        MOV     EAX,0xE820
+        MOV     ECX,MEM_E820_ENTRY_SIZE
+        MOV     EDX,'PAMS'
+        INT     0x15
+        JC      @@21
+        CMP     EAX,'PAMS'
+        JNE     @@21
+        OR      EBX,EBX
+        JZ      @@21
+        ADD     DI,MEM_E820_ENTRY_SIZE
+        POP     CX
+        LOOP    @@20
+        JMP     @@22
+@@21:   ADD     SP,2
+
+//Get PCI Bus Info
+@@22:   MOV     U2 [SYS_PCI_BUSSES],256
+        XOR     DX,DX
+        MOV     AX,0xB101
+        INT     0x1A
+        CMP     DX,'P'+'C'*256
+        JNE     @@30
+        MOV     CH,0
+        INC     CX
+        MOV     U2 [SYS_PCI_BUSSES],CX
+@@30:
+
+        CLI
+//Enable A20
+        IN      AL,0x92
+        OR      AL,2
+        OUT     0x92,AL
+
+        CLD                     //Start with known registers
+        MOV     AX,CS
+        MOV     DS,AX
+        MOV     ES,AX
+        MOV     FS,AX
+        MOV     GS,AX
+        XOR     EAX,EAX
+        XOR     EBX,EBX
+        XOR     ECX,ECX
+        XOR     EDX,EDX
+        XOR     ESI,ESI
+        XOR     EDI,EDI
+        XOR     EBP,EBP
+
+        XOR     EAX,EAX
+        MOV     AX,CS
+        SHL     EAX,4
+        MOV     U4 [SYS_BOOT_BASE],EAX
+
+        POP     U4 [SYS_BOOT_CODE]
+
+        MOV     BX,CS
+        DEC     BX
+        MOV     GS,BX
+        MOV     EBX,U4 GS:[4]
+        ADD     EAX,EBX
+        SUB     EAX,16
+        MOV     U4 [SYS_BOOT_HEADER_BASE],EAX
+
+        MOV     U4 [GDT_BOOT_DS],0x0000FFFF
+        MOV     U4 [GDT_BOOT_DS+4],0x0CF9200
+        MOV     U4 [GDT_BOOT_CS],0x0000FFFF
+        MOV     U4 [GDT_BOOT_CS+4],0x0CF9A00
+        MOV     EAX,U4 [SYS_BOOT_BASE]
+        ADD     U4 [GDT_BOOT_DS+2],EAX
+        ADD     U4 [GDT_BOOT_CS+2],EAX
+
+                                        // SETUP PTR TO LIMIT AND BASE
+                                        //OF GDT.  USE ENTRY (0) BECAUSE IT IS
+                                        //INVALID.
+        MOV     U2 [SYS_TEMP_PTR],GDTTAB_SIZE-1
+        MOV     EAX,U4 [SYS_BOOT_BASE]
+        ADD     EAX,SYS_GDTTAB
+        MOV     U4 [SYS_TEMP_PTR+2],EAX
+        MOV     U2 [SYS_TEMP_PTR+6],0
+
+        LGDT    U4 [SYS_TEMP_PTR]
+        MOV     EAX,SYS_START_CR0
+        MOV_CR0_EAX
+
+/*
+The assembler doesn't support far jumps so we hand code it.
+16-bit code is not important enough for me to implement
+16-bit mode in the assembler fully.
+
+To complete the switch to 32-bit mode, we have to load
+the code segment with a far jump.
+*/
+        DU1     0x66,0xEA;               //JMP SYS_CS_SEL:INIT_OS
+        DU4     INIT_OS;
+        DU2     SYS_BOOT_CS_SEL;
+
+#assert $+16&lt;=0xFFFF
+USE32
+// ************************************
+//  ASM Global variables not required for 16-bit start-up
+        ALIGN   8,OC_NOP
+SYS_HEAP_BASE::         DU8     0x100000+0x1000*(NUM_PML1+NUM_PML2+NUM_PML3+NUM_PML4);
+SYS_HEAP_LIMIT::        DU8     0;
+
+#exe {
+  StreamPrintF(
+"SYS_MEM_INIT_FLAG::    DU1     %d;"
+"SYS_MEM_INIT_VAL::     DU1     %d;"
+"SYS_HEAP_INIT_FLAG::   DU1     %d;"
+"SYS_HEAP_INIT_VAL::    DU1     %d;"
+"SYS_VAR_INIT_FLAG::    DU1     %d;"
+"SYS_VAR_INIT_VAL::     DU1     %d;",
+osmain_cfg-&gt;opts[CFG_MEM_INIT], osmain_cfg-&gt;mem_init_val,
+osmain_cfg-&gt;opts[CFG_HEAP_INIT],osmain_cfg-&gt;heap_init_val,
+osmain_cfg-&gt;opts[CFG_VAR_INIT], osmain_cfg-&gt;var_init_val);
+};
+SYS_HEAP_DBG_FLAG::             DU1     _CFG_HEAP_DBG;
+                        DU1     0; //pad
+
+SYS_CTRL_ALT_FLAGS::    DU8     0;
+
+SYS_CUR_SCAN_CODE::     DU8     0;
+SYS_EXTERN_TABLE::      DU8     0;
+
+SYS_BP_START::
+SYS_BP_LOCKED_FLAGS::   DU8     0;
+SYS_BP_SIZE::           DU8     0;
+SYS_BP_MEM_FREE_LIST::          DU8     0;
+SYS_BP_MEM_FREE_2MEG_LIST::     DU8     0;
+SYS_BP_FREE_PAGE_HASH:: DU8     FREE_PAGE_HASH_SIZE DUP(0);
+SYS_BP_FREE_PAGE_HASH2::        DU8     64 DUP(0);
+
+SYS_CODE_BP::           DU8     0;
+SYS_DATA_BP::           DU8     0;
+
+SYS_PROGRESS_VALS::
+SYS_PROGRESS1::         DU8     0;
+SYS_PROGRESS2::         DU8     0;
+SYS_PROGRESS3::         DU8     0;
+SYS_PROGRESS4::         DU8     0;
+
+SYS_PROGRESS_MAXES::
+SYS_PROGRESS1_MAX::     DU8     0;
+SYS_PROGRESS2_MAX::     DU8     0;
+SYS_PROGRESS3_MAX::     DU8     0;
+SYS_PROGRESS4_MAX::     DU8     0;
+
+SYS_PROGRESS_DESCS::
+SYS_PROGRESS1_DESC::    DU8     0;
+SYS_PROGRESS2_DESC::    DU8     0;
+SYS_PROGRESS3_DESC::    DU8     0;
+SYS_PROGRESS4_DESC::    DU8     0;
+
+
+SYS_CUR_FOCUS_TASK::    DU8     0;
+SYS_TASK_BEING_SCREEN_UPDATED:: DU8     0;
+SYS_TIMER::             DU8     1;
+SYS_JIFFIES::           DU8     1;
+SYS_CPU_STRUCTS::       DU8     0;
+SYS_MP_CNT::            DU8     1;
+SYS_MP_CNT_LOCK::       DU8     0;
+SYS_TEMP_CPU0_STRUCT::  DU1     CPU_STRUCT_SIZE DUP (0);
+
+        ALIGN   DEFAULT_CACHE_LINE_WIDTH,OC_NOP
+SYS_CACHE_LINE_WIDTH::  DU8     DEFAULT_CACHE_LINE_WIDTH;
+//Align to cache-line boundary,
+// compensating for 16 byte segment header
+        DU1     DEFAULT_CACHE_LINE_WIDTH-16-8 DUP(0);
+SYS_SEMA_IRQS::         DU1     NUM_IRQ_SEMAS*SEMA_STRUCT_SIZE DUP(0);
+SYS_SEMAS::             DU1     NUM_SYS_SEMAS*SEMA_STRUCT_SIZE DUP(0);
+        ALIGN   16,OC_NOP
+SYS_INIT_FPU_MMX::      DU1     sizeof(FPUState) DUP(0);
+// ************************************
+        ALIGN   16,OC_NOP
+INIT_OS:: //Entry point for RAM reboots.
+        PUSH    U4 SYS_START_RFLAGS
+        POPFD
+        MOV     EAX,SYS_START_CR0
+        MOV_CR0_EAX
+
+        MOV     AL,0xFF
+        OUT     0x21,AL //mask interrupts
+        OUT     0xA1,AL
+
+        MOV     AX,SYS_BOOT_DS_SEL      //LOAD DS SELECTOR
+        MOV     DS,AX
+        MOV     ES,AX
+
+        MOV     EAX,U4 [SYS_RUN_LEVEL]
+        AND     EAX,RLF_16BIT
+        OR      EAX,RLF_32BIT
+        MOV     U4 [SYS_RUN_LEVEL],EAX
+
+//Patch absolute addresses
+        MOV     ESI,U4 [SYS_BOOT_HEADER_BASE]
+        MOV     EDI,U4 [SYS_BOOT_BASE]
+        MOV     AX,ZERO_DS_SEL
+        MOV     DS,AX
+        MOV     ES,AX
+        MOV     ECX,U4 1+1+4+1[ESI]
+        LEA     ESI,U4 1+4+1+1+4+1[ESI]
+@@10:   LODSD
+        ADD     EAX,EDI
+        ADD     U4 [EAX],EDI
+        LOOP    @@10
+
+        MOV     AX,ZERO_DS_SEL
+        MOV     DS,AX
+        MOV     ES,AX
+        MOV     FS,AX
+        MOV     GS,AX
+        MOV     SS,AX
+        MOV     ESP,BOOT_RAM_LIMIT //Temp Stack
+
+        DU1     0xEA; //JMP SYS_CS_SEL:CONT_INIT_OS
+        DU4     CONT_INIT_OS;
+        DU2     SYS_CS_SEL;
+
+CONT_INIT_OS::
+        LOCK
+        BTS     U4 [SYS_RUN_LEVEL],RLf_PATCHED
+
+        XOR     EAX,EAX
+        MOV     U4 [SYS_CTRL_ALT_FLAGS],EAX
+        MOV     U4 [SYS_CTRL_ALT_FLAGS+4],EAX
+        MOV     EDI,U4 SYS_SEMAS
+        MOV     ECX,NUM_SYS_SEMAS*SEMA_STRUCT_SIZE/4
+        REP_STOSD
+        
+        CALL    FIND_BIOS32_SERVICE_DIR
+        CALL    FIND_PCI_SERVICES
+
+        MOV     U4 [SYS_HEAP_BASE],0x100000+0x1000*(NUM_PML1+NUM_PML2+NUM_PML3+NUM_PML4)
+        CALL    INIT_MEM
+
+        PUSH    U4 0
+        CALL    INIT_EM64T
+USE64
+        LOCK
+        BTS     U4 [SYS_RUN_LEVEL],RLf_64BIT
+
+        FNINIT
+        FXSAVE  U8 [SYS_INIT_FPU_MMX]
+
+//INIT CPU0 STRUCT
+        PUSH    U4 SYS_TEMP_CPU0_STRUCT
+        PUSH    0
+        CALL    _INIT_CPU_STRUCT
+        ADD     RSP,16
+
+        PUSH    RAX
+        CALL    _SET_GS_BASE
+        ADD     RSP,8
+
+//INIT ADAM TASK
+        MOV     RDI,U4 SYS_ADAM_TASK
+        MOV     RCX,TASK_STRUCT_SIZE
+        XOR     RAX,RAX
+        REP_STOSB
+
+//INIT ADAM HC
+        MOV     RDI,U4 SYS_ADAM_HC
+        MOV     RCX,HC_STRUCT_SIZE
+        XOR     RAX,RAX
+        REP_STOSB
+        MOV     RDI,U4 SYS_ADAM_HC
+        MOV     RAX,U4 SYS_BP_START
+        MOV     U8 HC_BP[RDI],RAX
+        MOV     U4 HC_SIGNATURE[RDI],HEAP_CTRL_SIGNATURE_VAL
+
+        
+        LEA     RAX,U8 HC_NEXT_UM-UM_NEXT[RDI]
+        MOV     U8 HC_NEXT_UM[RDI],RAX
+        MOV     U8 HC_LAST_UM[RDI],RAX
+
+        MOV     RAX,U4 SYS_ADAM_TASK
+        MOV     U8 HC_MEM_TASK[RDI],RAX
+        MOV     U8 TASK_CODE_HEAP[RAX],RDI
+        MOV     U8 TASK_DATA_HEAP[RAX],RDI
+        MOV     U4 TASK_SIGNATURE[RAX],TASK_SIGNATURE_VAL
+        MOV     U4 TASK_IN_QUEUE_SIGNATURE[RAX],TASK_IN_QUEUE_SIGNATURE_VAL
+        
+        LOCK
+        BTS     U4 [SYS_RUN_LEVEL],RLf_BOOT_HEAP
+
+        PUSH    ADAM_STACK
+        PUSH    U4 SYS_ADAM_TASK
+        CALL    _INIT_TASK
+        ADD     RSP,16
+        CALL    SET_FS_BASE
+        MOV     RSP,U8 TASK_RSP[RAX]
+
+        CALL    _INIT_IDT
+        JMP     I4 _OS_MAIN
+//Continues _OS_MAIN
+
+// ************************************
+USE32
+INIT_EM64T:
+        MOV_EAX_CR4
+        OR      EAX,0xB0
+        MOV_CR4_EAX
+
+        MOV     EAX,0x100000+0x1000*(NUM_PML1+NUM_PML2+NUM_PML3)
+        MOV_CR3_EAX
+
+        MOV     ECX,IA32_EFER
+        XOR     EDX,EDX
+        MOV     EAX,IA32F_LME
+        WRMSR
+
+        MOV_EAX_CR0
+        OR      EAX,0x80000000  //enable paging
+        MOV_CR0_EAX
+
+        DU1     0xEA;      //JMP SYS_CS64_SEL:EM64T_PART3
+        DU4     EM64T_PART3;
+        DU2     SYS_CS64_SEL;
+
+USE64
+EM64T_PART3:
+        RET
+
+// ************************************
+SYS_RESTART_OSMAIN::
+        XOR     RDI,RDI
+        MOV     EDI,U4 SYS_BOOT_BASE
+        MOV     EDI,U4 [RDI]
+        XOR     RSI,RSI
+        MOV     ESI,U4 SYS_OS_32START
+        MOV     ESI,U4 [RSI]
+        ADD     ESI,EDI
+
+        PUSH    U4 ZERO_DS_SEL  //STACKSEG
+        PUSH    U4 0x9C000      //STACK
+        PUSH    U4 0            //FLAGS
+        PUSH    U4 SYS_CS_SEL
+        CALL    @@2
+@@2:    POP     RAX
+        ADD     RAX,@@3-@@2
+        PUSH    RAX
+        IRET
+USE32
+@@3:
+        WBINVD
+//disable paging
+        MOV_EAX_CR0
+        BTR     EAX,31
+        MOV_CR0_EAX
+
+        MOV     ECX,IA32_EFER
+        XOR     EDX,EDX
+        XOR     EAX,EAX
+        WRMSR
+
+        MOV     EBX,BOOT_CODE_RAM
+        JMP     ESI
+USE64
+SYS_RESTART_OSMAIN_END::
+}
+</pre><div class="archive-note">Historical capture: 2010-01-29. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head></html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

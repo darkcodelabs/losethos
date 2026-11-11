@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Power on LoseThos</title>
+<link rel="stylesheet" href="/memorial.css"><link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/icons/icon-192.png"></head>
+<body class="boot-desktop"><main class="desktop">
+<section class="window launcher" aria-labelledby="launcher-title"><header class="titlebar" id="launcher-title">Power on LoseThos</header><div class="content">
+<button class="power" id="power">Power on LoseThos</button><p class="subtitle">Temporary browser session</p>
+<nav class="links"><a href="/">Home</a><a href="/sources/#start-here">New to LoseThos?</a><a href="/sources/">Lore &amp; sources</a><a href="/downloads/losethos-android.apk">Install Android app</a></nav>
+<div class="meta"><p class="comment">Original LoseThos live CD, archived March 19, 2012. This computer runs entirely in your browser. Everyone gets their own session.</p><p class="warning">Refreshing or closing this page discards everything.</p><p>Use a current browser. Touch controls are available on phones and tablets. The emulator needs about 2.3 GB of memory.</p></div>
+</div></section>
+<section class="window computer" aria-labelledby="computer-title"><header class="titlebar" id="computer-title">LoseThos / a temporary computer</header><div class="content">
+<canvas id="screen" width="640" height="480" tabindex="0" aria-label="LoseThos computer display. Click to capture the mouse and keyboard. Escape releases the mouse."></canvas>
+<div class="controls computer-toolbar"><button id="power-screen">Power on</button><button id="reset" disabled title="Discard this temporary session">Power off</button><button id="full">Full screen</button></div>
+<section id="touch-controls" aria-label="Touch controls">
+<div class="controls"><button id="keyboard-toggle" aria-controls="keyboard-panel" aria-expanded="false">Keyboard</button><button id="install-app" hidden>Install app</button></div>
+<div id="touch-pad" tabindex="0" role="group" aria-label="Trackpad. Drag to move the mouse.">Drag to move. Tap to click.</div>
+<div class="controls mouse-buttons"><button id="touch-left">Left click</button><button id="touch-right">Right click</button></div><div class="navigation-keys" aria-label="Navigation keys"><button data-key="ArrowUp">Up</button><button data-key="ArrowLeft">Left</button><button data-key="ArrowDown">Down</button><button data-key="ArrowRight">Right</button><button data-key="Space">Space</button><button data-key="Enter">Enter</button><button data-key="Escape">Esc</button></div>
+<div id="keyboard-panel" hidden><label for="keyboard-input">Type into LoseThos</label><textarea id="keyboard-input" rows="2" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
+<div class="controls"><button data-key="ArrowUp">Up</button><button data-key="ArrowDown">Down</button><button data-key="ArrowLeft">Left</button><button data-key="ArrowRight">Right</button><button data-key="Enter">Enter</button><button data-key="Escape">Esc</button><button data-key="Tab">Tab</button><button data-key="Space">Space</button><button data-key="Backspace">Backspace</button><button data-key="F1">F1</button><button data-key="F2">F2</button><button data-key="F5">F5</button><button data-key="ShiftLeft" aria-pressed="false">Shift</button><button data-key="ControlLeft" aria-pressed="false">Ctrl</button><button data-key="AltLeft" aria-pressed="false">Alt</button></div></div>
+</section>
+<p id="status" class="statusline" role="status">Ready. Power on to start.</p>
+<details class="bootlog"><summary>Boot log</summary><pre id="log"></pre></details>
+<p class="help">Click the screen to capture the mouse and type. Press Esc to release the mouse. Sound starts when you power on. The default account is User. When the original account menu appears, User is selected automatically after three seconds without input. To choose manually, use the arrow keys and Space. Booting can take a few minutes. No account required.</p>
+</div></section></main><script src="/boot.js"></script><script src="/mobile.js" defer></script></body></html>

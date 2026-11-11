@@ -1,0 +1,121 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>Compatibility2</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V8.00" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cF5">                               <a href="/archive/LTHtml/Doc/TrivialSolutions.html">Trivial Solutions</a>
+                    <a href="/archive/index.html">The LoseThos 64-bit PC Operating System</a>
+File:/LT/Demo/OldSchool/Demo2/Compatibility2.SPP
+This, and all LoseThos files, are public domain.  Do whatever you like.
+God is watching; God is just; God is never out-done in generosity.  He talks!
+
+LoseThos code compiles with the 64-bit LoseThos compiler/assembler I wrote.
+Boot the LoseThos CD and you can compile it.  Not in Kansas anymore!
+
+<a href="/archive/LTHtml/Demo/Lectures/FixedPoint.html">Click here for preliminary compiler information you need.</a>
+
+</span><a name="l1"></a><span class="cF2">/*</span><span class="cF0">
+<a name="l2"></a></span><span class="cF2">This file has a ".SPP" extension because</span><span class="cF0">
+<a name="l3"></a></span><span class="cF2">it is a "statically" compiled program</span><span class="cF0">
+<a name="l4"></a></span><span class="cF2">which you must compile ahead of time</span><span class="cF0">
+<a name="l5"></a></span><span class="cF2">as opposed to just-in-time.</span><span class="cF0">
+<a name="l6"></a>
+<a name="l7"></a></span><span class="cF2">To make it more standard, I chose not</span><span class="cF0">
+<a name="l8"></a></span><span class="cF2">to give it a file name extension</span><span class="cF0">
+<a name="l9"></a></span><span class="cF2">ending in "Z", so that it will not be</span><span class="cF0">
+<a name="l10"></a></span><span class="cF2">stored compressed.  (Use ".SPZ", if</span><span class="cF0">
+<a name="l11"></a></span><span class="cF2">you want a statically compiled,</span><span class="cF0">
+<a name="l12"></a></span><span class="cF2">compressed source file.)</span><span class="cF0">
+<a name="l13"></a>
+<a name="l14"></a></span><span class="cF2">Right-click the directory entry and</span><span class="cF0">
+<a name="l15"></a></span><span class="cF2">select "COMPILE" from the menu.  This</span><span class="cF0">
+<a name="l16"></a></span><span class="cF2">will produce a binary file with a</span><span class="cF0">
+<a name="l17"></a></span><span class="cF2">".BIZ" extension.  This is the</span><span class="cF0">
+<a name="l18"></a></span><span class="cF2">executable.  You can use</span><span class="cF0">
+<a name="l19"></a></span><a href="/archive/LTHtml/Compiler/CmpMain.html#l380"><span class="cF4">Cmp</span></a><span class="cF2">() in scripts or whatever.</span><span class="cF0">
+<a name="l20"></a>
+<a name="l21"></a></span><span class="cF2">To run this program, right-click the</span><span class="cF0">
+<a name="l22"></a></span><span class="cF2">directory entry for the binary and</span><span class="cF0">
+<a name="l23"></a></span><span class="cF2">select "LOAD".  Or, you can use </span><a href="/archive/LTHtml/OSMain/Hash1a.html#l733"><span class="cF4">Load</span></a><span class="cF2">()</span><span class="cF0">
+<a name="l24"></a></span><span class="cF2">in scripts or whatever.</span><span class="cF0">
+<a name="l25"></a>
+<a name="l26"></a></span><span class="cF2">If you place statements to start</span><span class="cF0">
+<a name="l27"></a></span><span class="cF2">execution, it will run them when loaded.</span><span class="cF0">
+<a name="l28"></a></span><span class="cF2">Otherwise, include a header after loading</span><span class="cF0">
+<a name="l29"></a></span><span class="cF2">and call them, as a library, if you like.</span><span class="cF0">
+<a name="l30"></a>
+<a name="l31"></a></span><span class="cF2">There still are no object files.</span><span class="cF0">
+<a name="l32"></a>
+<a name="l33"></a></span><span class="cF2">*/</span><span class="cF0">
+<a name="l34"></a>
+<a name="l35"></a>
+<a name="l36"></a>#</span><span class="cF1">include</span><span class="cF0"> </span><span class="cF6">"::/LT/OSMain/Static.HPZ"</span><span class="cF0">
+<a name="l37"></a>
+<a name="l38"></a>
+<a name="l39"></a></span><span class="cF2">//Syms not in the OSMain modules</span><span class="cF0">
+<a name="l40"></a></span><span class="cF2">//can be declared with import or LTimport.</span><span class="cF0">
+<a name="l41"></a></span><span class="cF2">//There are not currently header files</span><span class="cF0">
+<a name="l42"></a></span><span class="cF2">//for /LT/Adam or /LT/Adam routines.</span><span class="cF0">
+<a name="l43"></a>
+<a name="l44"></a></span><span class="cF2">//See </span><a href="/archive/LTHtml/Doc/ImportExports.html"><span class="cF4">Scoping and Linkages</span></a><span class="cF2"> for details on</span><span class="cF0">
+<a name="l45"></a></span><span class="cF2">//extern, import, LTextern, LTimport, etc.</span><span class="cF0">
+<a name="l46"></a>
+<a name="l47"></a>
+<a name="l48"></a></span><span class="cF2">//Note: </span><a href="/archive/LTHtml/Compiler/Directives.html#l22"><span class="cF4">Externs2Imports</span></a><span class="cF2">() is use</span><span class="cF0">
+<a name="l49"></a></span><span class="cF2">//in ::/LT/OSMain/Static.HPZ.</span><span class="cF0">
+<a name="l50"></a>
+<a name="l51"></a></span><span class="cF1">import</span><span class="cF0"> </span><span class="cF1">void</span><span class="cF0"> LtfClear(Ltf *l=NULL);
+<a name="l52"></a>
+<a name="l53"></a>
+<a name="l54"></a>#</span><span class="cF1">exe</span><span class="cF0"> {OptOn(OPTf_STD_C);};
+<a name="l55"></a>
+<a name="l56"></a></span><span class="cF1">void</span><span class="cF0"> main()
+<a name="l57"></a>{
+<a name="l58"></a></span><span class="cF2">//Do not combine "short" or "long"</span><span class="cF0">
+<a name="l59"></a></span><span class="cF2">//with "int".</span><span class="cF0">
+<a name="l60"></a>
+<a name="l61"></a>  </span><span class="cF1">char</span><span class="cF0"> ch;
+<a name="l62"></a>  </span><span class="cF1">unsigned</span><span class="cF0"> </span><span class="cF1">short</span><span class="cF0"> s; </span><span class="cF2">//example of unsigned</span><span class="cF0">
+<a name="l63"></a>  </span><span class="cF1">int</span><span class="cF0"> i;
+<a name="l64"></a>  </span><span class="cF1">long</span><span class="cF0"> q;
+<a name="l65"></a>  </span><span class="cF1">double</span><span class="cF0"> d;
+<a name="l66"></a>  bool b;
+<a name="l67"></a>
+<a name="l68"></a>  LtfClear();
+<a name="l69"></a>  PrintF(</span><span class="cF6">"char\t:%d\n"</span><span class="cF0">,</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF0">ch</span><span class="cF7">)</span><span class="cF0">);
+<a name="l70"></a>  PrintF(</span><span class="cF6">"bool\t:%d\n"</span><span class="cF0">,</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF0">b</span><span class="cF7">)</span><span class="cF0">);
+<a name="l71"></a>  PrintF(</span><span class="cF6">"short\t:%d\n"</span><span class="cF0">,</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF0">s</span><span class="cF7">)</span><span class="cF0">);
+<a name="l72"></a>  PrintF(</span><span class="cF6">"int\t:%d\n"</span><span class="cF0">,</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF0">i</span><span class="cF7">)</span><span class="cF0">);
+<a name="l73"></a>  PrintF(</span><span class="cF6">"long\t:%d\n"</span><span class="cF0">,</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF0">q</span><span class="cF7">)</span><span class="cF0">);
+<a name="l74"></a>  PrintF(</span><span class="cF6">"double\t:%d\n"</span><span class="cF0">,</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF0">d</span><span class="cF7">)</span><span class="cF0">);
+<a name="l75"></a>}
+<a name="l76"></a>
+<a name="l77"></a>main(); </span><span class="cF2">//run main() when </span><a href="/archive/LTHtml/OSMain/Hash1a.html#l733"><span class="cF4">Load</span></a><span class="cF2">()ed.</span><span class="cF0">
+</span></pre><div class="archive-note">Historical capture: 2012-03-09. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

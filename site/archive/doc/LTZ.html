@@ -1,0 +1,104 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="description"/>
+<meta content="64-Bit, Operating System, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="keywords"/>
+<meta content="LoseThos V6.02" name="generator"/>
+<style type="text/css">
+.cBLACK{color:rgb(0,0,0);}
+.cBLUE{color:rgb(0,0,168);}
+.cGREEN{color:rgb(0,168,0);}
+.cCYAN{color:rgb(0,168,168);}
+.cRED{color:rgb(168,0,0);}
+.cPURPLE{color:rgb(168,0,168);}
+.cBROWN{color:rgb(168,84,0);}
+.cLTGRAY{color:rgb(168,168,168);}
+.cDKGRAY{color:rgb(84,84,84);}
+.cLTBLUE{color:rgb(84,84,252);}
+.cLTGREEN{color:rgb(84,252,84);}
+.cLTCYAN{color:rgb(84,252,252);}
+.cLTRED{color:rgb(252,84,84);}
+.cLTPURPLE{color:rgb(252,84,252);}
+.cYELLOW{color:rgb(252,252,84);}
+.cWHITE{color:rgb(252,252,252);}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cBLACK">The </span><span class="cGREEN">LTZ</span><span class="cBLACK"> utility is on the </span><a href="/archive/doc/Registered.html"><span class="cRED">registered version</span></a><span class="cBLACK">.
+
+                               </span><span class="cPURPLE">Linux LTZ Utility</span><span class="cBLACK">
+
+
+</span><span class="cGREEN">LTZ [-ascii] filename</span><span class="cBLACK">
+
+Will uncompress a single file from Linux.  The </span><span class="cGREEN">-ascii</span><span class="cBLACK"> flag will convert the 
+irregular LoseThos ASCII 5 and ASCII 31 characters to spaces.  (ASCII 5 is used 
+to mark the cursor position and ASCII 31 is used for shifted space characters 
+and will cause problems unless you convert them.)
+
+
+                              </span><span class="cPURPLE">Windows LTZ Utility</span><span class="cBLACK">
+
+</span><span class="cGREEN">LTZ</span><span class="cBLACK"> is a Windows cmd line program which will assist transferring files from 
+LoseThos to Windows.  It will also uncompress LoseThos files you have gotten to 
+Windows.  There are three ways to get files from LoseThos to Windows -- via 
+CD-ROM, a </span><span class="cGREEN">FAT32</span><span class="cBLACK"> partition or via a "file partition" you have created with </span><span class="cGREEN">LTZ</span><span class="cBLACK"> on 
+a Windows partition.
+
+
+</span><span class="cGREEN">LTZ -expand [-ascii] dirname</span><span class="cBLACK">:
+
+will uncompress all LoseThos files with names ending in '</span><span class="cGREEN">Z</span><span class="cBLACK">' in a Windows 
+directory and in all subdirectories.  The </span><span class="cGREEN">-ascii</span><span class="cBLACK"> flag used in combination will 
+convert the irregular LoseThos ASCII 5 and ASCII 31 characters to spaces.  
+(ASCII 5 is used to mark the cursor position and ASCII 31 is used for shifted 
+space characters and will cause problems unless you convert them.)  Note: If you 
+pick names not ending in '</span><span class="cGREEN">Z</span><span class="cBLACK">', they will not need to be uncompressed.  You can 
+</span><a href="/archive/code/Disk2a.html"><span class="cRED">Move</span></a><span class="cBLACK">() or </span><a href="/archive/code/Disk2a.html"><span class="cRED">Copy</span></a><span class="cBLACK">() them to a name not ending in '</span><span class="cGREEN">Z</span><span class="cBLACK">' and they will be stored 
+uncompressed.
+
+
+</span><span class="cGREEN">LTZ -make megcnt partfilename signnum</span><span class="cBLACK">:
+
+will create a file on a Windows partition and fill it with a signature num that 
+can be searched for block-by-block from LoseThos.  Once some blocks have been 
+allocated by Windows and located by LoseThos, and if you don't mess with them, 
+you can use them to transfer files between LoseThos and Windows.  This is a 
+little risky.  It's pretty safe if you create this file on a partition dedicated 
+for this purpose.
+
+
+</span><span class="cRED">NonLTScan</span><span class="cBLACK">():
+
+is a LoseThos cmd which will scan for some blocks created by </span><span class="cGREEN">LTZ</span><span class="cBLACK"> and provide a 
+block num you can use to specify a "Non-LT file partition".  You can recompile 
+OSMain and define this partition or use </span><a href="https://web.archive.org/web/20100213071524/http://www.losethos.com/code/DiskAddDev.html"><span class="cRED">Mount</span></a><span class="cBLACK">() each time.  You will be asked to 
+provide a drive letter and from then on, you just copy files to that partition, 
+boot Windows and run </span><span class="cGREEN">LTZ</span><span class="cBLACK"> to extract them.
+
+
+</span><span class="cGREEN">LTZ -extract dstdirname partfilename</span><span class="cBLACK">:
+
+will copy all files in a file partition to a Windows directory, making them 
+available from Windows.
+
+
+WARNING: Do not attempt to uncompress files twice or it may crash.  If there are 
+any files ending in '</span><span class="cGREEN">Z</span><span class="cBLACK">' which are present, it'll may crash too.  You might get 
+really unlucky and it uncompresses and creates havoc.
+
+WARNING: Do not run a defrag operation on a partition holding a file partition.  
+If you store files to it after such an operation, you'll ruin data on your hard 
+drive.</span><span class="cDKGRAY">
+
+
+
+* "Windows" is a trademark of MicroSoft Corp.
+* "Linux" is probably a trademark owned by Linus Torvalds.
+</span></pre><div class="archive-note">Historical capture: 2010-02-13. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

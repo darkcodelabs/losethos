@@ -1,0 +1,90 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V7.07" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<a name="l1"></a><span class="cF5">                             LoseThos Constitution</span><span class="cF0">
+<a name="l2"></a>
+<a name="l3"></a>The goal of LoseThos is to provide an ideal environment for recreational 
+<a name="l4"></a>programming and not immitate </span><span class="cF2">Linux</span><span class="cF0">.  LoseThos is orders of magnitude simpler 
+<a name="l5"></a>than </span><span class="cF2">Linux</span><span class="cF0"> to better fulfill the promise of </span><span class="cF2">open source</span><span class="cF0">.  The vision for 
+<a name="l6"></a>LoseThos is a 64-bit, souped-up, multitasking, multicore </span><span class="cF2">Commodore 64</span><span class="cF0"> with a </span><span class="cF2">C+</span><span class="cF0"> 
+<a name="l7"></a>shell instead of </span><span class="cF2">BASIC</span><span class="cF0"> that runs </span><a href="http://wiki.osdev.org/IA32_Architecture_Family"><span class="cF4">x86_64</span></a><span class="cF0"> code.
+<a name="l8"></a>
+<a name="l9"></a>LoseThos holds no standards sacred -- everything is freshly designed from 
+<a name="l10"></a>scratch.  This is not a 1970's main frame operating system and, no, it has 
+<a name="l11"></a>nothing to do with </span><span class="cF2">Commodore 64</span><span class="cF0"> emulation -- it's </span><a href="http://wiki.osdev.org/IA32_Architecture_Family"><span class="cF4">x86_64</span></a><span class="cF0">.
+<a name="l12"></a>
+<a name="l13"></a> 
+<a name="l14"></a>1) LoseThos is </span><span class="cF2">ring-0-only</span><span class="cF0">, running everything in kernel mode including 
+<a name="l15"></a>applications.  You have full access to memory, I/O ports, instructions, etc. at 
+<a name="l16"></a>all times, because that's fun.
+<a name="l17"></a>
+<a name="l18"></a>2) LoseThos will always </span><span class="cF2">identity-map</span><span class="cF0"> memory in a </span><span class="cF2">single-address-map</span><span class="cF0"> 
+<a name="l19"></a>configuration.  (Virtual addresses are always kept equal to physical addresses 
+<a name="l20"></a>with a single map for all tasks on all cores.)  It's as though paging is not 
+<a name="l21"></a>used.
+<a name="l22"></a>
+<a name="l23"></a>3) LoseThos will always be for one platform -- </span><a href="http://wiki.osdev.org/IA32_Architecture_Family"><span class="cF4">x86_64</span></a><span class="cF0"> PC compatibles.
+<a name="l24"></a>
+<a name="l25"></a>4) LoseThos will never have networking, so malware is less of an issue.
+<a name="l26"></a>
+<a name="l27"></a>5) LoseThos will always have one video mode, </span><span class="cF2">640x480</span><span class="cF0"> by 16 colors, unless that 
+<a name="l28"></a>mode becomes unavailable on computers in the future.
+<a name="l29"></a>
+<a name="l30"></a>6) The LoseThos operating system will always be </span><span class="cF2">free</span><span class="cF0">.  I might sell 
+<a name="l31"></a>applications, support, or, possibly, do adware.
+<a name="l32"></a>
+<a name="l33"></a>7) LoseThos will always be </span><span class="cF2">100% open source</span><span class="cF0"> with all source included, unless 
+<a name="l34"></a>device drivers or something can only be included with non-disclosure agreements.
+<a name="l35"></a>
+<a name="l36"></a>8) All function args and returns will be 64-bit.  No plans for C++.
+<a name="l37"></a>
+<a name="l38"></a>9) LoseThos documents are not for printing.  They're dynamic and intended for 
+<a name="l39"></a>the screen.  There will always be just one font, a fixed-width font.  No 
+<a name="l40"></a>Unicode, just ASCII.
+<a name="l41"></a>
+<a name="l42"></a>10) LoseThos is not for multimedia.  Games will be created by programmers, not 
+<a name="l43"></a>artists.  Sounds and images will be, primarily, calculated in real-time, not 
+<a name="l44"></a>fetched.
+<a name="l45"></a>
+<a name="l46"></a>11) All functions, variables and class members will be accessible.  There are no 
+<a name="l47"></a>C++ </span><span class="cF2">public</span><span class="cF0">/</span><span class="cF2">private</span><span class="cF0"> protections and all functions, even secondary ones in the 
+<a name="l48"></a>kernel, can be called.
+<a name="l49"></a>
+<a name="l50"></a>12) </span><span class="cF4">Backward compatibility is NOT guaranteed.</span><span class="cF0">  You are safest working with </span><span class="cF2">JIT</span><span class="cF0"> 
+<a name="l51"></a>compilation instead of </span><span class="cF2">AOT</span><span class="cF0"> static binaries because I can add members to classes, 
+<a name="l52"></a>reorder members in classes, add default args to existing functions, change </span><span class="cF2">#defi
+<a name="l53"></a>ne</span><span class="cF0"> values, etc. all without breaking compatibility.
+<a name="l54"></a>
+<a name="l55"></a></span><span class="cF8">
+<a name="l56"></a>* "Commodore 64" was a trademark of Commodore Business Machines.
+<a name="l57"></a>* "Linux" is probably a trademark owned by Linus Torvalds.
+</span></pre><div class="archive-note">Historical capture: 2011-10-26. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

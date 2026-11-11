@@ -1,0 +1,73 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>MultiTasking</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V8.00" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<a name="l1"></a><span class="cF0">                                  </span><span class="cF5">MultiTasking</span><span class="cF0">
+<a name="l2"></a>
+<a name="l3"></a>LoseThos is a preemptive multitasking operating system.  However, you can 
+<a name="l4"></a>turn-off preemption on a task by task basis and the task will not yield ctrl 
+<a name="l5"></a>unless it volunteers with </span><a href="/archive/LTHtml/OSMain/Scheduler.html#l373"><span class="cF4">Yield</span></a><span class="cF0">(), </span><a href="https://web.archive.org/web/20120303011824/http://www.losethos.com/LTHtml/OSMain/Misc1a.html#l289"><span class="cF4">Sleep</span></a><span class="cF0">() or a call to I/O which yields ctrl.  
+<a name="l6"></a>Use the </span><a href="/archive/LTHtml/OSMain/Adam1b.html#l94"><span class="cF4">Preempt</span></a><span class="cF0">() cmd to turn on or off preemption.  This is useful when you 
+<a name="l7"></a>have multiple tasks modifying data structures simultaneously.  Interrupts still 
+<a name="l8"></a>occur when preemption is off.   
+<a name="l9"></a>
+<a name="l10"></a>Preemption is turned-off by default when a task is </span><a href="/archive/LTHtml/OSMain/Task1a.html#l230"><span class="cF4">Spawn</span></a><span class="cF0">()ed.
+<a name="l11"></a>
+<a name="l12"></a>The time-slice rate is set by </span><a href="/archive/LTHtml/OSMain/Adam1a.html#l455"><span class="cF4">JIFFY_FREQ</span></a><span class="cF0">.
+<a name="l13"></a>
+<a name="l14"></a>LoseThos does not remove tasks from "the queue" when they are waiting.  They 
+<a name="l15"></a>swap-in, check for whatever condition they are waiting for and swap-out.  This 
+<a name="l16"></a>keeps it simple, but would cause problems if too many tasks existed.  LoseThos 
+<a name="l17"></a>is intended for non-server home computers with a maximum of around ten, or so, 
+<a name="l18"></a>tasks.  See </span><a href="/archive/LTHtml/OSMain/Scheduler.html"><span class="cF4">Scheduler</span></a><span class="cF0">.
+<a name="l19"></a>
+<a name="l20"></a>LoseThos has no task priority scheme.
+<a name="l21"></a>
+<a name="l22"></a>                                   </span><span class="cF5">Interrupts</span><span class="cF0">
+<a name="l23"></a>
+<a name="l24"></a>You can turn-on and off interrupts, in your user programs.  This is part of the 
+<a name="l25"></a>mission statement, giving complete freedom to programmers  Use </span><a href="/archive/LTHtml/OSMain/Adam1b.html#l141"><span class="cF4">Cli</span></a><span class="cF0">() or </span><a href="/archive/LTHtml/OSMain/Adam1b.html#l142"><span class="cF4">Sti</span></a><span class="cF0">().  
+<a name="l26"></a>LoseThos currently doesn't use interrupt besides the timer and keyboard 
+<a name="l27"></a>interrupt.  Since the interrupt flag is part of your task context and since you 
+<a name="l28"></a>are voluntarily swapped-out if you call </span><a href="https://web.archive.org/web/20120303011824/http://www.losethos.com/LTHtml/OSMain/KbdMouse/Message.html#l181"><span class="cF4">GetChar</span></a><span class="cF0">() or whatever, you won't even 
+<a name="l29"></a>notice if you turn-off interrupts at the cmd prompt because you are being 
+<a name="l30"></a>swapped-out and interrupts are being turned-on by the next task.  
+<a name="l31"></a>
+<a name="l32"></a>I saw no reason to make the hard drive or CD-ROM drive code interrupt driven -- 
+<a name="l33"></a>it just creates potential compatibility issues.  On a home system, you do one 
+<a name="l34"></a>thing at a time, mostly.  LoseThos can do multiple things at once, but not as 
+<a name="l35"></a>efficiently as a server operating system.  It would bogg down with a hundred 
+<a name="l36"></a>tasks asking for service.  It sure is simpler, though... smaller... simpler to 
+<a name="l37"></a>maintain... and understandable by a layman!  The disk code does not break-up 
+<a name="l38"></a>requests, if you are curious why one task must wait until another finishes an 
+<a name="l39"></a>operation.
+<a name="l40"></a>
+<a name="l41"></a>See </span><a href="https://web.archive.org/web/20120303011824/http://www.losethos.com/LTHtml/Demo/Lectures/Spinning.html"><span class="cF4">::/LT/Demo/Lectures/Spinning.CPZ</span></a><span class="cF0">.</span></pre><div class="archive-note">Historical capture: 2012-03-03. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

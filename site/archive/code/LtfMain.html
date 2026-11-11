@@ -1,0 +1,826 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="description"/>
+<meta content="64-Bit, Operating System, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="keywords"/>
+<meta content="LoseThos V6.02" name="generator"/>
+<style type="text/css">
+.cBLACK{color:rgb(0,0,0);}
+.cBLUE{color:rgb(0,0,168);}
+.cGREEN{color:rgb(0,168,0);}
+.cCYAN{color:rgb(0,168,168);}
+.cRED{color:rgb(168,0,0);}
+.cPURPLE{color:rgb(168,0,168);}
+.cBROWN{color:rgb(168,84,0);}
+.cLTGRAY{color:rgb(168,168,168);}
+.cDKGRAY{color:rgb(84,84,84);}
+.cLTBLUE{color:rgb(84,84,252);}
+.cLTGREEN{color:rgb(84,252,84);}
+.cLTCYAN{color:rgb(84,252,252);}
+.cLTRED{color:rgb(252,84,84);}
+.cLTPURPLE{color:rgb(252,84,252);}
+.cYELLOW{color:rgb(252,252,84);}
+.cWHITE{color:rgb(252,252,252);}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cBLACK">#</span><span class="cBLUE">help_index</span><span class="cBLACK"> </span><span class="cBROWN">"Ltf/Cmd Line (Typically);Cmd Line (Typically)"</span><span class="cBLACK">
+
+</span><span class="cBLUE">U1</span><span class="cBLACK"> *EdLinkFile(</span><span class="cBLUE">U1</span><span class="cBLACK"> *filename)
+{
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> buf[4],*temp_filename,*tfn_ptr,*result=NULL;
+  SrcSymHashEntry *temph;
+
+  temp_filename=StrNew(filename),
+elf_restart:
+  tfn_ptr=temp_filename;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (StrLen</span><span class="cLTGRAY">(</span><span class="cBLACK">temp_filename</span><span class="cLTGRAY">)</span><span class="cBLACK">&gt;3 &amp;&amp; temp_filename[2]==</span><span class="cBROWN">':'</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    MemCpy(buf,temp_filename,2);
+    buf[2]=0;
+    tfn_ptr=temp_filename+3;
+    </span><span class="cBLUE">switch</span><span class="cBLACK"> (DefineMatch</span><span class="cLTGRAY">(</span><span class="cBLACK">buf,</span><span class="cBROWN">"ST_LINK_TYPES"</span><span class="cBLACK">,LEM_IGNORE_CASE</span><span class="cLTGRAY">)</span><span class="cBLACK">) {
+      </span><span class="cBLUE">case</span><span class="cBLACK"> LK_MAN_PAGE:
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (temph=HashFind</span><span class="cLTGRAY">(</span><span class="cBLACK">tfn_ptr,Fs-&gt;hash_table,HTT_SRC_SYM</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+          </span><span class="cBLUE">if</span><span class="cBLACK"> (temph-&gt;h.type&amp;HTT_DEFINE_STR &amp;&amp; temph&gt;&lt;</span><span class="cLTGRAY">(</span><span class="cBLACK">DefineStrHashEntry *</span><span class="cLTGRAY">)</span><span class="cBLACK">-&gt;caller) {
+            Free(temp_filename);
+            temp_filename=SrcEditLink(temph&gt;&lt;</span><span class="cLTGRAY">(</span><span class="cBLACK">DefineStrHashEntry *</span><span class="cLTGRAY">)</span><span class="cBLACK">-&gt;caller,64);
+            </span><span class="cBLUE">goto</span><span class="cBLACK"> elf_restart;
+          } </span><span class="cBLUE">else</span><span class="cBLACK"> {
+            Free(temp_filename);
+            temp_filename=StrNew(temph-&gt;src_link);
+            </span><span class="cBLUE">goto</span><span class="cBLACK"> elf_restart;
+          }
+        </span><span class="cLTGRAY">}</span><span class="cBLACK">
+      </span><span class="cBLUE">case</span><span class="cBLACK"> LK_DEF:
+      </span><span class="cBLUE">case</span><span class="cBLACK"> LK_HELP_INDEX:
+        Free(temp_filename);
+        </span><span class="cBLUE">return</span><span class="cBLACK"> NULL;
+
+      </span><span class="cBLUE">case</span><span class="cBLACK"> LK_BIBLE_FIND:
+        Free(temp_filename);
+        </span><span class="cBLUE">return</span><span class="cBLACK"> StrNew(Define</span><span class="cLTGRAY">(</span><span class="cBROWN">"ST_BIBLE_FILE"</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+
+      </span><span class="cBLUE">case</span><span class="cBLACK"> LK_FILE_LINE:
+      </span><span class="cBLUE">case</span><span class="cBLACK"> LK_PLAIN_LINE:
+      </span><span class="cBLUE">case</span><span class="cBLACK"> LK_FILE_ANCHOR:
+      </span><span class="cBLUE">case</span><span class="cBLACK"> LK_FILE_FIND:
+      </span><span class="cBLUE">case</span><span class="cBLACK"> LK_PLAIN_FIND:
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (Occurrences</span><span class="cLTGRAY">(</span><span class="cBLACK">tfn_ptr,</span><span class="cBROWN">','</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+          StrLastRem(tfn_ptr,</span><span class="cBROWN">","</span><span class="cBLACK">);
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+    }
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  result=StrNew(tfn_ptr);
+  Free(temp_filename);
+  </span><span class="cBLUE">return</span><span class="cBLACK"> result;
+}
+
+
+BoolI8 EdJoin(</span><span class="cBLUE">U1</span><span class="cBLACK"> *filename,BoolI1 bail)
+{ </span><span class="cGREEN">//bail is for </span><span class="cRED">LinkChk</span><span class="cGREEN">()</span><span class="cBLACK">
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *buf=StrNew(filename),
+     *buf2=StrNew(filename);
+  </span><span class="cBLUE">U8</span><span class="cBLACK"> num=1;
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *temp_filename=StrNew(filename),
+     *tfn_ptr=temp_filename;
+  SrcSymHashEntry *temph;
+  </span><span class="cBLUE">I8</span><span class="cBLACK"> i;
+  BoolI1 cont,result=FALSE;
+  Ltf *l;
+
+  i=LK_FILE;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (StrLen</span><span class="cLTGRAY">(</span><span class="cBLACK">filename</span><span class="cLTGRAY">)</span><span class="cBLACK">&gt;3 &amp;&amp; filename[2]==</span><span class="cBROWN">':'</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    buf[2]=0;
+    i=DefineMatch(buf,</span><span class="cBROWN">"ST_LINK_TYPES"</span><span class="cBLACK">,LEM_IGNORE_CASE);
+    tfn_ptr=temp_filename+3;
+    </span><span class="cBLUE">switch</span><span class="cBLACK"> (i) {
+      </span><span class="cBLUE">case</span><span class="cBLACK"> LK_MAN_PAGE:
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (temph=HashFind</span><span class="cLTGRAY">(</span><span class="cBLACK">tfn_ptr,Fs-&gt;hash_table,HTT_SRC_SYM</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+          </span><span class="cBLUE">if</span><span class="cBLACK"> (temph-&gt;h.type&amp;HTT_DEFINE_STR &amp;&amp; temph&gt;&lt;</span><span class="cLTGRAY">(</span><span class="cBLACK">DefineStrHashEntry *</span><span class="cLTGRAY">)</span><span class="cBLACK">-&gt;caller)
+            result=EdAddSrc(temph&gt;&lt;</span><span class="cLTGRAY">(</span><span class="cBLACK">DefineStrHashEntry *</span><span class="cLTGRAY">)</span><span class="cBLACK">-&gt;caller,64,bail);
+          </span><span class="cBLUE">else</span><span class="cBLACK">
+            result=EdJoin(temph-&gt;src_link,bail);
+        </span><span class="cLTGRAY">}</span><span class="cBLACK">
+        Free(temp_filename);
+        Free(buf);
+        Free(buf2);
+        </span><span class="cBLUE">return</span><span class="cBLACK"> result;
+      </span><span class="cBLUE">case</span><span class="cBLACK"> LK_DEF:
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (Occurrences</span><span class="cLTGRAY">(</span><span class="cBLACK">tfn_ptr,</span><span class="cBROWN">','</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+          StrLastRem(tfn_ptr,</span><span class="cBROWN">","</span><span class="cBLACK">,buf);
+          i=A2I(buf);
+        </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK">
+          i=-1;
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (!bail)
+          WsdPopUpDef(tfn_ptr,i);
+        Free(temp_filename);
+        Free(buf);
+        Free(buf2);
+        </span><span class="cBLUE">return</span><span class="cBLACK"> TRUE;  </span><span class="cGREEN">//TODO: linkchk</span><span class="cBLACK">
+      </span><span class="cBLUE">case</span><span class="cBLACK"> LK_HELP_INDEX:
+        l=LtfNew;
+        StrCpy(l-&gt;desc,</span><span class="cBROWN">"HelpIdx"</span><span class="cBLACK">);
+        LtfHelpIndex(l,tfn_ptr);
+        Free(temp_filename);
+        Free(buf);
+        Free(buf2);
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (!bail)
+          LtfDo(l);
+        LtfDel(l);
+        </span><span class="cBLUE">return</span><span class="cBLACK"> TRUE; </span><span class="cGREEN">//TODO: linkchk</span><span class="cBLACK">
+      </span><span class="cBLUE">case</span><span class="cBLACK"> LK_BIBLE_FIND:
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (Occurrences</span><span class="cLTGRAY">(</span><span class="cBLACK">tfn_ptr,</span><span class="cBROWN">','</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+          StrLastRem(tfn_ptr,</span><span class="cBROWN">","</span><span class="cBLACK">,buf);
+        </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK">
+          *buf=0;
+        num=A2I(DefineSub</span><span class="cLTGRAY">(</span><span class="cBLACK">
+           DefineMatch(tfn_ptr,</span><span class="cBROWN">"ST_BIBLE_BOOKS"</span><span class="cBLACK">,LEM_IGNORE_CASE),
+           </span><span class="cBROWN">"ST_BIBLE_BOOK_LINES"</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+        tfn_ptr=Define(</span><span class="cBROWN">"ST_BIBLE_FILE"</span><span class="cBLACK">);
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">case</span><span class="cBLACK"> LK_FILE_LINE:
+      </span><span class="cBLUE">case</span><span class="cBLACK"> LK_PLAIN_LINE:
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (Occurrences</span><span class="cLTGRAY">(</span><span class="cBLACK">tfn_ptr,</span><span class="cBROWN">','</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+          StrLastRem(tfn_ptr,</span><span class="cBROWN">","</span><span class="cBLACK">,buf);
+          num=A2I(buf);
+        </span><span class="cLTGRAY">}</span><span class="cBLACK">
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">case</span><span class="cBLACK"> LK_FILE_ANCHOR:
+        *buf=0;
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (Occurrences</span><span class="cLTGRAY">(</span><span class="cBLACK">tfn_ptr,</span><span class="cBROWN">','</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+          StrLastRem(tfn_ptr,</span><span class="cBROWN">","</span><span class="cBLACK">,buf);
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">case</span><span class="cBLACK"> LK_FILE_FIND:
+      </span><span class="cBLUE">case</span><span class="cBLACK"> LK_PLAIN_FIND:
+        *buf=0;
+        *buf2=0;
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (Occurrences</span><span class="cLTGRAY">(</span><span class="cBLACK">tfn_ptr,</span><span class="cBROWN">','</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+          StrLastRem(tfn_ptr,</span><span class="cBROWN">","</span><span class="cBLACK">,buf);
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (Occurrences</span><span class="cLTGRAY">(</span><span class="cBLACK">buf,</span><span class="cBROWN">':'</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+          StrLastRem(buf,</span><span class="cBROWN">":"</span><span class="cBLACK">,buf2);
+          num=A2I(buf2);
+        </span><span class="cLTGRAY">}</span><span class="cBLACK">
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+    }
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  tfn_ptr=StrNew(tfn_ptr);
+
+  cont=TRUE;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!IsTextFile</span><span class="cLTGRAY">(</span><span class="cBLACK">tfn_ptr</span><span class="cLTGRAY">)</span><span class="cBLACK"> &amp;&amp;
+      !PopUpCancelOk</span><span class="cLTGRAY">(</span><span class="cBLACK">ST_WARN_ST </span><span class="cBROWN">"Not Text File\r\n\r\n"</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+      cont=FALSE;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (cont)
+    result=LtfEditFile(i,tfn_ptr,buf,num,bail);
+
+  WinTextClear(Fs);
+  Free(tfn_ptr);
+  Free(temp_filename);
+  Free(buf);
+  Free(buf2);
+  </span><span class="cBLUE">return</span><span class="cBLACK"> result;
+}
+
+</span><span class="cBLUE">public</span><span class="cBLACK"> BoolI8 Ed(</span><span class="cBLUE">U1</span><span class="cBLACK"> *filename)
+{
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (IsRaw)
+    </span><span class="cBLUE">return</span><span class="cBLACK"> EdLite(filename);
+  </span><span class="cBLUE">else</span><span class="cBLACK">
+    </span><span class="cBLUE">return</span><span class="cBLACK"> EdJoin(filename,FALSE);
+}
+
+BoolI8 LtfLinkChk(</span><span class="cBLUE">U1</span><span class="cBLACK"> *filename)
+{
+  </span><span class="cBLUE">return</span><span class="cBLACK"> EdJoin(filename,TRUE);
+}
+
+</span><span class="cBLUE">public</span><span class="cBLACK"> </span><span class="cBLUE">U0</span><span class="cBLACK"> Plain(</span><span class="cBLUE">U1</span><span class="cBLACK"> *filename)
+</span><span class="cGREEN">//Open a document in plain text mode,</span><span class="cBLACK">
+</span><span class="cGREEN">//so that dollar signs are not special.</span><span class="cBLACK">
+{
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *buf=MSPrintF(</span><span class="cBROWN">"PI:%s"</span><span class="cBLACK">,filename);
+  Ed(buf);
+  Free(buf);
+}
+
+#</span><span class="cBLUE">help_index</span><span class="cBLACK"> </span><span class="cBROWN">"Ltf/Task"</span><span class="cBLACK">
+</span><span class="cBLUE">public</span><span class="cBLACK"> Ltf *SysAuxLtfInit(BoolI1 has_menu)
+{
+  LtfEntry *ll;
+  Ltf *aux,*l=LtfCur;
+
+  aux=LtfNew;
+  aux-&gt;flags|=LTFF_AUX_LTF;
+
+  LtfPutS(aux,</span><span class="cBROWN">"$$CM+H+BY+RX+NC,-8,1$$"</span><span class="cBLACK">);
+  ll=LtfPutS(aux,</span><span class="cBROWN">"$$TX+H+BD+TC,\" \"$$"</span><span class="cBLACK">);
+  ll-&gt;tag_cb=&amp;EdPreemptCB;
+
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (l) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    LtfPutS(aux,</span><span class="cBROWN">"$$CM+H+BY+RX+NC,-7,1$$"</span><span class="cBLACK">);
+    ll=LtfPutS(aux,</span><span class="cBROWN">"$$TX+H+BD+TC,\" \"$$"</span><span class="cBLACK">);
+    ll-&gt;user_data=l;
+    ll-&gt;tag_cb=&amp;EdFilterCB;
+    LtfPutS(aux,</span><span class="cBROWN">"$$CM+H+BY+RX+NC,-6,1$$"</span><span class="cBLACK">);
+    ll=LtfPutS(aux,</span><span class="cBROWN">"$$TX+H+BD+TC,\" \"$$"</span><span class="cBLACK">);
+    ll-&gt;user_data=l;
+    ll-&gt;tag_cb=&amp;EdOverStrikeCB;
+    LtfPutS(aux,</span><span class="cBROWN">"$$CM+H+BY+RX+NC,-5,1$$"</span><span class="cBLACK">);      </span><span class="cGREEN">//gets merged without this</span><span class="cBLACK">
+    ll=LtfPutS(aux,</span><span class="cBROWN">"$$TX+H+BD+TC,\" \"$$"</span><span class="cBLACK">);
+    ll-&gt;user_data=l;
+    ll-&gt;tag_cb=&amp;EdDollarCB;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+
+  LtfPutS(aux,</span><span class="cBROWN">"$$CM+H+BY+RX+NC,-4,1$$"</span><span class="cBLACK">);        </span><span class="cGREEN">//gets merged without this</span><span class="cBLACK">
+  ll=LtfPutS(aux,</span><span class="cBROWN">"$$TX+H+BD+TC,\" \"$$"</span><span class="cBLACK">);
+  ll-&gt;tag_cb=&amp;EdQuotesCB;
+  LtfPutS(aux,</span><span class="cBROWN">"$$CM+H+BY+RX+NC,-3,1$$"</span><span class="cBLACK">);        </span><span class="cGREEN">//gets merged without this</span><span class="cBLACK">
+  ll=LtfPutS(aux,</span><span class="cBROWN">"$$TX+H+BD+TC,\" \"$$"</span><span class="cBLACK">);
+  ll-&gt;tag_cb=&amp;EdBracesCB;
+  LtfPutS(aux,</span><span class="cBROWN">"$$CM+H+BY+RX+NC,-2,1$$"</span><span class="cBLACK">);        </span><span class="cGREEN">//gets merged without this</span><span class="cBLACK">
+  ll=LtfPutS(aux,</span><span class="cBROWN">"$$TX+H+BD+TC,\" \"$$"</span><span class="cBLACK">);
+  ll-&gt;tag_cb=&amp;EdSemicolonCB;
+
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (l) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    LtfPutS(aux,</span><span class="cBROWN">"$$CM+H+BY+RX+NC,-12,1$$"</span><span class="cBLACK">);
+    ll=LtfPutS(aux,</span><span class="cBROWN">"$$TX+H+BD+TC,\" \"$$"</span><span class="cBLACK">);
+    ll-&gt;user_data=l;
+    ll-&gt;tag_cb=&amp;EdDollarTypeCB;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (Fs-&gt;user_num)
+    LtfPrintF(aux,</span><span class="cBROWN">"$$CM+H+TY+LX+NC,5,-1$$$$TX+H+BD,\"#%d\"$$"</span><span class="cBLACK">,Fs-&gt;user_num);
+  LtfPutS(aux,</span><span class="cBROWN">"$$CM+H+TY+NC,0,-1$$"</span><span class="cBLACK">);
+  ll=LtfPutS(aux,</span><span class="cBROWN">"$$DA+H-T-P+BD+RD+CX+SCX+IV,140,\"%s...\",16$$"</span><span class="cBLACK">);
+  ll-&gt;data=&amp;Fs-&gt;task_title;
+  LtfFormatData(ll);
+  LtfPrintF(aux,</span><span class="cBROWN">"$$CM+H+NC,1,0$$$$TX+H+BD+IV,\"%X\"$$"</span><span class="cBLACK">,Fs);
+  aux-&gt;settings_root.dft_text_attr=Fs-&gt;border_attr;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (Bt</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;Fs-&gt;display_flags,DISPLAYf_HAS_CLOSE_WIN</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+    LtfPutS(aux,</span><span class="cBROWN">"$$TX+H+RX+BD,\"[X]\"$$"</span><span class="cBLACK">);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (has_menu) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    LtfPutS(aux,</span><span class="cBROWN">"$$BK,1$$$$TX+H+LX+BD,\"MENU\"$$$$BK,0$$"</span><span class="cBLACK">);
+    LBts(&amp;Fs-&gt;display_flags,DISPLAYf_HAS_MENU);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  </span><span class="cBLUE">return</span><span class="cBLACK"> aux;
+}
+
+</span><span class="cBLUE">public</span><span class="cBLACK"> </span><span class="cBLUE">U0</span><span class="cBLACK"> UseTermLtf(</span><span class="cBLUE">U1</span><span class="cBLACK"> *ltf_menu_file=NULL,</span><span class="cBLUE">U1</span><span class="cBLACK"> *pulldown_menu_file=NULL)
+{
+  BoolI1 old_preempt=Preempt(OFF);
+  Ltf *l=LtfNew,*m;
+  LtfInsQue(l,Fs-&gt;last_ltf);
+  l-&gt;right_click_link=&amp;TermRightClickLink;
+  l-&gt;max_entries=4096;
+  l-&gt;flags|=LTFF_ATTR_BY_PARTITION;
+
+  StrCpy(l-&gt;desc,</span><span class="cBROWN">"Term"</span><span class="cBLACK">);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (ltf_menu_file) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    m=LtfRead(ltf_menu_file);
+    m-&gt;flags|=LTFF_ATTR_BY_PARTITION|LTFF_ALLOW_UNDO;
+    l-&gt;menu_ltf=m;
+    LtfInsQueRev(SysAuxLtfInit</span><span class="cLTGRAY">(</span><span class="cBLACK">TRUE</span><span class="cLTGRAY">)</span><span class="cBLACK">,Fs-&gt;next_ltf);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK">
+    LtfInsQueRev(SysAuxLtfInit</span><span class="cLTGRAY">(</span><span class="cBLACK">FALSE</span><span class="cLTGRAY">)</span><span class="cBLACK">,Fs-&gt;next_ltf);
+
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (pulldown_menu_file)
+    Fs-&gt;cur_menu=MenuFile(pulldown_menu_file);
+  </span><span class="cBLUE">else</span><span class="cBLACK">
+    Fs-&gt;cur_menu=MenuFile(</span><span class="cBROWN">"::/LT/Doc/EditPullDown.TXZ"</span><span class="cBLACK">);
+
+  Fs-&gt;update_win=&amp;LtfUpdateTaskLtfs;
+  Fs-&gt;scroll_speed=7;
+  WinScrollsInit(Fs);
+  Preempt(old_preempt);
+  Raw(OFF);
+}
+
+#</span><span class="cBLUE">help_index</span><span class="cBLACK"> </span><span class="cBROWN">"Ltf/Input"</span><span class="cBLACK">
+</span><span class="cBLUE">public</span><span class="cBLACK"> </span><span class="cBLUE">U1</span><span class="cBLACK"> *LtfGetLine(Ltf *l,LtfEntry *cl,</span><span class="cBLUE">I8</span><span class="cBLACK"> *cur_col=NULL,LtfEntry **_cl_end=NULL)
+{
+  LtfEntry *cl2=cl;
+  BoolI1 unlock=LtfLock(l);
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *result,*dst,*src,*start;
+  </span><span class="cBLUE">U8</span><span class="cBLACK"> i=0;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (cur_col)
+    *cur_col=-1;
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (cl2!=l &amp;&amp; cl2-&gt;btype!=LTFT_CR) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (Bt</span><span class="cLTGRAY">(</span><span class="cBLACK">ltf_tag_types,cl2-&gt;btype</span><span class="cLTGRAY">)</span><span class="cBLACK">) {
+      src=cl2-&gt;tag;
+      i+=StrLen(src);
+    } </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cBLUE">if</span><span class="cBLACK"> (cl2-&gt;btype==LTFT_TAB)
+      i++;
+    cl2=cl2-&gt;next;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  result=MAlloc(i+1);
+  dst=result;
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (cl!=l &amp;&amp; cl-&gt;btype!=LTFT_CR) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    start=dst;
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (Bt</span><span class="cLTGRAY">(</span><span class="cBLACK">ltf_tag_types,cl-&gt;btype</span><span class="cLTGRAY">)</span><span class="cBLACK">) {
+      src=cl-&gt;tag;
+      </span><span class="cBLUE">while</span><span class="cBLACK"> (*src)
+        *dst++=*src++;
+    } </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cBLUE">if</span><span class="cBLACK"> (cl-&gt;btype==LTFT_TAB)
+      *dst++=CH_TAB;
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (cl==l-&gt;cur_entry &amp;&amp; cur_col)
+      *cur_col=start-result+l-&gt;cur_data_col;
+    cl=cl-&gt;next;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (_cl_end) *_cl_end=cl;
+  *dst=0;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (cl==l-&gt;cur_entry &amp;&amp; cur_col &amp;&amp; !l-&gt;cur_data_col)
+    *cur_col=dst-result;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (unlock)
+    LtfUnlock(l);
+  </span><span class="cBLUE">return</span><span class="cBLACK"> result;
+}
+
+#</span><span class="cBLUE">help_index</span><span class="cBLACK"> </span><span class="cBROWN">"Ltf/Output"</span><span class="cBLACK">
+</span><span class="cBLUE">public</span><span class="cBLACK"> </span><span class="cBLUE">U0</span><span class="cBLACK"> LtfDump(Ltf *l,</span><span class="cBLUE">U8</span><span class="cBLACK"> uS_delay=0)
+{
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *st;
+  LtfEntry *cl,*cl2;
+  BoolI1 unlock=LtfLock(l);
+  cl=l-&gt;root.next;
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (cl!=l) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    st=LtfGetLine(l,cl,NULL,&amp;cl2);
+    PutS(st);
+    Free(st);
+    cl=cl2;
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (cl-&gt;btype==LTFT_CR) {
+      CrLf;
+      BusyWait(uS_delay);
+      cl=cl-&gt;next;
+    }
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (unlock)
+    LtfUnlock(l);
+}
+
+</span><span class="cBLUE">public</span><span class="cBLACK"> BoolI8 View()
+{
+  </span><span class="cBLUE">U8</span><span class="cBLACK"> ch=0,sc=0;
+  BoolI1 old_preempt=Preempt(OFF);
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (ch!=CH_ESC &amp;&amp; ch!=CH_CTRLQ) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    Preempt(OFF);
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (ScanKey</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;ch,&amp;sc</span><span class="cLTGRAY">)</span><span class="cBLACK">) {
+      Preempt(old_preempt);
+      PutKey(ch,sc);
+      LtfRecalc;
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (ch==CH_ESC || ch==CH_CTRLQ) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        Preempt(OFF);
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (LtfCur &amp;&amp; LtfCur-&gt;find_replace-&gt;filter_lines) {
+          EdUndoFilter(LtfCur);
+          ch=0; sc=0;</span><span class="cGREEN">//don't exit</span><span class="cBLACK">
+        }
+        Preempt(old_preempt);
+      </span><span class="cLTGRAY">}</span><span class="cBLACK">
+    } </span><span class="cBLUE">else</span><span class="cBLACK"> {
+      LBts(&amp;Fs-&gt;task_flags,TASKf_IDLE);
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (!</span><span class="cLTGRAY">(</span><span class="cBLACK">Fs-&gt;parent_task &amp;&amp; Fs-&gt;parent_task-&gt;popup_task==Fs</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        LBts(&amp;Fs-&gt;task_flags,TASKf_AWAITING_MSG);
+        Preempt(old_preempt);
+        TaskNext;
+      </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        Preempt(old_preempt);
+        WinSync;
+      </span><span class="cLTGRAY">}</span><span class="cBLACK">
+      LBtr(&amp;Fs-&gt;task_flags,TASKf_IDLE);
+    }
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  Preempt(old_preempt);
+  </span><span class="cBLUE">return</span><span class="cBLACK"> ch==CH_ESC;
+}
+
+
+</span><span class="cBLUE">public</span><span class="cBLACK"> LtfEntry *LtfPutLine(LtfEntry *cl)
+{
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> ch,*ptr,*ptr2;
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (cl-&gt;btype!=LTFT_ERROR &amp;&amp; cl-&gt;btype!=LTFT_CR) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (Bt</span><span class="cLTGRAY">(</span><span class="cBLACK">ltf_tag_types,cl-&gt;btype</span><span class="cLTGRAY">)</span><span class="cBLACK">) {
+      ptr=cl-&gt;tag;
+      </span><span class="cBLUE">do</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        ptr2=ptr;
+        </span><span class="cBLUE">while</span><span class="cBLACK"> (ch=*ptr)
+          </span><span class="cBLUE">if</span><span class="cBLACK"> (ch==</span><span class="cBROWN">'$$'</span><span class="cBLACK">)
+            </span><span class="cBLUE">break</span><span class="cBLACK">;
+          </span><span class="cBLUE">else</span><span class="cBLACK">
+            ptr++;
+        *ptr=0;
+        PutS(ptr2);
+        *ptr=ch;
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (ch==</span><span class="cBROWN">'$$'</span><span class="cBLACK">) {
+          PutS(</span><span class="cBROWN">"$$$$"</span><span class="cBLACK">);
+          ptr++;
+        }
+      </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">while</span><span class="cBLACK"> (ch);
+    } </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cBLUE">if</span><span class="cBLACK"> (cl-&gt;btype==LTFT_TAB)
+      PutChar(CH_TAB);
+    cl=cl-&gt;next;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  CrLf;
+  </span><span class="cBLUE">return</span><span class="cBLACK"> cl-&gt;btype==LTFT_ERROR ? cl:cl-&gt;next;
+}
+
+#</span><span class="cBLUE">help_index</span><span class="cBLACK"> </span><span class="cBROWN">"Ltf/Input"</span><span class="cBLACK">
+</span><span class="cBLUE">public</span><span class="cBLACK"> </span><span class="cBLUE">U1</span><span class="cBLACK"> *LtfMGetS(</span><span class="cBLUE">U8</span><span class="cBLACK"> flags=0)
+</span><span class="cGREEN">//</span><a href="/archive/code/Adam1a.html"><span class="cRED">Flags</span></a><span class="cBLACK">
+{
+  Ltf *l;
+  LtfEntry *cl;
+  BoolI1 old_preempt=IsPreempt;
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *result;
+  </span><span class="cBLUE">U8</span><span class="cBLACK"> ch,sc;
+  PutS(</span><span class="cBROWN">"$$FU$$$$BU$$"</span><span class="cBLACK">);
+  </span><span class="cBLUE">do</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (ScanKey</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;ch,&amp;sc</span><span class="cLTGRAY">)</span><span class="cBLACK">) {
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (ch==CH_ESC || ch==CH_CTRLQ) </span><span class="cLTGRAY">{</span><span class="cBLACK"> </span><span class="cGREEN">//Check for exit filter mode</span><span class="cBLACK">
+        Preempt(OFF);
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (LtfCur &amp;&amp; LtfCur-&gt;find_replace-&gt;filter_lines) {
+          PutKey(ch,sc);
+          LtfRecalc;
+
+          EdUndoFilter(LtfCur);
+          ch=0; sc=0; </span><span class="cGREEN">//don't exit</span><span class="cBLACK">
+        }
+        Preempt(old_preempt);
+      </span><span class="cLTGRAY">}</span><span class="cBLACK">
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (ch==CH_ESC) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        l=Fs-&gt;next_ltf;
+        </span><span class="cBLUE">while</span><span class="cBLACK"> (l!=</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;Fs-&gt;next_ltf</span><span class="cLTGRAY">)</span><span class="cBLACK">&gt;&lt;</span><span class="cLTGRAY">(</span><span class="cBLUE">U1</span><span class="cBLACK"> *</span><span class="cLTGRAY">)</span><span class="cBLACK">-</span><span class="cBLUE">offset</span><span class="cLTGRAY">(</span><span class="cBLACK">Ltf.next_ltf</span><span class="cLTGRAY">)</span><span class="cBLACK"> &amp;&amp;
+            l-&gt;ltf_in_queue_signature==LTF_IN_QUEUE_SIGNATURE_VAL) {
+          LtfLock(l);
+          </span><span class="cBLUE">if</span><span class="cBLACK"> (!</span><span class="cLTGRAY">(</span><span class="cBLACK">l-&gt;flags&amp;LTFF_DONT_SHOW</span><span class="cLTGRAY">)</span><span class="cBLACK"> &amp;&amp;
+              </span><span class="cLTGRAY">(</span><span class="cBLACK">!l-&gt;best_d || !(l-&gt;flags&amp;LTFF_AUX_LTF)</span><span class="cLTGRAY">)</span><span class="cBLACK"> &amp;&amp;
+              l-&gt;ltf_in_queue_signature==LTF_IN_QUEUE_SIGNATURE_VAL &amp;&amp; l-&gt;cur_entry!=l) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+            cl=LtfCopyEntry(l,l-&gt;cur_entry);
+            </span><span class="cBLUE">if</span><span class="cBLACK"> (l-&gt;flags&amp;LTFF_AUX_LTF &amp;&amp; LtfCur)
+              LtfBottom;
+            </span><span class="cBLUE">else</span><span class="cBLACK">
+              LtfBottom(l);
+            LtfEntryRun(l,cl,TRUE);
+            LtfDelEntry(l,cl);
+            LtfUnlock(l);
+            </span><span class="cBLUE">break</span><span class="cBLACK">;
+          </span><span class="cLTGRAY">}</span><span class="cBLACK">
+          LtfUnlock(l);
+          l=l-&gt;next_ltf;
+        }
+      </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">if</span><span class="cBLACK"> (ch==CH_CTRLQ) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (flags&amp;GETSF_CTRLQ_EXIT)
+          Exit;
+        </span><span class="cBLUE">else</span><span class="cBLACK"> {
+          result=StrNew(</span><span class="cBROWN">""</span><span class="cBLACK">);
+          </span><span class="cBLUE">goto</span><span class="cBLACK"> mgets_done;
+        }
+      </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        PutKey(ch,sc);
+        LtfRecalc;
+      </span><span class="cLTGRAY">}</span><span class="cBLACK">
+    } </span><span class="cBLUE">else</span><span class="cBLACK"> {
+      Preempt(OFF);
+      LBts(&amp;Fs-&gt;task_flags,TASKf_IDLE);
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (!</span><span class="cLTGRAY">(</span><span class="cBLACK">Fs-&gt;parent_task &amp;&amp; Fs-&gt;parent_task-&gt;popup_task==Fs</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        LBts(&amp;Fs-&gt;task_flags,TASKf_AWAITING_MSG);
+        TaskNext;
+      </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK">
+        WinSync;
+      LBtr(&amp;Fs-&gt;task_flags,TASKf_IDLE);
+      Preempt(old_preempt);
+    }
+</span><span class="cGREEN">//Ctrl shift &lt;CR&gt; is a blank line without entry</span><span class="cBLACK">
+  </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">while</span><span class="cBLACK"> (ch!=CH_CR || sc &amp; SCF_CTRL &amp;&amp; sc &amp; SCF_SHIFT);
+
+  Preempt(OFF);
+  l=LtfCur;
+  LtfLock(l);
+  cl=l-&gt;cur_entry;
+  </span><span class="cBLUE">do</span><span class="cBLACK"> cl=cl-&gt;last;
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (cl!=l &amp;&amp; cl-&gt;btype!=LTFT_CR &amp;&amp;
+    cl-&gt;btype!=LTFT_USER_FOREGROUND &amp;&amp; cl-&gt;btype!=LTFT_USER_BACKGROUND);
+
+
+  </span><span class="cBLUE">do</span><span class="cBLACK"> cl=cl-&gt;last;
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (cl!=l &amp;&amp; cl-&gt;btype!=LTFT_CR &amp;&amp;
+    cl-&gt;btype!=LTFT_USER_FOREGROUND &amp;&amp; cl-&gt;btype!=LTFT_USER_BACKGROUND);
+
+  cl=cl-&gt;next;
+  result=LtfGetLine(l,cl,NULL);
+  LtfUnlock(l);
+mgets_done:
+  PutS(</span><span class="cBROWN">"$$FU$$$$FG$$$$BG$$"</span><span class="cBLACK">);
+  Preempt(old_preempt);
+  </span><span class="cBLUE">return</span><span class="cBLACK"> result;
+}
+
+#</span><span class="cBLUE">help_index</span><span class="cBLACK"> </span><span class="cBROWN">"Char/Input"</span><span class="cBLACK">
+
+</span><span class="cBLUE">public</span><span class="cBLACK"> </span><span class="cBLUE">I8</span><span class="cBLACK"> PmtI8(</span><span class="cBLUE">U1</span><span class="cBLACK"> *msg,</span><span class="cBLUE">I8</span><span class="cBLACK"> dft,</span><span class="cBLUE">I8</span><span class="cBLACK"> lo=MIN_I8,</span><span class="cBLUE">I8</span><span class="cBLACK"> hi=MAX_I8)
+{
+  </span><span class="cBLUE">I8</span><span class="cBLACK"> result;
+  BoolI1 okay;
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *st;
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (TRUE) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    PrintF(msg,dft);
+    st=MGetS;
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (!*st) {
+      Free(st);
+      </span><span class="cBLUE">return</span><span class="cBLACK"> dft;
+    }
+    </span><span class="cBLUE">try</span><span class="cBLACK"> {
+      okay=FALSE;
+      result=ExePrintF3(</span><span class="cBROWN">"ToI8(%s);"</span><span class="cBLACK">,st);
+      okay=TRUE;
+    } </span><span class="cBLUE">catch</span><span class="cBLACK">
+      Fs-&gt;catch_except=TRUE;
+    Free(st);
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (okay &amp;&amp; lo&lt;=result&lt;=hi)
+      </span><span class="cBLUE">return</span><span class="cBLACK"> result;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+}
+
+</span><span class="cBLUE">public</span><span class="cBLACK"> </span><span class="cBLUE">F8</span><span class="cBLACK"> PmtF8(</span><span class="cBLUE">U1</span><span class="cBLACK"> *msg,</span><span class="cBLUE">F8</span><span class="cBLACK"> dft,</span><span class="cBLUE">F8</span><span class="cBLACK"> lo=MIN_F8,</span><span class="cBLUE">F8</span><span class="cBLACK"> hi=MAX_F8)
+{
+  </span><span class="cBLUE">F8</span><span class="cBLACK"> result;
+  BoolI1 okay;
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *st;
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (TRUE) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    PrintF(msg,dft);
+    st=MGetS;
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (!*st) {
+      Free(st);
+      </span><span class="cBLUE">return</span><span class="cBLACK"> dft;
+    }
+    </span><span class="cBLUE">try</span><span class="cBLACK"> {
+      okay=FALSE;
+      result=ExePrintF3(</span><span class="cBROWN">"ToF8(%s);"</span><span class="cBLACK">,st)&gt;&lt;(</span><span class="cBLUE">F8</span><span class="cBLACK">);
+      okay=TRUE;
+    } </span><span class="cBLUE">catch</span><span class="cBLACK">
+      Fs-&gt;catch_except=TRUE;
+    Free(st);
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (okay &amp;&amp; lo&lt;=result&lt;=hi)
+      </span><span class="cBLUE">return</span><span class="cBLACK"> result;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+}
+
+</span><span class="cBLUE">public</span><span class="cBLACK"> </span><span class="cBLUE">U1</span><span class="cBLACK"> *PmtStr(</span><span class="cBLUE">U1</span><span class="cBLACK"> *msg=NULL,</span><span class="cBLUE">U1</span><span class="cBLACK"> *dft=NULL)
+{
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *st;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (msg) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (dft)
+      PrintF(msg,dft);
+    </span><span class="cBLUE">else</span><span class="cBLACK">
+      PrintF(msg);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  st=MGetS;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!*st) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    Free(st);
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (dft)
+      </span><span class="cBLUE">return</span><span class="cBLACK"> StrNew(dft);
+    </span><span class="cBLUE">else</span><span class="cBLACK">
+      </span><span class="cBLUE">return</span><span class="cBLACK"> StrNew(</span><span class="cBROWN">""</span><span class="cBLACK">);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  </span><span class="cBLUE">return</span><span class="cBLACK"> st;
+}
+
+</span><span class="cBLUE">public</span><span class="cBLACK"> LTDate PmtLTDate(</span><span class="cBLUE">U1</span><span class="cBLACK"> *msg,LTDate dft,LTDate lo=MIN_I8,LTDate hi=MAX_I8)
+{
+  LTDate result;
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *st;
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (TRUE) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    PrintF(msg,dft,dft);
+    st=MGetS;
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (!*st) {
+      Free(st);
+      </span><span class="cBLUE">return</span><span class="cBLACK"> dft;
+    }
+    result=A2LTDate(st);
+    Free(st);
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (result&gt;=lo &amp;&amp; result&lt;=hi)
+      </span><span class="cBLUE">return</span><span class="cBLACK"> result;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+}
+
+#</span><span class="cBLUE">help_index</span><span class="cBLACK"> </span><span class="cBROWN">"Ltf"</span><span class="cBLACK">
+
+#</span><span class="cBLUE">define</span><span class="cBLACK"> RIGHT_INCLUDE   0
+#</span><span class="cBLUE">define</span><span class="cBLACK"> RIGHT_DEBUG     1
+#</span><span class="cBLUE">define</span><span class="cBLACK"> RIGHT_COMPILE   2
+#</span><span class="cBLUE">define</span><span class="cBLACK"> RIGHT_LOAD      3
+#</span><span class="cBLUE">define</span><span class="cBLACK"> RIGHT_AINCLUDE  4
+#</span><span class="cBLUE">define</span><span class="cBLACK"> RIGHT_AUTOFILE  5
+#</span><span class="cBLUE">define</span><span class="cBLACK"> RIGHT_COPY      6
+#</span><span class="cBLUE">define</span><span class="cBLACK"> RIGHT_MOVE      7
+#</span><span class="cBLUE">define</span><span class="cBLACK"> RIGHT_DELETE    8
+
+</span><span class="cBLUE">I8</span><span class="cBLACK"> PopUpCancelIncludeDelAuto(</span><span class="cBLUE">U1</span><span class="cBLACK"> *header=NULL,</span><span class="cBLUE">U1</span><span class="cBLACK"> *footer=NULL)
+{
+  </span><span class="cBLUE">I8</span><span class="cBLACK"> i;
+  Ltf *l=LtfNew;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (header) LtfPutS(l,header);
+  LtfPutS(l,</span><span class="cBROWN">"$$CM+LX,1,3 $$$$BT, \"INCLUDE       (.CPZ)\",RIGHT_INCLUDE$$"</span><span class="cBLACK">);
+  LtfPutS(l,</span><span class="cBROWN">"$$CM+LX,25,0$$$$BT, \"DEBUG               \",RIGHT_DEBUG$$"</span><span class="cBLACK">);
+  LtfPutS(l,</span><span class="cBROWN">"$$CM+LX,1,3 $$$$BT, \"STATIC COMPILE(.SPZ)\",RIGHT_COMPILE$$"</span><span class="cBLACK">);
+  LtfPutS(l,</span><span class="cBROWN">"$$CM+LX,25,0$$$$BT, \"LOAD          (.BIZ)\",RIGHT_LOAD$$"</span><span class="cBLACK">);
+  LtfPutS(l,</span><span class="cBROWN">"$$CM+LX,1,3 $$$$BT, \"ADAM_INCLUDE  (.APZ)\",RIGHT_AINCLUDE$$"</span><span class="cBLACK">);
+  LtfPutS(l,</span><span class="cBROWN">"$$CM+LX,25,0$$$$BT, \"AUTOFILE      (.AUZ)\",RIGHT_AUTOFILE$$"</span><span class="cBLACK">);
+  LtfPutS(l,</span><span class="cBROWN">"$$CM+LX,1,3 $$$$BT, \"COPY                \",RIGHT_COPY$$"</span><span class="cBLACK">);
+  LtfPutS(l,</span><span class="cBROWN">"$$CM+LX,25,0$$$$BT, \"MOVE                \",RIGHT_MOVE$$"</span><span class="cBLACK">);
+  LtfPutS(l,</span><span class="cBROWN">"$$CM+LX,1,3 $$$$BT, \"DELETE              \",RIGHT_DELETE$$"</span><span class="cBLACK">);
+  LtfPutS(l,</span><span class="cBROWN">"$$CM+LX,25,0$$$$BT, \"CANCEL              \",-1$$\r\n"</span><span class="cBLACK">);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (footer) LtfPutS(l,footer);
+  i=PopUpMenu(l);
+  LtfDel(l);
+  </span><span class="cBLUE">return</span><span class="cBLACK"> i;
+}
+
+</span><span class="cBLUE">I8</span><span class="cBLACK"> EdLeftClickLink(Ltf *l,LtfEntry *cl)
+{ </span><span class="cGREEN">//called with l locked, exit unlocked</span><span class="cBLACK">
+  BoolI1 result;
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *st;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (cl-&gt;flags &amp; LTFLF_AUX_STR)
+    st=StrNew(cl-&gt;aux_str);
+  </span><span class="cBLUE">else</span><span class="cBLACK">
+    st=StrNew(cl-&gt;tag);
+  LtfUnlock(l);
+  result=Ed(st);
+  Free(st);
+  </span><span class="cBLUE">return</span><span class="cBLACK"> result;
+}
+
+</span><span class="cBLUE">I8</span><span class="cBLACK"> TermRightClickLink(Ltf *l,LtfEntry *cl)
+{ </span><span class="cGREEN">//called with l locked, exit unlocked</span><span class="cBLACK">
+  BoolI1 send_cr=FALSE,result=FALSE;
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *st;
+  </span><span class="cBLUE">I8</span><span class="cBLACK"> i;
+  EditFileNameStruct fn;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (cl-&gt;flags &amp; LTFLF_AUX_STR)
+    st=cl-&gt;aux_str;
+  </span><span class="cBLUE">else</span><span class="cBLACK">
+    st=cl-&gt;tag;
+  st= st[2]==</span><span class="cBROWN">':'</span><span class="cBLACK"> ? st+3:st;
+  LtfUnlock(l);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (</span><span class="cLTGRAY">(</span><span class="cBLACK">i=PopUpCancelIncludeDelAuto(st)</span><span class="cLTGRAY">)</span><span class="cBLACK">&gt;=0) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    LtfBottom(l);
+    </span><span class="cBLUE">switch</span><span class="cBLACK"> (i) {
+      </span><span class="cBLUE">case</span><span class="cBLACK"> RIGHT_INCLUDE:
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (Occurrences</span><span class="cLTGRAY">(</span><span class="cBLACK">st,</span><span class="cBROWN">'.'</span><span class="cLTGRAY">)</span><span class="cBLACK"> &amp;&amp; !WildCardMatch</span><span class="cLTGRAY">(</span><span class="cBROWN">"*.CP?"</span><span class="cBLACK">,st</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+          </span><span class="cBLUE">if</span><span class="cBLACK"> (!PopUpCancelOk</span><span class="cLTGRAY">(</span><span class="cBLACK">ST_WARN_ST </span><span class="cBROWN">"Not .CP? File\r\n\r\n"</span><span class="cLTGRAY">)</span><span class="cBLACK">) {
+            send_cr=TRUE;
+            </span><span class="cBLUE">break</span><span class="cBLACK">;
+          }
+        </span><span class="cLTGRAY">}</span><span class="cBLACK">
+        </span><span class="cBLUE">cout</span><span class="cBLACK"> </span><span class="cBROWN">"#include \""</span><span class="cBLACK">,st,</span><span class="cBROWN">"\";\r\n$$FU$$$$FG$$$$BG$$"</span><span class="cBLACK">;
+        ExeFile(st);
+        result=TRUE;
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">case</span><span class="cBLACK"> RIGHT_DELETE:
+        Del(st);
+        result=TRUE;
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">case</span><span class="cBLACK"> RIGHT_AUTOFILE:
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (Occurrences</span><span class="cLTGRAY">(</span><span class="cBLACK">st,</span><span class="cBROWN">'.'</span><span class="cLTGRAY">)</span><span class="cBLACK"> &amp;&amp; !WildCardMatch</span><span class="cLTGRAY">(</span><span class="cBROWN">"*.AU?"</span><span class="cBLACK">,st</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+          </span><span class="cBLUE">if</span><span class="cBLACK"> (!PopUpCancelOk</span><span class="cLTGRAY">(</span><span class="cBLACK">ST_WARN_ST </span><span class="cBROWN">"Not .AU? File\r\n\r\n"</span><span class="cLTGRAY">)</span><span class="cBLACK">) {
+            send_cr=TRUE;
+            </span><span class="cBLUE">break</span><span class="cBLACK">;
+          }
+        </span><span class="cLTGRAY">}</span><span class="cBLACK">
+        </span><span class="cBLUE">cout</span><span class="cBLACK"> </span><span class="cBROWN">"AutoFile(\""</span><span class="cBLACK">,st,</span><span class="cBROWN">"\");\r\n$$FU$$$$FG$$$$BG$$"</span><span class="cBLACK">;
+        AutoStr(</span><span class="cBROWN">"%F\r"</span><span class="cBLACK">,st);
+        result=TRUE;
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">case</span><span class="cBLACK"> RIGHT_AINCLUDE:
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (Occurrences</span><span class="cLTGRAY">(</span><span class="cBLACK">st,</span><span class="cBROWN">'.'</span><span class="cLTGRAY">)</span><span class="cBLACK"> &amp;&amp; !WildCardMatch</span><span class="cLTGRAY">(</span><span class="cBROWN">"*.AP?"</span><span class="cBLACK">,st</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+          </span><span class="cBLUE">if</span><span class="cBLACK"> (!PopUpCancelOk</span><span class="cLTGRAY">(</span><span class="cBLACK">ST_WARN_ST </span><span class="cBROWN">"Not .AP? File\r\n\r\n"</span><span class="cLTGRAY">)</span><span class="cBLACK">) {
+            send_cr=TRUE;
+            </span><span class="cBLUE">break</span><span class="cBLACK">;
+          }
+        </span><span class="cLTGRAY">}</span><span class="cBLACK">
+        </span><span class="cBLUE">cout</span><span class="cBLACK"> </span><span class="cBROWN">"Adam(\"#include \\\""</span><span class="cBLACK">,st,</span><span class="cBROWN">"\\\"\" );\r\n$$FU$$$$FG$$$$BG$$"</span><span class="cBLACK">;
+        AdamFile(st,FALSE);
+        result=TRUE;
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">case</span><span class="cBLACK"> RIGHT_COMPILE:
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (Occurrences</span><span class="cLTGRAY">(</span><span class="cBLACK">st,</span><span class="cBROWN">'.'</span><span class="cLTGRAY">)</span><span class="cBLACK"> &amp;&amp; !WildCardMatch</span><span class="cLTGRAY">(</span><span class="cBROWN">"*.SP?"</span><span class="cBLACK">,st</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+          </span><span class="cBLUE">if</span><span class="cBLACK"> (!PopUpCancelOk</span><span class="cLTGRAY">(</span><span class="cBLACK">ST_WARN_ST </span><span class="cBROWN">"Not .SP? File\r\n\r\n"</span><span class="cLTGRAY">)</span><span class="cBLACK">) {
+            send_cr=TRUE;
+            </span><span class="cBLUE">break</span><span class="cBLACK">;
+          }
+        </span><span class="cLTGRAY">}</span><span class="cBLACK">
+        </span><span class="cBLUE">cout</span><span class="cBLACK"> </span><span class="cBROWN">"Cmp(\""</span><span class="cBLACK">,st,</span><span class="cBROWN">"\");\r\n$$FU$$$$FG$$$$BG$$"</span><span class="cBLACK">;
+        Cmp(st);
+        result=TRUE;
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">case</span><span class="cBLACK"> RIGHT_LOAD:
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (Occurrences</span><span class="cLTGRAY">(</span><span class="cBLACK">st,</span><span class="cBROWN">'.'</span><span class="cLTGRAY">)</span><span class="cBLACK"> &amp;&amp; !WildCardMatch</span><span class="cLTGRAY">(</span><span class="cBROWN">"*.BI?"</span><span class="cBLACK">,st</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+          </span><span class="cBLUE">if</span><span class="cBLACK"> (!PopUpCancelOk</span><span class="cLTGRAY">(</span><span class="cBLACK">ST_WARN_ST </span><span class="cBROWN">"Not .BI? File\r\n\r\n"</span><span class="cLTGRAY">)</span><span class="cBLACK">) {
+            send_cr=TRUE;
+            </span><span class="cBLUE">break</span><span class="cBLACK">;
+          }
+        </span><span class="cLTGRAY">}</span><span class="cBLACK">
+        </span><span class="cBLUE">cout</span><span class="cBLACK"> </span><span class="cBROWN">"Load(\""</span><span class="cBLACK">,st,</span><span class="cBROWN">"\");\r\n$$FU$$$$FG$$$$BG$$"</span><span class="cBLACK">;
+        Load(st);
+        result=TRUE;
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">case</span><span class="cBLACK"> RIGHT_COPY:
+        StrCpy(fn.name,st);
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (LtfFormDo</span><span class="cLTGRAY">(</span><span class="cBLACK">fn.name,</span><span class="cBROWN">"EditFileNameStruct"</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+          Copy(st,fn.name);
+          result=TRUE;
+        </span><span class="cLTGRAY">}</span><span class="cBLACK">
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">case</span><span class="cBLACK"> RIGHT_MOVE:
+        StrCpy(fn.name,st);
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (LtfFormDo</span><span class="cLTGRAY">(</span><span class="cBLACK">fn.name,</span><span class="cBROWN">"EditFileNameStruct"</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+          Move(st,fn.name);
+          result=TRUE;
+        </span><span class="cLTGRAY">}</span><span class="cBLACK">
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">case</span><span class="cBLACK"> RIGHT_DEBUG:
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (Occurrences</span><span class="cLTGRAY">(</span><span class="cBLACK">st,</span><span class="cBROWN">'.'</span><span class="cLTGRAY">)</span><span class="cBLACK"> &amp;&amp; !WildCardMatch</span><span class="cLTGRAY">(</span><span class="cBROWN">"*.CP?"</span><span class="cBLACK">,st</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+          </span><span class="cBLUE">if</span><span class="cBLACK"> (!PopUpCancelOk</span><span class="cLTGRAY">(</span><span class="cBLACK">ST_WARN_ST </span><span class="cBROWN">"Not .CP? File\r\n\r\n"</span><span class="cLTGRAY">)</span><span class="cBLACK">) {
+            send_cr=TRUE;
+            </span><span class="cBLUE">break</span><span class="cBLACK">;
+          }
+        </span><span class="cLTGRAY">}</span><span class="cBLACK">
+        </span><span class="cBLUE">cout</span><span class="cBLACK"> </span><span class="cBROWN">"IDE(\""</span><span class="cBLACK">,st,</span><span class="cBROWN">"\");\r\n$$FU$$$$FG$$$$BG$$"</span><span class="cBLACK">;
+        IDE(st);
+        result=TRUE;
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+    }
+  </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK">
+    send_cr=TRUE;
+  LtfBottom(l);
+  </span><span class="cBLUE">cout</span><span class="cBLACK"> </span><span class="cBROWN">"$$FU$$$$FG$$$$BG$$"</span><span class="cBLACK">;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (send_cr)
+    PutChar(CH_CR);
+  </span><span class="cBLUE">return</span><span class="cBLACK"> result;
+}
+
+#</span><span class="cBLUE">help_index</span><span class="cBLACK"> </span><span class="cBROWN">"Ltf/Cmd Line (Typically);Cmd Line (Typically)"</span><span class="cBLACK">
+
+</span><span class="cBLUE">public</span><span class="cBLACK"> </span><span class="cBLUE">U0</span><span class="cBLACK"> Man(</span><span class="cBLUE">U1</span><span class="cBLACK"> *st)
+</span><span class="cGREEN">//Enter the name of a symbol and this</span><span class="cBLACK">
+</span><span class="cGREEN">//will jump to the src code.</span><span class="cBLACK">
+{
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *name=MAlloc(3+StrLen</span><span class="cLTGRAY">(</span><span class="cBLACK">st</span><span class="cLTGRAY">)</span><span class="cBLACK">+1);
+  StrCpy(name,</span><span class="cBROWN">"MN:"</span><span class="cBLACK">);
+  StrCat(name,st);
+  Ed(name);
+  Free(name);
+}
+
+#</span><span class="cBLUE">help_index</span><span class="cBLACK"> </span><span class="cBROWN">"Debugging;Ltf/Cmd Line (Typically);Ltf/Output;Cmd Line (Typically)"</span><span class="cBLACK">
+
+</span><span class="cBLUE">public</span><span class="cBLACK"> </span><span class="cBLUE">U0</span><span class="cBLACK"> LtfDm(</span><span class="cBLUE">U1</span><span class="cBLACK"> *buf,</span><span class="cBLUE">U8</span><span class="cBLACK"> cnt=0x80)
+</span><span class="cGREEN">//Dumps a chunk of mem, showing</span><span class="cBLACK">
+</span><span class="cGREEN">//addresses.  It is live and can be</span><span class="cBLACK">
+</span><span class="cGREEN">//edited.</span><span class="cBLACK">
+{
+  LtfEntry *ll;
+  Ltf *l=LtfCur;
+  BoolI1 unlock=LtfLock(l);
+  ll=LtfPrintF(l,</span><span class="cBROWN">"$$HX-Z,%d,16$$"</span><span class="cBLACK">,cnt);
+  ll-&gt;data=buf;
+  l-&gt;cur_entry=ll-&gt;next;
+  LtfRecalc(l);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (unlock)
+    LtfUnlock(l);
+}
+
+</span><span class="cBLUE">public</span><span class="cBLACK"> </span><span class="cBLUE">U0</span><span class="cBLACK"> LtfD(</span><span class="cBLUE">U1</span><span class="cBLACK"> *buf,</span><span class="cBLUE">U8</span><span class="cBLACK"> cnt=0x80)
+</span><span class="cGREEN">//Dumps a chunk of mem, showing</span><span class="cBLACK">
+</span><span class="cGREEN">//offsets.  It is live and can be</span><span class="cBLACK">
+</span><span class="cGREEN">//edited.</span><span class="cBLACK">
+{
+  LtfEntry *ll;
+  Ltf *l=LtfCur;
+  BoolI1 unlock=LtfLock(l);
+  ll=LtfPrintF(l,</span><span class="cBROWN">"$$HX,%d,16$$"</span><span class="cBLACK">,cnt);
+  ll-&gt;data=buf;
+  l-&gt;cur_entry=ll-&gt;next;
+  LtfRecalc(l);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (unlock)
+    LtfUnlock(l);
+}
+
+#</span><span class="cBLUE">help_index</span><span class="cBLACK"> </span><span class="cBROWN">"Ltf/Output"</span><span class="cBLACK">
+BoolI8 AKDLtfPutS(</span><span class="cBLUE">U1</span><span class="cBLACK"> *st)
+{
+  Ltf *l;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (l=LtfCur)
+    LtfPutSPartial(l,st);
+  </span><span class="cBLUE">return</span><span class="cBLACK"> FALSE;
+}
+
+KeyDevAdd(&amp;AKDLtfPutKey,&amp;AKDLtfPutS,0x80000000,TRUE);
+fp_mgets=&amp;LtfMGetS;
+fp_ltf_cur=&amp;LtfCur;
+
+#</span><span class="cBLUE">help_index</span><span class="cBLACK"> </span><span class="cBROWN">"Ltf"</span><span class="cBLACK">
+</span></pre><div class="archive-note">Historical capture: 2010-02-13. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

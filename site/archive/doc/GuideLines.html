@@ -1,0 +1,140 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="description"/>
+<meta content="64-Bit, Operating System, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="keywords"/>
+<meta content="LoseThos V6.02" name="generator"/>
+<style type="text/css">
+.cBLACK{color:rgb(0,0,0);}
+.cBLUE{color:rgb(0,0,168);}
+.cGREEN{color:rgb(0,168,0);}
+.cCYAN{color:rgb(0,168,168);}
+.cRED{color:rgb(168,0,0);}
+.cPURPLE{color:rgb(168,0,168);}
+.cBROWN{color:rgb(168,84,0);}
+.cLTGRAY{color:rgb(168,168,168);}
+.cDKGRAY{color:rgb(84,84,84);}
+.cLTBLUE{color:rgb(84,84,252);}
+.cLTGREEN{color:rgb(84,252,84);}
+.cLTCYAN{color:rgb(84,252,252);}
+.cLTRED{color:rgb(252,84,84);}
+.cLTPURPLE{color:rgb(252,84,252);}
+.cYELLOW{color:rgb(252,252,84);}
+.cWHITE{color:rgb(252,252,252);}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cBLACK">                                   </span><span class="cPURPLE">ACCT FILES</span><span class="cBLACK">
+
+You can add and remove accts by making or removing directories in the </span><span class="cGREEN">::/LT/Acct
+s</span><span class="cBLACK"> directory.  An empty account directory should be valid because it will get 
+default files from the parent directory.
+
+See </span><span class="cRED">HOME/UserStartUp.CPZ</span><span class="cBLACK"> for the user start-up file.
+
+See </span><span class="cRED">HOME/PersonalMenu.TXZ</span><span class="cBLACK"> for a personal menu which can be viewed at the cmd 
+line with the </span><span class="cGREEN">WINDOWS</span><span class="cBLACK"> key or by clicking "</span><span class="cGREEN">MENU</span><span class="cBLACK">" in the upper left border area of 
+a window.
+
+See </span><span class="cRED">HOME/DoItOnce.CPZ</span><span class="cBLACK"> for a file which is invoked at the start-up of the first 
+user.
+
+See </span><span class="cRED">HOME/Favorites.TXZ</span><span class="cBLACK"> for a handy "favorites" file which can be reached by 
+pressing </span><span class="cGREEN">ALT-F</span><span class="cBLACK">, pretty-much anywhere.  Users can place links and todo lists or 
+any text within this.
+
+See </span><span class="cRED">HOME/Adam3.APZ</span><span class="cBLACK"> for the user files that get loaded into the adam task at 
+start-up.  These are only loaded once.
+
+</span><span class="cRED">HOME/Registry.CPZ</span><span class="cBLACK"> can be edited by hand or deleted to reset to defaults.  Takes 
+affect next boot.
+
+See </span><span class="cRED">HOME/ServantStartUp.CPZ</span><span class="cBLACK"> for the start-up file other cmds which </span><a href="/archive/code/Task1a.html"><span class="cRED">Spawn</span></a><span class="cBLACK">() 
+tasks.
+
+
+                              </span><span class="cPURPLE">APPLICATION POLICIES</span><span class="cBLACK">
+
+* Place applications in their own </span><span class="cGREEN">/LT/Apps</span><span class="cBLACK"> subdirectory.
+
+* Make a file called </span><span class="cGREEN">Load.CPZ</span><span class="cBLACK"> to load the application.
+
+* Make a file called </span><span class="cGREEN">Run.CPZ</span><span class="cBLACK"> to load and run the application, preferable by </span><span class="cGREEN">#inc
+lude</span><span class="cBLACK">ing the </span><span class="cGREEN">Load.CPZ</span><span class="cBLACK"> file.
+
+* Place user data in a subdirectory of </span><span class="cGREEN">HOME</span><span class="cBLACK">, preferably naming the subdirectory 
+the same as the </span><span class="cGREEN">/LT/Apps</span><span class="cBLACK"> subdirectory.  Or, place data in the </span><span class="cGREEN">Registry.CPZ</span><span class="cBLACK"> file. 
+ See </span><span class="cRED">::/LT/Demo/RegistryDemo.CPZ</span><span class="cBLACK">.
+
+* Make a file called </span><span class="cGREEN">Install.CPZ</span><span class="cBLACK"> or </span><span class="cGREEN">Install.AUZ</span><span class="cBLACK"> to create the </span><span class="cGREEN">HOME</span><span class="cBLACK"> subdirectory 
+and do similar stuff.
+
+ 
+
+                           </span><span class="cPURPLE">OS PROGRAMMING GUIDELINES:</span><span class="cBLACK">
+
+* Virtual mem is not used (It is identity mapped in EM64T mode).  The stack does 
+not grow, so allocate enough when the task (process) is </span><a href="/archive/code/Task1a.html"><span class="cRED">Spawn</span></a><span class="cBLACK">ed and use the heap 
+for most things.  (The "heap" refers to </span><a href="/archive/code/Memory.html"><span class="cRED">MAlloc</span></a><span class="cBLACK">() and </span><a href="/archive/code/Memory.html"><span class="cRED">Free</span></a><span class="cBLACK">().)
+
+* I've tried to standardize names see </span><a href="https://web.archive.org/web/20100213065117/http://www.losethos.com/doc/Glossary.html"><span class="cRED">Naming convention</span></a><span class="cBLACK">
+
+* There are two modes of compiling </span><a href="https://web.archive.org/web/20100213065117/http://www.losethos.com/doc/Glossary.html"><span class="cRED">Static Compiled Mode</span></a><span class="cBLACK"> and </span><a href="https://web.archive.org/web/20100213065117/http://www.losethos.com/doc/Glossary.html"><span class="cRED">JIT Mode</span></a><span class="cBLACK">.  Actual 
+compilation is done in both--nothing is "interpreted".
+
+* </span><a href="/archive/doc/Differences.html"><span class="cRED">Differences from C/C++</span></a><span class="cBLACK">
+
+* I got rid of </span><span class="cGREEN">continue</span><span class="cBLACK"> for loops because I don't use it, don't like it, and it 
+bloats the compiler.  Use </span><span class="cGREEN">goto</span><span class="cBLACK">.
+
+* </span><a href="https://web.archive.org/web/20100213065117/http://www.losethos.com/doc/SysPgmGuide.html"><span class="cRED">System Programming Guidelines</span></a><span class="cBLACK">
+
+                              </span><span class="cPURPLE">Hash symbol tables:</span><span class="cBLACK">
+
+* See </span><a href="https://web.archive.org/web/20100213065117/http://www.losethos.com/code/Hash2a.html"><span class="cRED">::/LT/Adam/Hash2a.APZ</span></a><span class="cBLACK"> for examples of how the hash tables are set-up.  
+Basically, symbols are placed into hash tables and child process hash tables are 
+chained to parents.  This provides scopes for variables and functions.
+
+* </span><span class="cGREEN">adam_task-&gt;hash_table</span><span class="cBLACK"> holds the C/C++ symbols loaded in on start-up.
+
+* </span><span class="cGREEN">Fs-&gt;hash_table</span><span class="cBLACK"> holds user C+ symbols and if a symbol is not found, it checks 
+parents.  When a duplicate symbol is added to the table, it overshadows the 
+previous symbol unless you have done </span><span class="cRED">OptOn</span><span class="cBLACK">(</span><a href="/archive/code/Adam1a.html"><span class="cRED">OPTf_REPLACE_SYMS</span></a><span class="cBLACK">).  When developing 
+software, typically you include the file at the cmd prompt, make changes and 
+reinclude it.  Old symbols are overshadowed but they are still there.  
+Periodically, kill the TASK and start fresh when mem is low.  If you wish your 
+applications to free themselves instead of staying in mem, spawn or </span><a href="https://web.archive.org/web/20100213065117/http://www.losethos.com/code/LtfPopUp.html"><span class="cRED">PopUp</span></a><span class="cBLACK">() a 
+task to run the application and kill it when it's done.
+
+* To display the contents of a hash table, use the </span><a href="https://web.archive.org/web/20100213065117/http://www.losethos.com/code/Hash2a.html"><span class="cRED">HashRep</span></a><span class="cBLACK">() routine or the 
+varients.  </span><a href="https://web.archive.org/web/20100213065117/http://www.losethos.com/code/Hash2a.html"><span class="cRED">HashDepthRep</span></a><span class="cBLACK">() gives a histogram  of how long the chains are, in case 
+you wish to make hash table sizes bigger.
+
+                          </span><span class="cPURPLE">Assembly Language Concerns:</span><span class="cBLACK">
+
+* </span><span class="cGREEN">FS</span><span class="cBLACK"> must always point to the per-TASK's structure.  See </span><a href="/archive/code/Adam1a.html"><span class="cRED">C+</span></a><span class="cBLACK"> and </span><a href="/archive/code/OSAsmDefs.html"><span class="cRED">Asm</span></a><span class="cBLACK">.
+
+* </span><span class="cGREEN">GS</span><span class="cBLACK"> must always point to the per-CPU's structure.  See </span><a href="/archive/code/Adam1a.html"><span class="cRED">C+</span></a><span class="cBLACK"> and </span><a href="/archive/code/OSAsmDefs.html"><span class="cRED">Asm</span></a><span class="cBLACK">.
+
+* Don't change the segment registers unless interrupts are off.
+
+* When interacting with compiled code, preserve </span><span class="cGREEN">RBP, RSI, RDI, R12-R15</span><span class="cBLACK"> because 
+the compiler uses these for register vars.  You are free to trash </span><span class="cGREEN">RAX, RBX, RCX, 
+RDX</span><span class="cBLACK"> and </span><span class="cGREEN">R8-R11</span><span class="cBLACK">.
+
+* I recommend using the standard stack frame for functions because </span><a href="/archive/code/Dbg1a.html"><span class="cRED">Caller</span></a><span class="cBLACK">() is 
+used to display the call stack, such as for the wallpaper.
+</span><span class="cGREEN">        PUSH    RBP
+        MOV     RBP,RSP
+...
+        POP     RBP
+        RET</span><span class="cBLACK">
+
+
+</span></pre><div class="archive-note">Historical capture: 2010-02-13. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

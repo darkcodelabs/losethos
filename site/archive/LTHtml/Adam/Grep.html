@@ -1,0 +1,298 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>Grep</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V8.00" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cF5">                               <a href="/archive/LTHtml/Doc/TrivialSolutions.html">Trivial Solutions</a>
+                    <a href="/archive/index.html">The LoseThos 64-bit PC Operating System</a>
+File:/LT/Adam/Grep.APZ
+This, and all LoseThos files, are public domain.  Do whatever you like.
+God is watching; God is just; God is never out-done in generosity.  He talks!
+
+LoseThos code compiles with the 64-bit LoseThos compiler/assembler I wrote.
+Boot the LoseThos CD and you can compile it.  Not in Kansas anymore!
+
+<a href="/archive/LTHtml/Demo/Lectures/FixedPoint.html">Click here for preliminary compiler information you need.</a>
+
+</span><a name="l1"></a><span class="cF0">#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Utils;Cmd Line (Typically)"</span><span class="cF0">
+<a name="l2"></a>
+<a name="l3"></a>#</span><span class="cF1">define</span><span class="cF0"> GRF_REPLACE     0
+<a name="l4"></a>#</span><span class="cF1">define</span><span class="cF0"> GRF_SKIP        1
+<a name="l5"></a>#</span><span class="cF1">define</span><span class="cF0"> GRF_ALL         2
+<a name="l6"></a>#</span><span class="cF1">define</span><span class="cF0"> GRF_ED          3
+<a name="l7"></a>#</span><span class="cF1">define</span><span class="cF0"> GRF_ABORT_FILE  4
+<a name="l8"></a>#</span><span class="cF1">define</span><span class="cF0"> GRF_SKIP_FILE   5
+<a name="l9"></a>
+<a name="l10"></a></span><span class="cF1">I64</span><span class="cF0"> PopUpReplaceSkipAllCancelEd(</span><span class="cF1">U8</span><span class="cF0"> *msg)
+<a name="l11"></a>{
+<a name="l12"></a>  </span><span class="cF1">I64</span><span class="cF0"> i;
+<a name="l13"></a>  Ltf *l=LtfNew;
+<a name="l14"></a>  LtfPutS(l,msg);
+<a name="l15"></a>  LtfPutS(l,</span><span class="cF6">"$CM+LX,2,4$$BT,\"REPLACE\",GRF_REPLACE$"</span><span class="cF0">
+<a name="l16"></a>        </span><span class="cF6">"$CM+LX,22,0$$BT,\"SKIP\",GRF_SKIP$"</span><span class="cF0">
+<a name="l17"></a>        </span><span class="cF6">"$CM+LX,2,4$$BT,\"ALL\",GRF_ALL$"</span><span class="cF0">
+<a name="l18"></a>        </span><span class="cF6">"$CM+LX,22,0$$BT,\"ABORT ALL\",LTFM_CANCEL$"</span><span class="cF0">
+<a name="l19"></a>        </span><span class="cF6">"$CM+LX,2,4$$BT,\"EDIT\",GRF_ED$"</span><span class="cF0">
+<a name="l20"></a>        </span><span class="cF6">"$CM+LX,22,0$$BT,\"ABORT FILE\",GRF_ABORT_FILE$"</span><span class="cF0">
+<a name="l21"></a>        </span><span class="cF6">"$CM+LX,2,4$$BT,\"SKIP FILE\",GRF_SKIP_FILE$\n"</span><span class="cF0">);
+<a name="l22"></a>  i=PopUpMenu(l);
+<a name="l23"></a>  LtfDel(l);
+<a name="l24"></a>  </span><span class="cF1">return</span><span class="cF0"> i;
+<a name="l25"></a>}
+<a name="l26"></a>
+<a name="l27"></a>
+<a name="l28"></a>
+<a name="l29"></a></span><span class="cF1">U64</span><span class="cF0"> GrepFile(</span><span class="cF1">U8</span><span class="cF0"> *pattern,</span><span class="cF1">U8</span><span class="cF0"> *name,</span><span class="cF1">U64</span><span class="cF0"> *_fuf_flags,</span><span class="cF1">U8</span><span class="cF0"> *replace_text)
+<a name="l30"></a>{
+<a name="l31"></a>  BoolI8 first_on_line,write_this_file=FALSE,cont=!Bt(_fuf_flags,FUf_CANCEL);
+<a name="l32"></a>  </span><span class="cF1">U8</span><span class="cF0"> *src,*dst,*dst2,*name_buf=NULL;
+<a name="l33"></a>  </span><span class="cF1">U64</span><span class="cF0"> ss_flags;
+<a name="l34"></a>  Ltf *cur_l,*l=LtfRead(name,LTFF_PLAIN_TEXT_WITH_TABS|LTFF_NO_CURSOR);
+<a name="l35"></a>  LtfEntry *cl;
+<a name="l36"></a>  </span><span class="cF1">I64</span><span class="cF0"> i,j,plen,rlen,dlen;
+<a name="l37"></a>  </span><span class="cF1">U64</span><span class="cF0"> cnt=0,old_flags;
+<a name="l38"></a>
+<a name="l39"></a>  ss_flags=Bt(_fuf_flags,FUf_IGNORE) ? SRF_IGNORE_CASE :0;
+<a name="l40"></a>  </span><span class="cF1">if</span><span class="cF0"> (Bt</span><span class="cF7">(</span><span class="cF0">_fuf_flags,FUf_WHOLE_LABELS</span><span class="cF7">)</span><span class="cF0">)
+<a name="l41"></a>    ss_flags|=SRF_WHOLE_LABELS;
+<a name="l42"></a>
+<a name="l43"></a>  plen=StrLen(pattern);
+<a name="l44"></a>  </span><span class="cF1">if</span><span class="cF0"> (replace_text)
+<a name="l45"></a>    rlen=StrLen(replace_text);
+<a name="l46"></a>  cl=l-&gt;root.next;
+<a name="l47"></a>  </span><span class="cF1">while</span><span class="cF0"> (cl!=l &amp;&amp; cont) </span><span class="cF7">{</span><span class="cF0">
+<a name="l48"></a>    </span><span class="cF1">if</span><span class="cF0"> (cl-&gt;type_u8==LTFT_TEXT) {
+<a name="l49"></a>      src=cl-&gt;tag;
+<a name="l50"></a>      first_on_line=TRUE;
+<a name="l51"></a>      </span><span class="cF1">while</span><span class="cF0"> (src &amp;&amp; cont) </span><span class="cF7">{</span><span class="cF0">
+<a name="l52"></a>        </span><span class="cF1">if</span><span class="cF0"> (src=SearchStr</span><span class="cF7">(</span><span class="cF0">src,pattern,ss_flags</span><span class="cF7">)</span><span class="cF0">) {
+<a name="l53"></a>          cnt++;
+<a name="l54"></a>          </span><span class="cF1">if</span><span class="cF0"> (first_on_line || Bt</span><span class="cF7">(</span><span class="cF0">_fuf_flags,FUf_REPLACE</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF7">{</span><span class="cF0">
+<a name="l55"></a>            first_on_line=FALSE;
+<a name="l56"></a>            PutFileLink(name,cl-&gt;y+1,TRUE);
+<a name="l57"></a>            name_buf=MSPrintF(</span><span class="cF6">"%s,%d"</span><span class="cF0">,name,cl-&gt;y+1);
+<a name="l58"></a>            </span><span class="cF1">if</span><span class="cF0"> (cur_l=LtfCur) {
+<a name="l59"></a>              old_flags=cur_l-&gt;flags&amp;LTFF_PLAIN_TEXT;
+<a name="l60"></a>              cur_l-&gt;flags|=LTFF_PLAIN_TEXT;
+<a name="l61"></a>            }
+<a name="l62"></a>            </span><span class="cF6">" %s\n"</span><span class="cF0">,cl-&gt;tag;
+<a name="l63"></a>            </span><span class="cF1">if</span><span class="cF0"> (cur_l)
+<a name="l64"></a>              cur_l-&gt;flags= cur_l-&gt;flags&amp;~LTFF_PLAIN_TEXT |old_flags;
+<a name="l65"></a>          </span><span class="cF7">}</span><span class="cF0">
+<a name="l66"></a>          </span><span class="cF1">if</span><span class="cF0"> (Bt</span><span class="cF7">(</span><span class="cF0">_fuf_flags,FUf_REPLACE</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF7">{</span><span class="cF0">
+<a name="l67"></a>            </span><span class="cF1">if</span><span class="cF0"> (Bt</span><span class="cF7">(</span><span class="cF0">_fuf_flags,FUf_ALL</span><span class="cF7">)</span><span class="cF0">)
+<a name="l68"></a>              i=GRF_ALL;
+<a name="l69"></a>            </span><span class="cF1">else</span><span class="cF0"> {
+<a name="l70"></a>              i=PopUpReplaceSkipAllCancelEd(</span><span class="cF6">""</span><span class="cF0">);
+<a name="l71"></a>              </span><span class="cF1">if</span><span class="cF0"> (i&lt;0) </span><span class="cF7">{</span><span class="cF0">
+<a name="l72"></a>                LBts(_fuf_flags,FUf_CANCEL);
+<a name="l73"></a>                cont=FALSE;
+<a name="l74"></a>                write_this_file=FALSE;
+<a name="l75"></a>              </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF1">if</span><span class="cF0"> (i==GRF_ALL)
+<a name="l76"></a>                LBts(_fuf_flags,FUf_ALL);
+<a name="l77"></a>              </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF1">if</span><span class="cF0"> (i==GRF_ABORT_FILE) </span><span class="cF7">{</span><span class="cF0">
+<a name="l78"></a>                cont=FALSE;
+<a name="l79"></a>                write_this_file=FALSE;
+<a name="l80"></a>              </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF1">if</span><span class="cF0"> (i==GRF_SKIP_FILE)
+<a name="l81"></a>                cont=FALSE;
+<a name="l82"></a>            }
+<a name="l83"></a>            </span><span class="cF1">if</span><span class="cF0"> (i==GRF_REPLACE || i==GRF_ALL) {
+<a name="l84"></a>              dlen=StrLen(cl-&gt;tag);
+<a name="l85"></a>              dst=MAlloc(dlen+1+rlen-plen);
+<a name="l86"></a>              dst2=dst;
+<a name="l87"></a>              j=src-cl-&gt;tag;
+<a name="l88"></a>              </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;j;i++)
+<a name="l89"></a>                *dst++=cl-&gt;tag[i];
+<a name="l90"></a>              </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;rlen;i++)
+<a name="l91"></a>                *dst++=replace_text[i];
+<a name="l92"></a>              src=dst;
+<a name="l93"></a>              </span><span class="cF1">for</span><span class="cF0"> (i=j+plen;i&lt;=dlen;i++)
+<a name="l94"></a>                *dst++=cl-&gt;tag[i];
+<a name="l95"></a>              Free(cl-&gt;tag);
+<a name="l96"></a>              cl-&gt;tag=dst2;
+<a name="l97"></a>              </span><span class="cF1">if</span><span class="cF0"> (cur_l=LtfCur) </span><span class="cF7">{</span><span class="cF0">
+<a name="l98"></a>                old_flags=cur_l-&gt;flags&amp;LTFF_PLAIN_TEXT;
+<a name="l99"></a>                cur_l-&gt;flags|=LTFF_PLAIN_TEXT;
+<a name="l100"></a>              </span><span class="cF7">}</span><span class="cF0">
+<a name="l101"></a>              </span><span class="cF6">"%12s,%04d*%s\n"</span><span class="cF0">,name,cl-&gt;y+1,dst2;
+<a name="l102"></a>              </span><span class="cF1">if</span><span class="cF0"> (cur_l)
+<a name="l103"></a>                cur_l-&gt;flags= cur_l-&gt;flags&amp;~LTFF_PLAIN_TEXT |old_flags;
+<a name="l104"></a>              write_this_file=TRUE;
+<a name="l105"></a>            } </span><span class="cF1">else</span><span class="cF0"> {
+<a name="l106"></a>              src++;
+<a name="l107"></a>              </span><span class="cF1">if</span><span class="cF0"> (i==GRF_ED) </span><span class="cF7">{</span><span class="cF0">
+<a name="l108"></a>                Free(name_buf);
+<a name="l109"></a>                name_buf=StrNew(l-&gt;filename.name);
+<a name="l110"></a>                l-&gt;flags&amp;=~LTFF_NO_CURSOR;
+<a name="l111"></a>                l-&gt;cur_entry=cl;
+<a name="l112"></a>                l-&gt;cur_data_col=cl-&gt;min_col;
+<a name="l113"></a>                LtfWrite(l);
+<a name="l114"></a>                LtfDel(l);
+<a name="l115"></a>                </span><span class="cF6">"Wrote:%s\n"</span><span class="cF0">,name_buf;
+<a name="l116"></a>                Ed(name_buf);
+<a name="l117"></a>                l=LtfRead(name_buf, LTFF_PLAIN_TEXT_WITH_TABS);
+<a name="l118"></a>                cl=l-&gt;cur_entry;
+<a name="l119"></a>                </span><span class="cF1">if</span><span class="cF0"> (cl-&gt;last!=l) cl=cl-&gt;last;
+<a name="l120"></a>                src=NULL;
+<a name="l121"></a>                write_this_file=FALSE;
+<a name="l122"></a>              </span><span class="cF7">}</span><span class="cF0">
+<a name="l123"></a>            }
+<a name="l124"></a>          </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0">
+<a name="l125"></a>            src++;
+<a name="l126"></a>          Free(name_buf);
+<a name="l127"></a>          name_buf=NULL;
+<a name="l128"></a>        }
+<a name="l129"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l130"></a>    }
+<a name="l131"></a>    cl=cl-&gt;next;
+<a name="l132"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l133"></a>  </span><span class="cF1">if</span><span class="cF0"> (write_this_file) </span><span class="cF7">{</span><span class="cF0">
+<a name="l134"></a>    LtfWrite(l);
+<a name="l135"></a>    </span><span class="cF6">"Wrote:%s\n"</span><span class="cF0">,l-&gt;filename.name;
+<a name="l136"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l137"></a>  LtfDel(l);
+<a name="l138"></a>  </span><span class="cF1">return</span><span class="cF0"> cnt;
+<a name="l139"></a>}
+<a name="l140"></a>
+<a name="l141"></a></span><span class="cF1">U64</span><span class="cF0"> GrepList(</span><span class="cF1">U8</span><span class="cF0"> *pattern,LTDirEntry *tempm1,</span><span class="cF1">U64</span><span class="cF0"> *_fuf_flags,</span><span class="cF1">U8</span><span class="cF0"> *replace_text)
+<a name="l142"></a>{
+<a name="l143"></a>  </span><span class="cF1">U64</span><span class="cF0"> cnt=0;
+<a name="l144"></a>  LTDirEntry *tempm2;
+<a name="l145"></a>
+<a name="l146"></a>  </span><span class="cF1">while</span><span class="cF0"> (tempm1 &amp;&amp; !Bt</span><span class="cF7">(</span><span class="cF0">_fuf_flags,FUf_CANCEL</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF7">{</span><span class="cF0">
+<a name="l147"></a>    tempm2=tempm1-&gt;next;
+<a name="l148"></a>    </span><span class="cF1">if</span><span class="cF0"> (tempm1-&gt;attr &amp; LT_ATTR_DIR) {
+<a name="l149"></a>      </span><span class="cF1">if</span><span class="cF0"> (tempm1-&gt;sub) </span><span class="cF7">{</span><span class="cF0">
+<a name="l150"></a>        </span><span class="cF6">"%S %s\n"</span><span class="cF0">,</span><span class="cF6">"ST_SCANNING_DIR"</span><span class="cF0">,tempm1-&gt;full_name;
+<a name="l151"></a>        cnt+=GrepList(pattern,tempm1-&gt;sub,_fuf_flags,replace_text);
+<a name="l152"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l153"></a>    } </span><span class="cF1">else</span><span class="cF0">
+<a name="l154"></a>      cnt+=GrepFile(pattern,tempm1-&gt;full_name,_fuf_flags,replace_text);
+<a name="l155"></a>    LTDirEntryDel(tempm1);
+<a name="l156"></a>    tempm1=tempm2;
+<a name="l157"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l158"></a>  </span><span class="cF1">return</span><span class="cF0"> cnt;
+<a name="l159"></a>}
+<a name="l160"></a>
+<a name="l161"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">U64</span><span class="cF0"> Grep(</span><span class="cF1">U8</span><span class="cF0"> *pattern,</span><span class="cF1">U8</span><span class="cF0"> *files_find_mask=TEXT_FILE_MASK,</span><span class="cF1">U8</span><span class="cF0"> *fu_flags=NULL,</span><span class="cF1">U8</span><span class="cF0"> *replace_text=NULL)
+<a name="l162"></a></span><span class="cF2">/*</span><span class="cF0">
+<a name="l163"></a></span><span class="cF2">This does not do regular expressions--my bad.</span><span class="cF0">
+<a name="l164"></a></span><span class="cF2">Anyway, it's good for searching and replacing.</span><span class="cF0">
+<a name="l165"></a></span><span class="cF2">Let's say it stands for global replace ;-)</span><span class="cF0">
+<a name="l166"></a>
+<a name="l167"></a></span><span class="cF2">"+r"=recurse</span><span class="cF0">
+<a name="l168"></a></span><span class="cF2">"+i"=ignore case</span><span class="cF0">
+<a name="l169"></a></span><span class="cF2">"+l"=whole labels only.</span><span class="cF0">
+<a name="l170"></a></span><span class="cF2">     This will check for a nonlabel character before</span><span class="cF0">
+<a name="l171"></a></span><span class="cF2">     and after.  If you have a var, "ll" and don't</span><span class="cF0">
+<a name="l172"></a></span><span class="cF2">     want to match words like "will" and "wallow", you</span><span class="cF0">
+<a name="l173"></a></span><span class="cF2">     set this flag and it will see that the characters</span><span class="cF0">
+<a name="l174"></a></span><span class="cF2">     before or after "ll" are label characters.</span><span class="cF0">
+<a name="l175"></a></span><span class="cF2">*/</span><span class="cF0">
+<a name="l176"></a>
+<a name="l177"></a>{
+<a name="l178"></a>  </span><span class="cF1">U64</span><span class="cF0"> cnt=0,fuf_flags=0;
+<a name="l179"></a>  GetFFlags(&amp;fuf_flags,Define</span><span class="cF7">(</span><span class="cF6">"ST_FILE_UTIL_FLAGS"</span><span class="cF7">)</span><span class="cF0">,</span><span class="cF6">"+r+i"</span><span class="cF0">); </span><span class="cF2">//Set dft flags</span><span class="cF0">
+<a name="l180"></a>  GetFFlags(&amp;fuf_flags,Define</span><span class="cF7">(</span><span class="cF6">"ST_FILE_UTIL_FLAGS"</span><span class="cF7">)</span><span class="cF0">,fu_flags);
+<a name="l181"></a>  LBEqu(&amp;fuf_flags,FUf_REPLACE,replace_text);
+<a name="l182"></a>  cnt+=GrepList(pattern,FilesFind</span><span class="cF7">(</span><span class="cF0">files_find_mask,fuf_flags</span><span class="cF7">)</span><span class="cF0">,&amp;fuf_flags,replace_text);
+<a name="l183"></a>  </span><span class="cF1">return</span><span class="cF0"> cnt;
+<a name="l184"></a>}
+<a name="l185"></a>
+<a name="l186"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">U64</span><span class="cF0"> FileOcc(</span><span class="cF1">U8</span><span class="cF0"> *pattern,</span><span class="cF1">U8</span><span class="cF0"> *files_find_mask=TEXT_FILE_MASK,</span><span class="cF1">U8</span><span class="cF0"> *fu_flags=</span><span class="cF6">"+r+i+l"</span><span class="cF0">)
+<a name="l187"></a>{</span><span class="cF2">/*</span><span class="cF0">
+<a name="l188"></a></span><span class="cF2">"+r"=recurse</span><span class="cF0">
+<a name="l189"></a></span><span class="cF2">"+i"=ignore case</span><span class="cF0">
+<a name="l190"></a></span><span class="cF2">"+l"=whole labels only.</span><span class="cF0">
+<a name="l191"></a></span><span class="cF2">*/</span><span class="cF0">
+<a name="l192"></a>  </span><span class="cF1">U64</span><span class="cF0"> cnt=0;
+<a name="l193"></a>  BoolI8 old_silent=Silent(TRUE);
+<a name="l194"></a>  cnt=Grep(pattern,files_find_mask,fu_flags);
+<a name="l195"></a>  Silent(old_silent);
+<a name="l196"></a>  </span><span class="cF1">return</span><span class="cF0"> cnt;
+<a name="l197"></a>}
+<a name="l198"></a>
+<a name="l199"></a></span><span class="cF1">class</span><span class="cF0"> GrepStruct
+<a name="l200"></a>{
+<a name="l201"></a>  </span><span class="cF1">U8</span><span class="cF0">    find_text[136]      fmtstr </span><span class="cF6">"$DA-P,135,\"FIND        :%s\"$\n"</span><span class="cF0">;
+<a name="l202"></a>  </span><span class="cF1">U8</span><span class="cF0">    replace_text[136]   fmtstr </span><span class="cF6">"$DA-P,135,\"REPLACE     :%s\"$\n"</span><span class="cF0">;
+<a name="l203"></a>  BoolI8 replace            fmtstr </span><span class="cF6">"$CB,\"REPLACE\"$\n"</span><span class="cF0">;
+<a name="l204"></a>  BoolI8 match_case         fmtstr </span><span class="cF6">"$CB,\"MATCH CASE\"$\n"</span><span class="cF0">;
+<a name="l205"></a>  BoolI8 whole_labels       fmtstr </span><span class="cF6">"$CB,\"WHOLE LABELS\"$\n"</span><span class="cF0">;
+<a name="l206"></a>  </span><span class="cF1">U8</span><span class="cF0">    filemask[136]       fmtstr </span><span class="cF6">"$DA-P,135,\"FILE MASK   :%s\"$\n"</span><span class="cF0">;
+<a name="l207"></a>  BoolI8 recurse            fmtstr </span><span class="cF6">"$CB,\"RECURSE\"$\n"</span><span class="cF0">;
+<a name="l208"></a>};
+<a name="l209"></a>
+<a name="l210"></a></span><span class="cF1">U64</span><span class="cF0"> GrepWiz()
+<a name="l211"></a>{
+<a name="l212"></a>  </span><span class="cF1">U64</span><span class="cF0"> result=0;
+<a name="l213"></a>  Ltf *l;
+<a name="l214"></a>  </span><span class="cF1">U8</span><span class="cF0"> buf[32],*dir,*st;
+<a name="l215"></a>  GrepStruct *g=CAlloc(</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF0">GrepStruct</span><span class="cF7">)</span><span class="cF0">);
+<a name="l216"></a>  g-&gt;recurse=TRUE;
+<a name="l217"></a>  StrCpy(g-&gt;filemask,TEXT_FILE_MASK);
+<a name="l218"></a>  </span><span class="cF1">if</span><span class="cF0"> (l=LtfCur) </span><span class="cF7">{</span><span class="cF0">
+<a name="l219"></a>    StrCpy(g-&gt;find_text,l-&gt;find_replace-&gt;find_text);
+<a name="l220"></a>    StrCpy(g-&gt;replace_text,l-&gt;find_replace-&gt;replace_text);
+<a name="l221"></a>    g-&gt;replace=l-&gt;find_replace-&gt;replace;
+<a name="l222"></a>    g-&gt;match_case=l-&gt;find_replace-&gt;match_case;
+<a name="l223"></a>    g-&gt;whole_labels=l-&gt;find_replace-&gt;whole_labels;
+<a name="l224"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l225"></a>  </span><span class="cF1">if</span><span class="cF0"> (LtfFormDo</span><span class="cF7">(</span><span class="cF0">g,</span><span class="cF6">"GrepStruct"</span><span class="cF0">,NULL,FALSE,</span><span class="cF6">"$FG,PURPLE$$TX+CX,\"Grep\"$\n$FG$"</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF7">{</span><span class="cF0">
+<a name="l226"></a>    </span><span class="cF1">if</span><span class="cF0"> (l) {
+<a name="l227"></a>      StrCpy(l-&gt;find_replace-&gt;find_text,g-&gt;find_text);
+<a name="l228"></a>      StrCpy(l-&gt;find_replace-&gt;replace_text,g-&gt;replace_text);
+<a name="l229"></a>      l-&gt;find_replace-&gt;replace=g-&gt;replace;
+<a name="l230"></a>      l-&gt;find_replace-&gt;match_case=g-&gt;match_case;
+<a name="l231"></a>      l-&gt;find_replace-&gt;whole_labels=g-&gt;whole_labels;
+<a name="l232"></a>    }
+<a name="l233"></a>    dir=PopUpPickDir;
+<a name="l234"></a>    </span><span class="cF1">if</span><span class="cF0"> (*dir) {
+<a name="l235"></a>      *buf=0;
+<a name="l236"></a>      </span><span class="cF1">if</span><span class="cF0"> (g-&gt;match_case)
+<a name="l237"></a>        StrCat(buf,</span><span class="cF6">"-i"</span><span class="cF0">);
+<a name="l238"></a>      </span><span class="cF1">if</span><span class="cF0"> (!g-&gt;recurse)
+<a name="l239"></a>        StrCat(buf,</span><span class="cF6">"-r"</span><span class="cF0">);
+<a name="l240"></a>      </span><span class="cF1">if</span><span class="cF0"> (g-&gt;whole_labels)
+<a name="l241"></a>        StrCat(buf,</span><span class="cF6">"+l"</span><span class="cF0">);
+<a name="l242"></a>      </span><span class="cF1">if</span><span class="cF0"> (g-&gt;replace)
+<a name="l243"></a>        st=MSPrintF(</span><span class="cF6">"\"$$WW+H,1$$\";Cd(\"%s\");Grep(\"%Q\",\"%Q\",\"%Q\",\"%Q\");UserTaskCont;"</span><span class="cF0">,dir,g-&gt;find_text,g-&gt;filemask,buf,g-&gt;replace_text);
+<a name="l244"></a>      </span><span class="cF1">else</span><span class="cF0">
+<a name="l245"></a>        st=MSPrintF(</span><span class="cF6">"\"$$WW+H,1$$\";Cd(\"%s\");Grep(\"%Q\",\"%Q\",\"%Q\");UserTaskCont;"</span><span class="cF0">,dir,g-&gt;find_text,g-&gt;filemask,buf);
+<a name="l246"></a>      result=PopUp(st);
+<a name="l247"></a>    }
+<a name="l248"></a>    Free(dir);
+<a name="l249"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l250"></a>  Free(g);
+<a name="l251"></a>  </span><span class="cF1">return</span><span class="cF0"> result;
+<a name="l252"></a>}
+<a name="l253"></a>
+<a name="l254"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">""</span><span class="cF0">
+</span></pre><div class="archive-note">Historical capture: 2012-03-02. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

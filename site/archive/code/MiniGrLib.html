@@ -1,0 +1,176 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="description"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="keywords"/>
+<meta content="LoseThos V6.18" name="generator"/>
+<style type="text/css">
+.cBLACK{color:rgb(0,0,0);}
+.cBLUE{color:rgb(0,0,168);}
+.cGREEN{color:rgb(0,168,0);}
+.cCYAN{color:rgb(0,168,168);}
+.cRED{color:rgb(168,0,0);}
+.cPURPLE{color:rgb(168,0,168);}
+.cBROWN{color:rgb(168,84,0);}
+.cLTGRAY{color:rgb(168,168,168);}
+.cDKGRAY{color:rgb(84,84,84);}
+.cLTBLUE{color:rgb(84,84,252);}
+.cLTGREEN{color:rgb(84,252,84);}
+.cLTCYAN{color:rgb(84,252,252);}
+.cLTRED{color:rgb(252,84,84);}
+.cLTPURPLE{color:rgb(252,84,252);}
+.cYELLOW{color:rgb(252,252,84);}
+.cWHITE{color:rgb(252,252,252);}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cPURPLE">                               <a href="/archive/doc/TrivialSolutions.html">Trivial Solutions</a>
+                    <a href="/archive/index.html">The LoseThos 64-bit PC Operating System</a>
+File:/LT/Demo/MiniGrLib.CPZ
+This, and all LoseThos files, are public domain.  Do whatever you like.
+God is watching; God is just; God is never out-done in generosity.  He talks!
+
+LoseThos code compiles with the 64-bit LoseThos compiler/assembler I wrote.
+Boot the LoseThos CD and you can compile it.  Not in Kansas anymore!
+
+<a href="/archive/code/FixedPoint.html">Click here for preliminary compiler information you need.</a>
+
+</span><a name="l1"></a><span class="cGREEN">//See </span><span class="cRED">::/LT/Doc/Lectures/GraphicsCPULoad.CPZ</span><span class="cBLACK">
+<a name="l2"></a></span><span class="cBLUE">U8</span><span class="cBLACK"> reverse[256],        </span><span class="cGREEN">//The VGA bits are backward</span><span class="cBLACK">
+<a name="l3"></a>
+<a name="l4"></a>   image[640*480/8];    </span><span class="cGREEN">//We need read-modify write.</span><span class="cBLACK">
+<a name="l5"></a>                        </span><span class="cGREEN">//0xA0000 memory can't be read.</span><span class="cBLACK">
+<a name="l6"></a> 
+<a name="l7"></a></span><span class="cBLUE">U0</span><span class="cBLACK"> MGInit()
+<a name="l8"></a>{
+<a name="l9"></a>  </span><span class="cBLUE">I64</span><span class="cBLACK"> i,j;
+<a name="l10"></a>  MemSet(image,0,</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">image</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+<a name="l11"></a>  MemSet(reverse,0,</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">reverse</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+<a name="l12"></a>  </span><span class="cBLUE">for</span><span class="cBLACK"> (i=0;i&lt;256;i++)
+<a name="l13"></a>    </span><span class="cBLUE">for</span><span class="cBLACK"> (j=0;j&lt;8;j++)
+<a name="l14"></a>      </span><span class="cBLUE">if</span><span class="cBLACK"> (Bt</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;i,j</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+<a name="l15"></a>        Bts(&amp;reverse[i],7-j);
+<a name="l16"></a>}
+<a name="l17"></a> 
+<a name="l18"></a></span><span class="cBLUE">U0</span><span class="cBLACK"> MGUpdate()
+<a name="l19"></a>{ </span><span class="cGREEN">//Copy image to VGA memory</span><span class="cBLACK">
+<a name="l20"></a>  </span><span class="cGREEN">//For better performance we could only write what's changed.</span><span class="cBLACK">
+<a name="l21"></a>  </span><span class="cGREEN">//0xA0000 is slower than normal RAM.</span><span class="cBLACK">
+<a name="l22"></a>  OutU8(VGA_SC_INDEX,VGA_MAP_MASK);
+<a name="l23"></a>  OutU8(VGA_SC_DATA,0xF);</span><span class="cGREEN">//All color planes at once -- Black and White</span><span class="cBLACK">
+<a name="l24"></a>  MemCpy(0xA0000,image,</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">image</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+<a name="l25"></a>}
+<a name="l26"></a> 
+<a name="l27"></a></span><span class="cBLUE">U0</span><span class="cBLACK"> MGPlot(</span><span class="cBLUE">I64</span><span class="cBLACK"> x,</span><span class="cBLUE">I64</span><span class="cBLACK"> y)
+<a name="l28"></a>{
+<a name="l29"></a>  </span><span class="cBLUE">if</span><span class="cBLACK"> (0&lt;=x&lt;640 &amp;&amp; 0&lt;=y&lt;480)
+<a name="l30"></a>    Bts(image,y*640+x^7);
+<a name="l31"></a>}
+<a name="l32"></a> 
+<a name="l33"></a></span><span class="cBLUE">U0</span><span class="cBLACK"> MGHLine(</span><span class="cBLUE">I64</span><span class="cBLACK"> x1,</span><span class="cBLUE">I64</span><span class="cBLACK"> x2,</span><span class="cBLUE">I64</span><span class="cBLACK"> y)
+<a name="l34"></a>{ </span><span class="cGREEN">//Warning!  No clipping</span><span class="cBLACK">
+<a name="l35"></a>  </span><span class="cGREEN">//For performance, we do as many whole-bytes as possible.</span><span class="cBLACK">
+<a name="l36"></a>  </span><span class="cBLUE">U8</span><span class="cBLACK"> *ptr;
+<a name="l37"></a>  </span><span class="cBLUE">I64</span><span class="cBLACK"> i,w,leading,trailing,whole_bytes;
+<a name="l38"></a>  </span><span class="cBLUE">if</span><span class="cBLACK"> (x2&lt;x1) SwapU64(&amp;x1,&amp;x2);
+<a name="l39"></a>  ptr=image+y*640/8+x1&gt;&gt;3;
+<a name="l40"></a>  w=x2-x1+1;
+<a name="l41"></a>  leading =8-x1&amp;7;
+<a name="l42"></a>  trailing=(x2+1)&amp;7;
+<a name="l43"></a>  </span><span class="cBLUE">if</span><span class="cBLACK"> (leading+trailing&gt;w)
+<a name="l44"></a>    *ptr|=reverse[(0xFF00&gt;&gt;leading&amp;</span><span class="cLTGRAY">(</span><span class="cBLACK">0x00FF&lt;&lt;trailing</span><span class="cLTGRAY">)</span><span class="cBLACK">&gt;&gt;8)];
+<a name="l45"></a>  </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+<a name="l46"></a>    whole_bytes=(w-leading-trailing)&gt;&gt;3;
+<a name="l47"></a>    </span><span class="cBLUE">if</span><span class="cBLACK"> (leading)
+<a name="l48"></a>      *ptr++|=reverse[(0xFF00&gt;&gt;leading)&amp;0xFF];
+<a name="l49"></a>    </span><span class="cBLUE">for</span><span class="cBLACK"> (i=0;i&lt;whole_bytes;i++)
+<a name="l50"></a>      *ptr++=0xFF;
+<a name="l51"></a>    </span><span class="cBLUE">if</span><span class="cBLACK"> (trailing)
+<a name="l52"></a>      *ptr++|=reverse[(0x00FF&lt;&lt;trailing)&gt;&gt;8];
+<a name="l53"></a>  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+<a name="l54"></a>}
+<a name="l55"></a> 
+<a name="l56"></a></span><span class="cBLUE">U0</span><span class="cBLACK"> MGLine(</span><span class="cBLUE">I64</span><span class="cBLACK"> x1,</span><span class="cBLUE">I64</span><span class="cBLACK"> y1,</span><span class="cBLUE">I64</span><span class="cBLACK"> x2,</span><span class="cBLUE">I64</span><span class="cBLACK"> y2)
+<a name="l57"></a>{ </span><span class="cGREEN">//Warning!  No clipping</span><span class="cBLACK">
+<a name="l58"></a>  </span><span class="cBLUE">I64</span><span class="cBLACK"> dx=x2-x1,dy=y2-y1;
+<a name="l59"></a>  x1&lt;&lt;=32; x2&lt;&lt;=32;
+<a name="l60"></a>  y1&lt;&lt;=32; y2&lt;&lt;=32;
+<a name="l61"></a>  </span><span class="cBLUE">if</span><span class="cBLACK"> (AbsI64</span><span class="cLTGRAY">(</span><span class="cBLACK">dx</span><span class="cLTGRAY">)</span><span class="cBLACK">&gt;AbsI64</span><span class="cLTGRAY">(</span><span class="cBLACK">dy</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+<a name="l62"></a>    dy=dy&lt;&lt;32/AbsI64(dx);
+<a name="l63"></a>    dx=SignI64(dx)&lt;&lt;32;
+<a name="l64"></a>    </span><span class="cBLUE">while</span><span class="cBLACK"> (x1!=x2) {
+<a name="l65"></a>      MGPlot(x1.i32[1],y1.i32[1]);
+<a name="l66"></a>      x1+=dx; y1+=dy;
+<a name="l67"></a>    }
+<a name="l68"></a>  </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+<a name="l69"></a>    dx=dx&lt;&lt;32/AbsI64(dy);
+<a name="l70"></a>    dy=SignI64(dy)&lt;&lt;32;
+<a name="l71"></a>    </span><span class="cBLUE">while</span><span class="cBLACK"> (y1!=y2) {
+<a name="l72"></a>      MGPlot(x1.i32[1],y1.i32[1]);
+<a name="l73"></a>      x1+=dx; y1+=dy;
+<a name="l74"></a>    }
+<a name="l75"></a>  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+<a name="l76"></a>  MGPlot(x1.i32[1],y1.i32[1]);
+<a name="l77"></a>}
+<a name="l78"></a> 
+<a name="l79"></a></span><span class="cBLUE">U0</span><span class="cBLACK"> MGCircle(</span><span class="cBLUE">I64</span><span class="cBLACK"> x,</span><span class="cBLUE">I64</span><span class="cBLACK"> y,</span><span class="cBLUE">F64</span><span class="cBLACK"> r)
+<a name="l80"></a>{
+<a name="l81"></a>  </span><span class="cBLUE">F64</span><span class="cBLACK"> s,c,x1,y1,x2,y2;
+<a name="l82"></a>  </span><span class="cBLUE">I64</span><span class="cBLACK"> len;
+<a name="l83"></a>  </span><span class="cBLUE">if</span><span class="cBLACK"> (r&lt;0) </span><span class="cBLUE">return</span><span class="cBLACK">;
+<a name="l84"></a>  x1=r; y1=0;
+<a name="l85"></a>  c=Cos(1/r);
+<a name="l86"></a>  s=Sin(1/r);
+<a name="l87"></a>  len=2*r*pi;
+<a name="l88"></a>  MGPlot(x+x1,y+y1);
+<a name="l89"></a>  </span><span class="cBLUE">while</span><span class="cBLACK"> (len--&gt;=0) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+<a name="l90"></a>
+<a name="l91"></a></span><span class="cGREEN">//m1@a1 * m2@a2     = m1*m2@(a1+a2)</span><span class="cBLACK">
+<a name="l92"></a>
+<a name="l93"></a></span><span class="cGREEN">//(x1+y1i)*(x2+y2i) = x1*x2+(x1*y1+x2*y2)i-y1*y2</span><span class="cBLACK">
+<a name="l94"></a>
+<a name="l95"></a></span><span class="cGREEN">// meti=mCos(t)+imSin(t)</span><span class="cBLACK">
+<a name="l96"></a>
+<a name="l97"></a>    x2=x1; y2=y1;
+<a name="l98"></a>    x1=c*x2-s*y2;
+<a name="l99"></a>    y1=s*x2+c*y2;
+<a name="l100"></a>    MGPlot(x+x1,y+y1);
+<a name="l101"></a>  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+<a name="l102"></a>}
+<a name="l103"></a> 
+<a name="l104"></a> 
+<a name="l105"></a></span><span class="cBLUE">U0</span><span class="cBLACK"> MiniGrLibDemo()
+<a name="l106"></a>{
+<a name="l107"></a>  </span><span class="cBLUE">I64</span><span class="cBLACK"> i;
+<a name="l108"></a>  MGInit;
+<a name="l109"></a>  Preempt(OFF);
+<a name="l110"></a>  </span><span class="cBLUE">for</span><span class="cBLACK"> (i=0;i&lt;100;i++)
+<a name="l111"></a>    MGHLine(200+i,400+i,300+i);
+<a name="l112"></a>  </span><span class="cBLUE">for</span><span class="cBLACK"> (i=0;i&lt;500;i+=10)
+<a name="l113"></a>    MGLine(i,0,0,480-i);
+<a name="l114"></a>  </span><span class="cBLUE">for</span><span class="cBLACK"> (i=0;i&lt;300;i+=4)
+<a name="l115"></a>    MGCircle(200,100+i,i);
+<a name="l116"></a>  MGUpdate;
+<a name="l117"></a>  BusyWait(1500000);
+<a name="l118"></a>  Preempt(ON);
+<a name="l119"></a></span><span class="cGREEN">/*</span><span class="cBLACK">
+<a name="l120"></a></span><span class="cGREEN">We are returning graphics to normal operations under LoseThos.</span><span class="cBLACK">
+<a name="l121"></a></span><span class="cGREEN">It is not normal to by-pass the LoseThos graphcis routines.</span><span class="cBLACK">
+<a name="l122"></a></span><span class="cGREEN">The LoseThos graphics don't know VGA has changed.</span><span class="cBLACK">
+<a name="l123"></a></span><span class="cGREEN">This bit tells LoseThos to update whole screen.</span><span class="cBLACK">
+<a name="l124"></a></span><span class="cGREEN">*/</span><span class="cBLACK">
+<a name="l125"></a>  LBts(&amp;sys_semas[SYS_SEMA_FLUSH_VGA_IMAGE],0);
+<a name="l126"></a>}
+<a name="l127"></a> 
+<a name="l128"></a>MiniGrLibDemo;
+<a name="l129"></a>
+<a name="l130"></a></span><span class="cGREEN">//See </span><a href="/archive/code/Display.html#l3"><span class="cRED">DrawChar</span></a><span class="cGREEN">() for text.</span><span class="cBLACK">
+<a name="l131"></a></span><span class="cGREEN">//See </span><span class="cRED">::/LT/Doc/Lectures/ScreenMemory.CPZ</span><span class="cGREEN"> for color.</span><span class="cBLACK">
+<a name="l132"></a></span><span class="cGREEN">//See </span><span class="cRED">::/LT/Doc/Lectures/GraphicsCPULoad.CPZ</span><span class="cGREEN">.</span><span class="cBLACK">
+</span></pre><div class="archive-note">Historical capture: 2010-11-19. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

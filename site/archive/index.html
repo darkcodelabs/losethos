@@ -1,0 +1,98 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V8.00" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<a name="l1"></a><span class="cF0">                               </span><a href="/archive/LTHtml/Doc/TrivialSolutions.html"><span class="cF5">Trivial Solutions</span></a><span class="cF0">
+<a name="l2"></a>                    The LoseThos 64-bit PC Operating System
+<a name="l3"></a>
+<a name="l4"></a></span><!--begin exclude-->
+
+<!--end exclude-->
+<span class="cF3">                   </span><span class="cF0">
+<a name="l5"></a>
+<a name="l6"></a>                                    </span><a href="/emulator/losethos.iso"><span class="cF4">Download</span></a><span class="cF0">
+<a name="l7"></a>                           </span><a href="/emulator/losethos.iso"><span class="cF4">LoseThos V8.00 (5.82 Meg)</span></a><span class="cF0">
+<a name="l8"></a>                                   </span><a href="/emulator/losethos.iso"><span class="cF4">It's Free</span></a><span class="cF0">
+<a name="l9"></a>
+<a name="l10"></a>LoseThos is a 64-bit, multicored, multitasking, 100% open source, public domain, 
+<a name="l11"></a>ring-0-only, single-address-map operating system for the </span><span class="cF2">PC</span><span class="cF0">.  It requires a 
+<a name="l12"></a>64-bit </span><a href="http://wiki.osdev.org/IA32_Architecture_Family"><span class="cF4">x86_64</span></a><span class="cF0"> CPU and 512+ Megs of RAM.  It does not have GPU acceleration, so I 
+<a name="l13"></a>limit it to 640x480 16 color graphics.  In general, it does not have drivers; 
+<a name="l14"></a>instead, it supports SOME common hardware to 64-bit systems, specifically, 
+<a name="l15"></a>keyboards, mice, VGA graphics, PC speaker, ATA hard drives, ATAPI CD-ROMs and 
+<a name="l16"></a>multicored x86_64 CPUs.  It might support HD audio.
+<a name="l17"></a>
+<a name="l18"></a>The vision for LoseThos is a 64-bit </span><span class="cF2">Commodore 64</span><span class="cF0"> that's a thousand times faster 
+<a name="l19"></a>than the original and has a shell that is </span><span class="cF2">C/C++</span><span class="cF0"> instead of </span><span class="cF2">BASIC</span><span class="cF0">.  It's for 
+<a name="l20"></a>recreational programming.  LoseThos is a secondary operating system because it 
+<a name="l21"></a>doesn't have networking.
+<a name="l22"></a>
+<a name="l23"></a>"</span><a href="/archive/LTHtml/Doc/TrivialSolutions.html"><span class="cF4">Trivial Solutions</span></a><span class="cF0">" is the name of the company that makes LoseThos.  The best 
+<a name="l24"></a>example of a trivial solution is the fable that NASA spent millions on a space 
+<a name="l25"></a>pen while Russia used a pencil.  </span><a href="/archive/LTHtml/Doc/Strategy.html"><span class="cF4">These</span></a><span class="cF0"> are the trivial solutions that make 
+<a name="l26"></a>LoseThos.  They create a stark contrast to </span><span class="cF2">Linux</span><span class="cF0">.  LoseThos is orders of 
+<a name="l27"></a>magnitude simpler than </span><span class="cF2">Linux</span><span class="cF0">, only 131,608 lines-of-code, including the 
+<a name="l28"></a>compiler!  With LoseThos, "</span><a href="/archive/linecnt.html"><span class="cF4">open source</span></a><span class="cF0">" is not a false promise that frustrates 
+<a name="l29"></a>people.  I'm sure there are a lot of open source fans who are heart broken 
+<a name="l30"></a>because they cannot understand </span><span class="cF2">Linux</span><span class="cF0"> code.  That's the niche for LoseThos.
+<a name="l31"></a>
+<a name="l32"></a>LoseThos has unmatched performance in some areas because it doesn't waste time 
+<a name="l33"></a>with privilege level changes and it doesn't waste time modifying page tables.  
+<a name="l34"></a>It can change tasks in half a microsecond.  (All x86_64 or better CPU's are 
+<a name="l35"></a>faster than 2 GHz.)  Just remember that CPU protections only benefit you if you 
+<a name="l36"></a>have malware or buggy programs.  A home computer is not a 1970's mainframe.
+<a name="l37"></a>
+<a name="l38"></a></span><a href="/archive/LTHtml/Doc/Welcome.html"><span class="cF4">Introduction</span></a><span class="cF0">
+<a name="l39"></a></span><a href="/archive/LTHtml/Doc/Constitution.html"><span class="cF4">"Constitution"</span></a><span class="cF4">
+<a name="l40"></a></span><a href="/archive/screenshots.html"><span class="cF4">Screen Shots</span></a><span class="cF0">
+<a name="l41"></a></span><a href="/archive/videos.html"><span class="cF4">Videos</span></a><span class="cF0">
+<a name="l42"></a></span><a href="/archive/LTHtml/Doc/Features.html"><span class="cF4">Features</span></a><span class="cF0">
+<a name="l43"></a></span><a href="/archive/LTHtml/Doc/Strategy.html"><span class="cF4">Strategic Decisions</span></a><span class="cF0">
+<a name="l44"></a></span><a href="/archive/LTHtml/Doc/Requirements.html"><span class="cF4">Requirements</span></a><span class="cF0">
+<a name="l45"></a></span><a href="/archive/LTHtml/Doc/Install.html"><span class="cF4">Installing</span></a><span class="cF0">
+<a name="l46"></a></span><a href="https://web.archive.org/web/20120330083533/http://www.losethos.com/LTHtml/Doc/Upgrade.html"><span class="cF4">Upgrading</span></a><span class="cF0">
+<a name="l47"></a></span><a href="https://web.archive.org/web/20120330083533/http://www.losethos.com/LTHtml/Doc/HelpMain.html"><span class="cF4">Main Help System</span></a><span class="cF0">
+<a name="l48"></a></span><a href="/archive/linecnt.html"><span class="cF4">Source Code</span></a><span class="cF0">  : See </span><a href="/archive/LTHtml/Doc/Differences.html"><span class="cF4">Differences from C/C++</span></a><span class="cF0">
+<a name="l49"></a></span><a href="https://web.archive.org/web/20120330083533/http://www.losethos.com/LT/"><span class="cF4">Native Files</span></a><span class="cF0"> : See </span><a href="/archive/LTHtml/OSMain/Compress.html"><span class="cF4">Compression</span></a><span class="cF0">
+<a name="l50"></a></span><a href="https://web.archive.org/web/20120330083533/http://www.losethos.com/sym.html"><span class="cF4">Symbol Table</span></a><span class="cF0">
+<a name="l51"></a></span><a href="/archive/LTHtml/Doc/Registered.html"><span class="cF4">Registered Version</span></a><span class="cF0">
+<a name="l52"></a></span><a href="/archive/hymns.html"><span class="cF4">Hymns</span></a><span class="cF0">        : See </span><a href="https://web.archive.org/web/20120330083533/http://www.losethos.com/files/TSHymns.ZIP"><span class="cF4">Windows Hymns Player</span></a><span class="cF0">
+<a name="l53"></a></span><a href="https://web.archive.org/web/20120330083533/http://www.losethos.com/comics/"><span class="cF4">Moses Comics</span></a><span class="cF0"> : See </span><a href="https://web.archive.org/web/20120330083533/http://www.losethos.com/files/TSGod.ZIP"><span class="cF4">Windows Tongues Program</span></a><span class="cF0">
+<a name="l54"></a></span><a href="https://web.archive.org/web/20120330083533/http://www.losethos.com/LTHtml/Doc/Bugs.html"><span class="cF4">Bug Status</span></a><span class="cF0">
+<a name="l55"></a></span><a href="/archive/news.html"><span class="cF4">Change Log</span></a><span class="cF0">
+<a name="l56"></a></span><a href="/archive/blog.html"><span class="cF4">Terry A. Davis' Blog</span></a><span class="cF0">
+<a name="l57"></a></span><a href="/archive/LTHtml/Doc/TrivialSolutions.html"><span class="cF4">Contact Trivial Solutions</span></a><span class="cF0">
+<a name="l58"></a>
+<a name="l59"></a></span><span class="cF8">
+<a name="l60"></a>* "Windows" is a trademark of MicroSoft Corp.
+<a name="l61"></a>* "Linux" is probably a trademark owned by Linus Torvalds.
+<a name="l62"></a>* "Commodore 64" was a trademark of Commodore Business Machines.
+</span></pre><div class="archive-note">Historical capture: 2012-03-30. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

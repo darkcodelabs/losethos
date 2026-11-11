@@ -1,0 +1,1029 @@
+<html>
+<head><meta charset="utf-8"/>
+<style>
+</style>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+#help_index "Graphics/Math"
+
+public I8 gr_x_offsets[8]={-1,0,1,-1,1,-1,0,1},
+          gr_y_offsets[8]={-1,-1,-1,0,0,1,1,1},
+          gr_x_offsets2[4]={0,-1,1,0},
+          gr_y_offsets2[4]={-1,0,0,1};
+
+public BoolI8 Line(U0 *aux_data,
+                 I8 x1,I8 y1,I8 z1,
+                 I8 x2,I8 y2,I8 z2,
+                 BoolI8 (*fp_plot)(U0 *aux,I8 x,I8 y,I8 z),
+                 I8 step=1,I8 start=0)
+{
+  I8 i,j,d,dx=x2-x1,dy=y2-y1,dz=z2-z1,_x,_y,_z;
+  I8 adx=AbsI8(dx),ady=AbsI8(dy),adz=AbsI8(dz);
+  BoolI1 first=TRUE;
+  if (adx&gt;=ady) {
+    if (adx&gt;=adz) {
+      if (d=adx) {
+        if (dx&gt;=0)
+          dx=0x100000000;
+        else
+          dx=-0x100000000;
+        dy=dy&lt;&lt;32/d;
+        dz=dz&lt;&lt;32/d;
+      }
+    } else {
+      if (d=adz) {
+        dx=dx&lt;&lt;32/d;
+        dy=dy&lt;&lt;32/d;
+        if (dz&gt;=0)
+          dz=0x100000000;
+        else
+          dz=-0x100000000;
+      }
+    }
+  } else {
+    if (ady&gt;=adz) {
+      if (d=ady) {
+        dx=dx&lt;&lt;32/d;
+        if (dy&gt;=0)
+          dy=0x100000000;
+        else
+          dy=-0x100000000;
+        dz=dz&lt;&lt;32/d;
+      }
+    } else {
+      if (d=adz) {
+        dx=dx&lt;&lt;32/d;
+        dy=dy&lt;&lt;32/d;
+        if (dz&gt;=0)
+          dz=0x100000000;
+        else
+          dz=-0x100000000;
+      }
+    }
+  }
+  x1&lt;&lt;=32; y1&lt;&lt;=32; z1&lt;&lt;=32;
+  for (j=0;j&lt;start;j++) {
+      x1+=dx; y1+=dy; z1+=dz;
+  }
+  if (step!=1 &amp;&amp; step!=0) {
+    dx*=step;
+    dy*=step;
+    dz*=step;
+    d/=step;
+  }
+  for (i=start;i&lt;=d;i++) {
+    if (_x!=x1.i4[1] || _y!=y1.i4[1] || _z!=z1.i4[1] || first) {
+      if (!fp_plot(aux_data,x1.i4[1],y1.i4[1],z1.i4[1]))
+        return FALSE;
+    }
+    first=FALSE;
+    _x=x1.i4[1]; _y=y1.i4[1]; _z=z1.i4[1];
+    x1+=dx; y1+=dy; z1+=dz;
+  }
+  if (step==1 &amp;&amp; (_x!=x2||_y!=y2||_z!=z2)) {
+    if (!fp_plot(aux_data,x2,y2,z2))
+      return FALSE;
+  }
+  return TRUE;
+}
+
+public BoolI8 Rect(U0 *aux_data,
+                I8 x1,I8 y1,I8 z1,
+                I8 x2,I8 y2,I8 z2,
+                I8 x3,I8 y3,I8 z3,
+                BoolI8 (*fp_plot)(U0 *aux,I8 x,I8 y,I8 z))
+{
+  I8 i,j,
+     d1,dx1=x2-x1,dy1=y2-y1,dz1=z2-z1,
+     d2,dx2=x3-x1,dy2=y3-y1,dz2=z3-z1,
+     adx1=AbsI8(dx1),ady1=AbsI8(dy1),adz1=AbsI8(dz1),
+     adx2=AbsI8(dx2),ady2=AbsI8(dy2),adz2=AbsI8(dz2),
+     last_x,last_y,last_z;
+  BoolI1 first=TRUE;
+
+  if (adx1&gt;=ady1)
+    d1=adx1&gt;=adz1 ? adx1:adz1;
+  else
+    d1=ady1&gt;=adz1 ? ady1:adz1;
+  if (adx2&gt;=ady2)
+    d2=adx2&gt;=adz2 ? adx2:adz2;
+  else
+    d2=ady2&gt;=adz2 ? ady2:adz2;
+  d1&lt;&lt;=1;
+  d2&lt;&lt;=1;
+  if (d1) {
+    dx1=dx1&lt;&lt;32/d1;
+    dy1=dy1&lt;&lt;32/d1;
+    dz1=dz1&lt;&lt;32/d1;
+  }
+
+  if (d2) {
+    dx2=dx2&lt;&lt;32/d2;
+    dy2=dy2&lt;&lt;32/d2;
+    dz2=dz2&lt;&lt;32/d2;
+  }
+
+  x1&lt;&lt;=32; y1&lt;&lt;=32; z1&lt;&lt;=32;
+  for (j=0;j&lt;=d1;j++) {
+    x2=x1; y2=y1; z2=z1;
+    for (i=0;i&lt;=d2;i++) {
+      if (x2.i4[1]!=last_x || y2.i4[1]!=last_y || z2.i4[1]!=last_z ||first) {
+        if (!fp_plot(aux_data,x2.i4[1],y2.i4[1],z2.i4[1]))
+          return FALSE;
+      }
+      first=FALSE;
+      last_x=x2.i4[1]; last_y=y2.i4[1]; last_z=z2.i4[1];
+      x2+=dx2; y2+=dy2; z2+=dz2;
+    }
+    x1+=dx1; y1+=dy1; z1+=dz1;
+  }
+  return TRUE;
+}
+
+#help_index "Graphics/Math/3D Transformation"
+#help_file "::/LT/Doc/Transform"
+I8 gr_scale=MAX_U4+1;
+
+public U0 GrRot(I8 *r,I8 *x,I8 *y,I8 *z)
+{
+  I8 x1,y1,z1,xx=*x,yy=*y,zz=*z;
+  x1=(r[0]*xx+r[1]*yy+r[2]*zz+r[3])&gt;&gt;32;
+  y1=(r[4]*xx+r[5]*yy+r[6]*zz+r[7])&gt;&gt;32;
+  z1=(r[8]*xx+r[9]*yy+r[10]*zz+r[11])&gt;&gt;32;
+  *x=x1;*y=y1;*z=z1;
+}
+
+public U0 GrTransform(GrBitMap *base,I8 *x,I8 *y,I8 *z)
+{
+  GrRot(base-&gt;r,x,y,z);
+  *x+=base-&gt;x;
+  *y+=base-&gt;y;
+  *z+=base-&gt;z;
+}
+
+public I8 *GrRotX(F8 phi,TaskStruct *mem_task=NULL)
+{
+  F8 my_cos=Cos(phi)*gr_scale,
+     my_sin=Sin(phi)*gr_scale;
+  I8 *r=CAlloc(sizeof(I8)*16,mem_task);
+
+  r[5]=my_cos;
+  r[10]=my_cos;
+  r[9]=my_sin;
+  r[6]=-my_sin;
+  r[0]=gr_scale;
+  r[15]=gr_scale;
+  return r;
+}
+
+public I8 *GrRotY(F8 zeta,TaskStruct *mem_task=NULL)
+{
+  F8 my_cos=Cos(zeta)*gr_scale,
+     my_sin=Sin(zeta)*gr_scale;
+  I8 *r=CAlloc(sizeof(I8)*16,mem_task);
+
+  r[0]=my_cos;
+  r[10]=my_cos;
+  r[8]=-my_sin;
+  r[2]=my_sin;
+  r[5]=gr_scale;
+  r[15]=gr_scale;
+  return r;
+}
+
+public I8 *GrRotZ(F8 theta,TaskStruct *mem_task=NULL)
+{
+  F8 my_cos=Cos(theta)*gr_scale,
+     my_sin=Sin(theta)*gr_scale;
+  I8 *r=CAlloc(sizeof(I8)*16,mem_task);
+
+  r[0]=my_cos;
+  r[5]=my_cos;
+  r[4]=my_sin;
+  r[1]=-my_sin;
+  r[10]=gr_scale;
+  r[15]=gr_scale;
+  return r;
+}
+
+public I8 *GrScaleMat(I8 *m1,F8 s,TaskStruct *mem_task=NULL)
+{
+  I8 i,*r=CAlloc(sizeof(I8)*16,mem_task);
+  for (i=0;i&lt;16;i++)
+    r[i]=m1[i]*s;
+  return r;
+}
+
+public I8 *GrMulMat(I8 *m1,I8 *m2,TaskStruct *mem_task=NULL)
+{ //Conceptually, the transform m1 is applied after m2
+  I8 *r=CAlloc(sizeof(I8)*16,mem_task);
+  I8 i,j,k;
+  F8 d;
+  for (i=0;i&lt;4;i++) {
+    for (j=0;j&lt;4;j++) {
+      for (k=0;k&lt;4;k++) {
+        d=m1[k+4*j];
+        d*=m2[i+4*k]; //TODO!  Possible overflow if norm &gt; one.
+        d/=gr_scale;
+        r[i+4*j]+=d;
+      }
+    }
+  }
+  return r;
+}
+
+public I8 *GrRotXEqu(I8 *m1,F8 phi)
+{
+  F8 my_cos=Cos(phi)*gr_scale,
+     my_sin=Sin(phi)*gr_scale;
+  I8 r[16],*r2;
+  MemSet(r,0,sizeof(r));
+  r[5]=my_cos;
+  r[10]=my_cos;
+  r[9]=my_sin;
+  r[6]=-my_sin;
+  r[0]=gr_scale;
+  r[15]=gr_scale;
+
+  r2=GrMulMat(r,m1);
+  MemCpy(m1,r2,sizeof(I8)*16);
+  Free(r2);
+  return m1;
+}
+
+public I8 *GrRotYEqu(I8 *m1,F8 zeta)
+{
+  F8 my_cos=Cos(zeta)*gr_scale,
+     my_sin=Sin(zeta)*gr_scale;
+  I8 r[16],*r2;
+  MemSet(r,0,sizeof(r));
+  r[0]=my_cos;
+  r[10]=my_cos;
+  r[8]=-my_sin;
+  r[2]=my_sin;
+  r[5]=gr_scale;
+  r[15]=gr_scale;
+
+  r2=GrMulMat(r,m1);
+  MemCpy(m1,r2,sizeof(I8)*16);
+  Free(r2);
+  return m1;
+}
+
+public I8 *GrRotZEqu(I8 *m1,F8 theta)
+{
+  F8 my_cos=Cos(theta)*gr_scale,
+     my_sin=Sin(theta)*gr_scale;
+  I8 r[16],*r2;
+  MemSet(r,0,sizeof(r));
+  r[0]=my_cos;
+  r[5]=my_cos;
+  r[4]=my_sin;
+  r[1]=-my_sin;
+  r[10]=gr_scale;
+  r[15]=gr_scale;
+
+  r2=GrMulMat(r,m1);
+  MemCpy(m1,r2,sizeof(I8)*16);
+  Free(r2);
+  return m1;
+}
+
+public I8 *GrScaleMatEqu(I8 *m1,F8 s)
+{
+  I8 i;
+  for (i=0;i&lt;16;i++)
+    m1[i]*=s;
+  return m1;
+}
+
+public U0 GrSetRotMat(GrBitMap *base,I8 *r)
+{
+// (1.0/Sqrt(3))*65536=37837.22
+  I8 xx=37838,yy=37837,zz=37837;
+  base-&gt;r=r;
+  GrRot(r,&amp;xx,&amp;yy,&amp;zz);
+  //scaled 32 bits
+  base-&gt;r_norm=Sqrt(xx*xx+yy*yy+zz*zz)*65536;
+}
+
+public U0 GrScalePenWidth(GrBitMap *base)
+{
+  I8 d;
+  if (base-&gt;flags&amp;BMF_TRANSFORMATION) {
+    if (base-&gt;pen_width) {
+      d=base-&gt;pen_width*base-&gt;r_norm+0x80000000;
+      base-&gt;pen_width=d.u4[1];
+      if (base-&gt;pen_width&lt;1)
+        base-&gt;pen_width=1;
+    }
+  }
+}
+
+public I8 *GrIdent(TaskStruct *mem_task=NULL)
+{
+  I8 *r=CAlloc(sizeof(I8)*16,mem_task);
+  r[0].i4[1]=1;
+  r[5].i4[1]=1;
+  r[10].i4[1]=1;
+  r[15].i4[1]=1;
+  return r;
+}
+
+public I8 *GrIdentEqu(I8 *r)
+{
+  MemSet(r,0,sizeof(I8)*16);
+  r[0].i4[1]=1;
+  r[5].i4[1]=1;
+  r[10].i4[1]=1;
+  r[15].i4[1]=1;
+  return r;
+}
+
+public I8 *GrSetTranslation(I8 *r,I8 x,I8 y,I8 z)
+{
+  r[3]=x&lt;&lt;32;
+  r[7]=y&lt;&lt;32;
+  r[11]=z&lt;&lt;32;
+  r[15]=gr_scale;
+  return r;
+}
+
+public BoolI8 GrSetSymmetry(GrBitMap *base,I8 x1,I8 y1,I8 x2,I8 y2)
+{
+  F8 d;
+  if (y1==y2 &amp;&amp; x1==x2)
+    return FALSE;
+  base-&gt;sym.snx=y2-y1;
+  base-&gt;sym.sny=x1-x2;
+  base-&gt;sym.snz=0;
+  if (d=Sqrt(SqrI8(base-&gt;sym.snx)+
+             SqrI8(base-&gt;sym.sny)+
+             SqrI8(base-&gt;sym.snz))) {
+    d=gr_scale/d;
+    base-&gt;sym.snx *= d;
+    base-&gt;sym.sny *= d;
+    base-&gt;sym.snz *= d;
+  }
+  base-&gt;sym.sx=x1;
+  base-&gt;sym.sy=y1;
+  base-&gt;sym.sz=0;
+  return TRUE;
+}
+
+public BoolI8 GrSetSymmetry3(GrBitMap *base,I8 x1,I8 y1,I8 z1,I8 x2,I8 y2,I8 z2,I8 x3,I8 y3,I8 z3)
+{
+  F8 d,x,y,z,xx,yy,zz;
+  I8 xx1,yy1,zz1,xx2,yy2,zz2,*r;
+  xx1=x1-x2; yy1=y1-y2; zz1=z1-z2;
+  xx2=x3-x2; yy2=y3-y2; zz2=z3-z2;
+  if (!xx1 &amp;&amp; !yy1 &amp;&amp; !zz1 ||
+      !xx2 &amp;&amp; !yy2 &amp;&amp; !zz2 ||
+      xx1==xx2 &amp;&amp; yy1==yy2 &amp;&amp; zz1==zz2)
+    return FALSE;
+
+  x=yy1*zz2-zz1*yy2;
+  y=-xx1*zz2+zz1*xx2;
+  z=xx1*yy2-yy1*xx2;
+  if (base-&gt;flags &amp; BMF_TRANSFORMATION) {
+    r=base-&gt;r;
+    xx=x*r[0]+y*r[1]+z*r[2];
+    yy=x*r[4]+y*r[5]+z*r[6];
+    zz=x*r[8]+y*r[9]+z*r[10];
+    x=xx; y=yy; z=zz;
+  }
+  if (d=Sqrt(Sqr(x)+Sqr(y)+Sqr(z))) {
+    d=gr_scale/d;
+    base-&gt;sym.snx = d*x;
+    base-&gt;sym.sny = d*y;
+    base-&gt;sym.snz = d*z;
+  }
+  if (base-&gt;flags &amp; BMF_TRANSFORMATION)
+    base-&gt;transform(base,&amp;x1,&amp;y1,&amp;z1);
+  base-&gt;sym.sx=x1;
+  base-&gt;sym.sy=y1;
+  base-&gt;sym.sz=z1;
+  return TRUE;
+}
+
+public U0 GrReflect(GrBitMap *base,I8 *_x,I8 *_y,I8 *_z)
+{
+  I8 x=*_x&lt;&lt;32,y=*_y&lt;&lt;32,z=*_z&lt;&lt;32,
+    xx=*_x-base-&gt;sym.sx,yy=*_y-base-&gt;sym.sy,zz=*_z-base-&gt;sym.sz,
+    d=(xx*base-&gt;sym.snx+yy*base-&gt;sym.sny+zz*base-&gt;sym.snz)&gt;&gt;16,
+    xn,yn,zn,xx2,yy2,zz2;
+  xn=d*base-&gt;sym.snx&gt;&gt;15;
+  yn=d*base-&gt;sym.sny&gt;&gt;15;
+  zn=d*base-&gt;sym.snz&gt;&gt;15;
+  xx=x-xn;
+  yy=y-yn;
+  zz=z-zn;
+  xx2=x+xn;
+  yy2=y+yn;
+  zz2=z+zn;
+  if (SqrI8(xx&gt;&gt;16 -base-&gt;sym.sx&lt;&lt;16)+
+      SqrI8(yy&gt;&gt;16 -base-&gt;sym.sy&lt;&lt;16)+
+      SqrI8(zz&gt;&gt;16 -base-&gt;sym.sz&lt;&lt;16)&lt;
+      SqrI8(xx2&gt;&gt;16-base-&gt;sym.sx&lt;&lt;16)+
+      SqrI8(yy2&gt;&gt;16-base-&gt;sym.sy&lt;&lt;16)+
+      SqrI8(zz2&gt;&gt;16-base-&gt;sym.sz&lt;&lt;16)) {
+    *_x=xx.i4[1]; *_y=yy.i4[1]; *_z=zz.i4[1];
+  } else {
+    *_x=xx2.i4[1]; *_y=yy2.i4[1]; *_z=zz2.i4[1];
+  }
+}
+
+#help_index "Graphics/Mesh"
+public U0 GrLighting(GrBitMap *base,P3I4 *p1,P3I4 *p2,P3I4 *p3,I8 color)
+{
+  P3I4 v1,v2;
+  I8 i,vn_x,vn_y,vn_z;
+  F8 d;
+
+  v1.x=p1-&gt;x-p2-&gt;x;
+  v1.y=p1-&gt;y-p2-&gt;y;
+  v1.z=p1-&gt;z-p2-&gt;z;
+
+  v2.x=p3-&gt;x-p2-&gt;x;
+  v2.y=p3-&gt;y-p2-&gt;y;
+  v2.z=p3-&gt;z-p2-&gt;z;
+
+//V1 and V2 are vectors along two sides
+//of the triangle joined at p2.
+
+  vn_x=v1.y*v2.z-v1.z*v2.y;
+  vn_y=v1.z*v2.x-v1.x*v2.z;
+  vn_z=v1.x*v2.y-v1.y*v2.x;
+  if (d=Sqrt(SqrI8(vn_x)+SqrI8(vn_y)+SqrI8(vn_z)))
+    d=1&lt;&lt;16/d;
+  vn_x*=d;
+  vn_y*=d;
+  vn_z*=d;
+//Vn is the cross product of V1 and V3
+//which means it is perpendicular.It
+//is the normal vector to the surface.
+//It has been scaled to length 65536.
+
+//Light source has been scaled to length 65536.
+  i=(vn_x*base-&gt;ls.x+vn_y*base-&gt;ls.y+vn_z*base-&gt;ls.z)&gt;&gt;16;
+//The dot product of the light source
+//vector and the surface normal
+//gives an illumination number.
+//65536*65536&gt;&gt;16=65536
+
+//LoseThos will generate a random U2
+//and compare to dither_probability and
+//will pick from two colors.
+//Probability dithering does not work with pen_width&gt;1 at this time.
+  if (color&amp;ROP_TWO_SIDED) {
+    color&amp;=~ROP_TWO_SIDED;
+    i=AbsI8(i)&lt;&lt;1;
+  } else
+    i+=65536;
+  if (color&amp;ROP_HALF_RANGE_COLOR) {
+    color&amp;=~ROP_HALF_RANGE_COLOR;
+    i&gt;&gt;=1;
+    if (color&gt;=8) {
+      color-=8;
+      i+=65536;
+    }
+  }
+  if (i&lt;65536) {
+    base-&gt;color=ROP_PROBABILITY_DITHER+color&lt;&lt;32+BLACK;
+    base-&gt;dither_probability=i;
+  } else {
+    base-&gt;color=ROP_PROBABILITY_DITHER+(color^8)&lt;&lt;32+color;
+    base-&gt;dither_probability=i-65536;
+  }
+}
+
+#help_index "Graphics/Math"
+public BoolI8 Circle(U0 *aux_data,
+                I8 cx,I8 cy,I8 cz,
+                I8 radius,
+                BoolI8 (*fp_plot)(U0 *aux,I8 x,I8 y,I8 z),
+                I8 step=1,
+                F8 start_radians=0,
+                F8 len_radians=2*pi)
+{
+  I8 i,j,len=Ceiling(len_radians*radius);
+  I8 x,y,x1,y1,s1,s2,c;
+  F8 t;
+  if (radius&lt;=0||step&lt;1) return TRUE;
+  t=1.0/radius;
+  s1=1&lt;&lt;16*Sin(t);
+  s2=-s1;
+  c=1&lt;&lt;16*Cos(t);
+  if (start_radians) {
+    x=radius*Cos(start_radians);
+    y=-radius*Sin(start_radians);
+  } else {
+    x=radius;
+    y=0;
+  }
+  x&lt;&lt;=8;
+  y&lt;&lt;=8;
+  for (i=0;i&lt;=len;i+=step) {
+    if (!fp_plot(aux_data,cx+x&gt;&gt;8,cy+y&gt;&gt;8,cz))
+      return FALSE;
+    for (j=0;j&lt;step;j++) {
+      x1=(c*x+s1*y)&gt;&gt;16;
+      y1=(s2*x+c*y)&gt;&gt;16;
+      x=x1; y=y1;
+    }
+  }
+  return TRUE;
+}
+
+public BoolI8 Ellipse(U0 *aux_data,
+                I8 cx,I8 cy,I8 cz,
+                I8 x_radius,I8 y_radius,
+                BoolI8 (*fp_plot)(U0 *aux,I8 x,I8 y,I8 z),
+                F8 rot_angle=0,
+                I8 step=1,
+                F8 start_radians=0,
+                F8 len_radians=2*pi)
+{
+  I8 i,j,len;
+  I8 x,y,_x,_y,x1,y1,x2,y2, s1,s2,c, s12,s22,c2;
+  F8 t;
+  BoolI1 first=TRUE;
+  if (x_radius&lt;=0 || y_radius&lt;=0 || step&lt;1)
+    return TRUE;
+  if (x_radius&gt;=y_radius) {
+    t=1.0/x_radius;
+    len=Ceiling(len_radians*x_radius);
+  } else {
+    t=1.0/y_radius;
+    len=Ceiling(len_radians*y_radius);
+  }
+
+  s1=1&lt;&lt;16*Sin(t);
+  s2=-s1;
+  c=1&lt;&lt;16*Cos(t);
+
+  s12=1&lt;&lt;16*Sin(rot_angle);
+  s22=-s12;
+  c2=1&lt;&lt;16*Cos(rot_angle);
+
+  if (start_radians) {
+    x=x_radius*Cos(start_radians);
+    y=-x_radius*Sin(start_radians);
+  } else {
+    x=x_radius;
+    y=0;
+  }
+  x&lt;&lt;=8;
+  y&lt;&lt;=8;
+  x2=x;
+  y2=y;
+
+  y1=y2*y_radius/x_radius;
+  x=(c2*x2+s12*y1)&gt;&gt;16;
+  y=(s22*x2+c2*y1)&gt;&gt;16;
+
+  for (i=0;i&lt;=len;i+=step) {
+    if (x&gt;&gt;8!=_x || y&gt;&gt;8!=_y || first) {
+      if (!fp_plot(aux_data,cx+x&gt;&gt;8,cy+y&gt;&gt;8,cz))
+        return FALSE;
+    }
+    _x=x&gt;&gt;8; _y=y&gt;&gt;8; first=FALSE;
+    for (j=0;j&lt;step;j++) {
+      x1=(c*x2+s1*y2)&gt;&gt;16;
+      y1=(s2*x2+c*y2)&gt;&gt;16;
+      x2=x1;
+      y2=y1;
+      y1=y1*y_radius/x_radius;
+      x=(c2*x1+s12*y1)&gt;&gt;16;
+      y=(s22*x1+c2*y1)&gt;&gt;16;
+    }
+  }
+  return TRUE;
+}
+
+public BoolI8 RegPolygon(U0 *aux_data,
+                I8 cx,I8 cy,I8 cz,
+                I8 x_radius,I8 y_radius,I8 sides,
+                BoolI8 (*fp_plot)(U0 *aux,I8 x,I8 y,I8 z),
+                F8 rot_angle=0,
+                I8 step=1,
+                F8 start_radians=0,
+                F8 len_radians=2*pi)
+{
+  I8 i,n,x,y,x1,y1,x2,y2,
+    xx1,yy1,xx2,yy2,
+    s1,s2,c, s12,s22,c2;
+  F8 angle_step;
+
+  if (sides&lt;=0 || x_radius&lt;=0 || y_radius&lt;=0)
+    return TRUE;
+
+  angle_step=2*pi/sides;
+  n=len_radians*sides/(2*pi);
+
+  s1=1&lt;&lt;16*Sin(angle_step);
+  s2=-s1;
+  c=1&lt;&lt;16*Cos(angle_step);
+
+  s12=1&lt;&lt;16*Sin(rot_angle);
+  s22=-s12;
+  c2=1&lt;&lt;16*Cos(rot_angle);
+
+  if (start_radians) {
+    x=x_radius*Cos(start_radians);
+    y=-x_radius*Sin(start_radians);
+  } else {
+    x=x_radius;
+    y=0;
+  }
+  x&lt;&lt;=8;
+  y&lt;&lt;=8;
+  x2=x;
+  y2=y;
+
+  y1=y2*y_radius/x_radius;
+  x=(c2*x2+s12*y1)&gt;&gt;16;
+  y=(s22*x2+c2*y1)&gt;&gt;16;
+
+  xx1=cx+x&gt;&gt;8;
+  yy1=cy+y&gt;&gt;8;
+  for (i=0;i&lt;n;i++) {
+    x1=(c*x2+s1*y2)&gt;&gt;16;
+    y1=(s2*x2+c*y2)&gt;&gt;16;
+    x2=x1;
+    y2=y1;
+    y1=y1*y_radius/x_radius;
+    x=(c2*x1+s12*y1)&gt;&gt;16;
+    y=(s22*x1+c2*y1)&gt;&gt;16;
+    xx2=cx+x&gt;&gt;8;
+    yy2=cy+y&gt;&gt;8;
+    if (!Line(aux_data,xx1,yy1,cz,xx2,yy2,cz,fp_plot,step))
+      return FALSE;
+    xx1=xx2; yy1=yy2;
+  }
+  return TRUE;
+}
+
+#help_index "Graphics/P3I4;Math/P3I4"
+public F8 P3I4Dist(P3I4 *p1,P3I4 *p2)
+{
+  return Sqrt(SqrI8(p1-&gt;x-p2-&gt;x)+SqrI8(p1-&gt;y-p2-&gt;y)+SqrI8(p1-&gt;z-p2-&gt;z));
+}
+
+public F8 P3I4Norm(P3I4 *p)
+{
+  return Sqrt(SqrI8(p-&gt;x)+SqrI8(p-&gt;y)+SqrI8(p-&gt;z));
+}
+
+public I8 P3I4SqrNorm(P3I4 *p)
+{
+  return SqrI8(p-&gt;x)+SqrI8(p-&gt;y)+SqrI8(p-&gt;z);
+}
+
+#help_index "Graphics/Math"
+public BoolI8 Bezier2(U0 *aux_data,P3I4 *ctrl,BoolI8 (*fp_plot)(U0 *aux,I8 x,I8 y,I8 z),BoolI1 first=TRUE)
+{//2nd order
+  I8 x,y,z,xx,yy,zz,dx,dy,dz,d_max;
+  F8 x0=ctrl[0].x,y0=ctrl[0].y,z0=ctrl[0].z;
+  F8 x1=ctrl[1].x-x0,y1=ctrl[1].y-y0,z1=ctrl[1].z-z0;
+  F8 x2=ctrl[2].x-x0,y2=ctrl[2].y-y0,z2=ctrl[2].z-z0;
+  F8 t,d=P3I4Dist(&amp;ctrl[0],&amp;ctrl[1])+
+             P3I4Dist(&amp;ctrl[1],&amp;ctrl[2])+
+             P3I4Dist(&amp;ctrl[2],&amp;ctrl[0]),
+         s=0.5/d,t1,t2;
+  xx=x0; yy=y0; zz=z0;
+  if (first) {
+    if (!fp_plot(aux_data,xx,yy,zz))
+      return FALSE;
+  }
+  for (t=0.0;t&lt;=1.0;t+=s) {
+    t1=t*(1.0-t);
+    t2=t*t;
+    x=x0+x1*t1+x2*t2;
+    y=y0+y1*t1+y2*t2;
+    z=z0+z1*t1+z2*t2;
+    dx=AbsI8(x-xx);
+    dy=AbsI8(y-yy);
+    dz=AbsI8(z-zz);
+    if (dx&gt;dy)
+      d_max=dx;
+    else
+      d_max=dy;
+    if (dz&gt;d_max)
+      d_max=dz;
+    if (!d_max)
+      s*=1.1;
+    else {
+      s*=0.9;
+      if (!fp_plot(aux_data,x,y,z))
+        return FALSE;
+      xx=x;yy=y;zz=z;
+    }
+  }
+  x=ctrl[2].x; y=ctrl[2].y; z=ctrl[2].z;
+  if (xx!=x || yy!=y || zz!=z) {
+    if (!fp_plot(aux_data,x,y,z))
+      return FALSE;
+  }
+  return TRUE;
+}
+
+public BoolI8 Bezier3(U0 *aux_data,P3I4 *ctrl,BoolI8 (*fp_plot)(U0 *aux,I8 x,I8 y,I8 z),BoolI1 first=TRUE)
+{ //3rd order
+  I8 x,y,z,xx,yy,zz,dx,dy,dz,d_max;
+  F8 x0=ctrl[0].x,y0=ctrl[0].y,z0=ctrl[0].z;
+  F8 x1=ctrl[1].x-x0,y1=ctrl[1].y-y0,z1=ctrl[1].z-z0;
+  F8 x2=ctrl[2].x-x0,y2=ctrl[2].y-y0,z2=ctrl[2].z-z0;
+  F8 x3=ctrl[3].x-x0,y3=ctrl[3].y-y0,z3=ctrl[3].z-z0;
+  F8 t,d=P3I4Dist(&amp;ctrl[0],&amp;ctrl[1])+
+             P3I4Dist(&amp;ctrl[1],&amp;ctrl[2])+
+             P3I4Dist(&amp;ctrl[2],&amp;ctrl[3])+
+             P3I4Dist(&amp;ctrl[3],&amp;ctrl[0]),
+         s=0.5/d,nt,t1,t2,t3;
+  xx=x0; yy=y0; zz=z0;
+  if (first) {
+    if (!fp_plot(aux_data,xx,yy,zz))
+      return FALSE;
+  }
+  for (t=0.0;t&lt;=1.0;t+=s) {
+    nt=1.0-t;
+    t1=t*nt*nt;
+    t2=t*t*nt;
+    t3=t*t*t;
+    x=x0+x1*t1+x2*t2+x3*t3;
+    y=y0+y1*t1+y2*t2+y3*t3;
+    z=z0+z1*t1+z2*t2+z3*t3;
+    dx=AbsI8(x-xx);
+    dy=AbsI8(y-yy);
+    dz=AbsI8(z-zz);
+    if (dx&gt;dy)
+      d_max=dx;
+    else
+      d_max=dy;
+    if (dz&gt;d_max)
+      d_max=dz;
+    if (!d_max)
+      s*=1.1;
+    else {
+      s*=0.9;
+      if (!fp_plot(aux_data,x,y,z))
+        return FALSE;
+      xx=x;yy=y;zz=z;
+    }
+  }
+  x=ctrl[3].x; y=ctrl[3].y; z=ctrl[3].z;
+  if (xx!=x || yy!=y || zz!=z) {
+    if (!fp_plot(aux_data,x,y,z))
+      return FALSE;
+  }
+  return TRUE;
+}
+
+public BoolI8 BSpline2(U0 *aux_data,P3I4 *ctrl,I8 cnt,BoolI8 (*fp_plot)(U0 *aux,I8 x,I8 y,I8 z),BoolI1 closed=FALSE)
+{ //2nd order
+  I8 i,j;
+  P3I4 *c;
+  BoolI1 first=TRUE;
+  if (cnt&lt;3) return TRUE;
+  if (closed) {
+    cnt++;
+    c=MAlloc(sizeof(P3I4)*(cnt*2-1));
+    j=1;
+    for (i=0;i&lt;cnt-2;i++) {
+      c[j].x=(ctrl[i].x+ctrl[i+1].x)/2.0;
+      c[j].y=(ctrl[i].y+ctrl[i+1].y)/2.0;
+      c[j].z=(ctrl[i].z+ctrl[i+1].z)/2.0;
+      j+=2;
+    }
+    c[j].x=(ctrl[0].x+ctrl[cnt-2].x)/2.0;
+    c[j].y=(ctrl[0].y+ctrl[cnt-2].y)/2.0;
+    c[j].z=(ctrl[0].z+ctrl[cnt-2].z)/2.0;
+
+    c[0].x=(c[1].x+c[j].x)/2.0;
+    c[0].y=(c[1].y+c[j].y)/2.0;
+    c[0].z=(c[1].z+c[j].z)/2.0;
+    j=2;
+    for (i=0;i&lt;cnt-2;i++) {
+      c[j].x=(c[j-1].x+c[j+1].x)/2.0;
+      c[j].y=(c[j-1].y+c[j+1].y)/2.0;
+      c[j].z=(c[j-1].z+c[j+1].z)/2.0;
+      j+=2;
+    }
+    c[j].x=c[0].x;
+    c[j].y=c[0].y;
+    c[j].z=c[0].z;
+  } else {
+    c=MAlloc(sizeof(P3I4)*(cnt*2-1));
+    c[0].x=ctrl[0].x;
+    c[0].y=ctrl[0].y;
+    c[0].z=ctrl[0].z;
+    c[cnt*2-2].x=ctrl[cnt-1].x;
+    c[cnt*2-2].y=ctrl[cnt-1].y;
+    c[cnt*2-2].z=ctrl[cnt-1].z;
+    j=1;
+    for (i=0;i&lt;cnt-1;i++) {
+      c[j].x=(ctrl[i].x+ctrl[i+1].x)/2.0;
+      c[j].y=(ctrl[i].y+ctrl[i+1].y)/2.0;
+      c[j].z=(ctrl[i].z+ctrl[i+1].z)/2.0;
+      j+=2;
+    }
+    j=2;
+    for (i=0;i&lt;cnt-2;i++) {
+      c[j].x=(c[j-1].x+c[j+1].x)/2.0;
+      c[j].y=(c[j-1].y+c[j+1].y)/2.0;
+      c[j].z=(c[j-1].z+c[j+1].z)/2.0;
+      j+=2;
+    }
+  }
+  for (i=0;i&lt;cnt*2-2;i+=2) {
+    if (!Bezier2(aux_data,&amp;c[i],fp_plot,first)) {
+      Free(c);
+      return FALSE;
+    }
+    first=FALSE;
+  }
+  Free(c);
+  return TRUE;
+}
+
+public BoolI8 BSpline3(U0 *aux_data,P3I4 *ctrl,I8 cnt,BoolI8 (*fp_plot)(U0 *aux,I8 x,I8 y,I8 z),BoolI1 closed=FALSE)
+{ //3rd order
+  I8 i,j;
+  F8 x,y,z;
+  P3I4 *c;
+  BoolI1 first=TRUE;
+  if (cnt&lt;3) return TRUE;
+  if (closed) {
+    cnt++;
+    c=MAlloc(sizeof(P3I4)*(cnt*3-2));
+    j=1;
+    for (i=0;i&lt;cnt-2;i++) {
+      x=ctrl[i].x;
+      y=ctrl[i].y;
+      z=ctrl[i].z;
+      c[j].x=(ctrl[i+1].x-x)/3.0+x;
+      c[j].y=(ctrl[i+1].y-y)/3.0+y;
+      c[j].z=(ctrl[i+1].z-z)/3.0+z;
+      j++;
+      c[j].x=2.0*(ctrl[i+1].x-x)/3.0+x;
+      c[j].y=2.0*(ctrl[i+1].y-y)/3.0+y;
+      c[j].z=2.0*(ctrl[i+1].z-z)/3.0+z;
+      j+=2;
+    }
+    x=ctrl[cnt-2].x;
+    y=ctrl[cnt-2].y;
+    z=ctrl[cnt-2].z;
+    c[j].x=(ctrl[0].x-x)/3.0+x;
+    c[j].y=(ctrl[0].y-y)/3.0+y;
+    c[j].z=(ctrl[0].z-z)/3.0+z;
+    j++;
+    c[j].x=2.0*(ctrl[0].x-x)/3.0+x;
+    c[j].y=2.0*(ctrl[0].y-y)/3.0+y;
+    c[j].z=2.0*(ctrl[0].z-z)/3.0+z;
+
+    c[0].x=(c[1].x+c[j].x)/2.0;
+    c[0].y=(c[1].y+c[j].y)/2.0;
+    c[0].z=(c[1].z+c[j].z)/2.0;
+
+    j=3;
+    for (i=0;i&lt;cnt-2;i++) {
+      c[j].x=(c[j-1].x+c[j+1].x)/2.0;
+      c[j].y=(c[j-1].y+c[j+1].y)/2.0;
+      c[j].z=(c[j-1].z+c[j+1].z)/2.0;
+      j+=3;
+    }
+    c[j].x=c[0].x;
+    c[j].y=c[0].y;
+    c[j].z=c[0].z;
+  } else {
+    c=MAlloc(sizeof(P3I4)*(cnt*3-2));
+    c[0].x=ctrl[0].x;
+    c[0].y=ctrl[0].y;
+    c[0].z=ctrl[0].z;
+    c[cnt*3-3].x=ctrl[cnt-1].x;
+    c[cnt*3-3].y=ctrl[cnt-1].y;
+    c[cnt*3-3].z=ctrl[cnt-1].z;
+    j=1;
+    for (i=0;i&lt;cnt-1;i++) {
+      x=ctrl[i].x;
+      y=ctrl[i].y;
+      z=ctrl[i].z;
+      c[j].x=(ctrl[i+1].x-x)/3.0+x;
+      c[j].y=(ctrl[i+1].y-y)/3.0+y;
+      c[j].z=(ctrl[i+1].z-z)/3.0+z;
+      j++;
+      c[j].x=2.0*(ctrl[i+1].x-x)/3.0+x;
+      c[j].y=2.0*(ctrl[i+1].y-y)/3.0+y;
+      c[j].z=2.0*(ctrl[i+1].z-z)/3.0+z;
+      j+=2;
+    }
+    j=3;
+    for (i=0;i&lt;cnt-2;i++) {
+      c[j].x=(c[j-1].x+c[j+1].x)/2.0;
+      c[j].y=(c[j-1].y+c[j+1].y)/2.0;
+      c[j].z=(c[j-1].z+c[j+1].z)/2.0;
+      j+=3;
+    }
+  }
+  for (i=0;i&lt;cnt*3-3;i+=3) {
+    if (!Bezier3(aux_data,&amp;c[i],fp_plot,first)) {
+      Free(c);
+      return FALSE;
+    }
+    first=FALSE;
+  }
+  Free(c);
+  return TRUE;
+}
+
+#define CC_LEFT         1
+#define CC_RIGHT        2
+#define CC_TOP          4
+#define CC_BOTTOM       8
+
+public BoolI8 ClipLine(I8 *_x1,I8 *_y1,I8 *_x2,I8 *_y2,I8 left,I8 top,I8 right,I8 bottom)
+{
+  I8 x,y,x1=*_x1,y1=*_y1,x2=*_x2,y2=*_y2;
+  U8 cc,cc1,cc2;
+
+  if (y1&gt;bottom)
+    cc1=CC_BOTTOM;
+  else if (y1&lt;top)
+    cc1=CC_TOP;
+  else
+    cc1=0;
+  if (x1&gt;right)
+    cc1|=CC_RIGHT;
+  else if (x1&lt;left)
+    cc1|=CC_LEFT;
+
+  if (y2&gt;bottom)
+    cc2=CC_BOTTOM;
+  else if (y2&lt;top)
+    cc2=CC_TOP;
+  else
+    cc2=0;
+  if (x2&gt;right)
+    cc2|=CC_RIGHT;
+  else if (x2&lt;left)
+    cc2|=CC_LEFT;
+
+  while (TRUE) {
+    if (!(cc1|cc2))
+      return TRUE;
+    if (cc1&amp;cc2)
+      return FALSE;
+
+    if (cc1)
+      cc=cc1;
+    else
+      cc=cc2;
+
+    if (cc&amp;CC_BOTTOM) {
+      x=x1+(x2-x1)*(bottom-y1)/(y2-y1);
+      y=bottom;
+    } else if (cc&amp;CC_TOP) {
+      x=x1+(x2-x1)*(top-y1)/(y2-y1);
+      y=top;
+    } else if (cc&amp;CC_RIGHT) {
+      y=y1+(y2-y1)*(right-x1)/(x2-x1);
+      x=right;
+    } else {
+      y=y1+(y2-y1)*(left-x1)/(x2-x1);
+      x=left;
+    }
+
+    if (cc==cc1) {
+      *_x1=x1=x;
+      *_y1=y1=y;
+      if (y1&gt;bottom)
+        cc1=CC_BOTTOM;
+      else if (y1&lt;top)
+        cc1=CC_TOP;
+      else
+        cc1=0;
+      if (x1&gt;right)
+        cc1|=CC_RIGHT;
+      else if (x1&lt;left)
+        cc1|=CC_LEFT;
+    } else {
+      *_x2=x2=x;
+      *_y2=y2=y;
+      if (y2&gt;bottom)
+        cc2=CC_BOTTOM;
+      else if (y2&lt;top)
+        cc2=CC_TOP;
+      else
+        cc2=0;
+      if (x2&gt;right)
+        cc2|=CC_RIGHT;
+      else if (x2&lt;left)
+        cc2|=CC_LEFT;
+    }
+  }
+}
+
+#help_index "Graphics"
+</pre><div class="archive-note">Historical capture: 2010-01-31. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head></html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

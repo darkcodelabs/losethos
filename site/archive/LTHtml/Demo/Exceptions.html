@@ -1,0 +1,115 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>Exceptions</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V8.00" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cF5">                               <a href="/archive/LTHtml/Doc/TrivialSolutions.html">Trivial Solutions</a>
+                    <a href="/archive/index.html">The LoseThos 64-bit PC Operating System</a>
+File:/LT/Demo/Exceptions.CPZ
+This, and all LoseThos files, are public domain.  Do whatever you like.
+God is watching; God is just; God is never out-done in generosity.  He talks!
+
+LoseThos code compiles with the 64-bit LoseThos compiler/assembler I wrote.
+Boot the LoseThos CD and you can compile it.  Not in Kansas anymore!
+
+<a href="/archive/LTHtml/Demo/Lectures/FixedPoint.html">Click here for preliminary compiler information you need.</a>
+
+</span><a name="l1"></a><span class="cF2">//WARNING: Don't return out of a catch{}.  This</span><span class="cF0">
+<a name="l2"></a></span><span class="cF2">//might get fixed.</span><span class="cF0">
+<a name="l3"></a>
+<a name="l4"></a></span><span class="cF2">//You can use </span><a href="/archive/LTHtml/OSMain/Except.html#l233"><span class="cF4">CatchAll</span></a><span class="cF2">() in a catch statement</span><span class="cF0">
+<a name="l5"></a></span><span class="cF2">//and it will report args.</span><span class="cF0">
+<a name="l6"></a>
+<a name="l7"></a>#</span><span class="cF1">define</span><span class="cF0"> EXCEPT_1        1
+<a name="l8"></a>#</span><span class="cF1">define</span><span class="cF0"> EXCEPT_2        2
+<a name="l9"></a>#</span><span class="cF1">define</span><span class="cF0"> EXCEPT_3        3
+<a name="l10"></a>#</span><span class="cF1">define</span><span class="cF0"> EXCEPT_4        4
+<a name="l11"></a>
+<a name="l12"></a></span><span class="cF1">U0</span><span class="cF0"> Show()
+<a name="l13"></a>{
+<a name="l14"></a>  </span><span class="cF1">I64</span><span class="cF0"> i;
+<a name="l15"></a>  </span><span class="cF6">"Fs-&gt;except_argc=%X\n"</span><span class="cF0">,Fs-&gt;except_argc;
+<a name="l16"></a>  </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;Fs-&gt;except_argc;i++)
+<a name="l17"></a>    </span><span class="cF6">"Fs-&gt;except_argv[%d]=%08X\n"</span><span class="cF0">,i,Fs-&gt;except_argv[i];
+<a name="l18"></a>}
+<a name="l19"></a>
+<a name="l20"></a>
+<a name="l21"></a>
+<a name="l22"></a>BoolI64 Pmt(</span><span class="cF1">I64</span><span class="cF0"> i)
+<a name="l23"></a>{
+<a name="l24"></a>  </span><span class="cF6">"%d "</span><span class="cF0">,i;
+<a name="l25"></a>  </span><span class="cF1">return</span><span class="cF0"> YorN;
+<a name="l26"></a>}
+<a name="l27"></a>
+<a name="l28"></a></span><span class="cF1">U0</span><span class="cF0"> D1()
+<a name="l29"></a>{
+<a name="l30"></a>  </span><span class="cF6">"D1\n"</span><span class="cF0">;
+<a name="l31"></a>  </span><span class="cF1">if</span><span class="cF0"> (Pmt</span><span class="cF7">(</span><span class="cF0">1</span><span class="cF7">)</span><span class="cF0">) throw(EXCEPT_1);
+<a name="l32"></a>  </span><span class="cF1">if</span><span class="cF0"> (Pmt</span><span class="cF7">(</span><span class="cF0">2</span><span class="cF7">)</span><span class="cF0">) throw(EXCEPT_2,33,55,66);
+<a name="l33"></a>  </span><span class="cF1">if</span><span class="cF0"> (Pmt</span><span class="cF7">(</span><span class="cF0">5</span><span class="cF7">)</span><span class="cF0">) throw;
+<a name="l34"></a>}
+<a name="l35"></a>
+<a name="l36"></a></span><span class="cF1">U0</span><span class="cF0"> D2()
+<a name="l37"></a>{
+<a name="l38"></a>  </span><span class="cF6">"D2\n"</span><span class="cF0">;
+<a name="l39"></a>  </span><span class="cF1">try</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l40"></a>    D1;
+<a name="l41"></a>    </span><span class="cF1">if</span><span class="cF0"> (Pmt</span><span class="cF7">(</span><span class="cF0">4</span><span class="cF7">)</span><span class="cF0">) throw(EXCEPT_4);
+<a name="l42"></a>  </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">catch</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l43"></a>    </span><span class="cF6">"D2 handler\n"</span><span class="cF0">;
+<a name="l44"></a>    Show;
+<a name="l45"></a>    </span><span class="cF1">if</span><span class="cF0"> (Fs-&gt;except_argc&gt;0) {
+<a name="l46"></a>      </span><span class="cF1">if</span><span class="cF0"> (Fs-&gt;except_argv[0]==EXCEPT_1) </span><span class="cF7">{</span><span class="cF0">
+<a name="l47"></a>        </span><span class="cF6">"Caught in D2\n"</span><span class="cF0">;
+<a name="l48"></a>        Fs-&gt;catch_except=TRUE;
+<a name="l49"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l50"></a>    }
+<a name="l51"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l52"></a>}
+<a name="l53"></a>
+<a name="l54"></a></span><span class="cF1">U0</span><span class="cF0"> Demo()
+<a name="l55"></a>{
+<a name="l56"></a>  </span><span class="cF1">try</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l57"></a>    D2;
+<a name="l58"></a>    </span><span class="cF1">if</span><span class="cF0"> (Pmt</span><span class="cF7">(</span><span class="cF0">3</span><span class="cF7">)</span><span class="cF0">) throw;
+<a name="l59"></a>  </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">catch</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l60"></a>    </span><span class="cF6">"Demo handler\n"</span><span class="cF0">;
+<a name="l61"></a>    Show;
+<a name="l62"></a>    </span><span class="cF6">"Ignore Except"</span><span class="cF0">;
+<a name="l63"></a>    </span><span class="cF1">if</span><span class="cF0"> (YorN)
+<a name="l64"></a>      Fs-&gt;ignore_except=TRUE;
+<a name="l65"></a>    </span><span class="cF1">else</span><span class="cF0">
+<a name="l66"></a>      Fs-&gt;catch_except=TRUE;
+<a name="l67"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l68"></a>}
+<a name="l69"></a>
+<a name="l70"></a>
+<a name="l71"></a>Demo;
+</span></pre><div class="archive-note">Historical capture: 2012-03-09. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

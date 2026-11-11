@@ -1,0 +1,324 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>ToHtml</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V8.00" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cF5">                               <a href="/archive/LTHtml/Doc/TrivialSolutions.html">Trivial Solutions</a>
+                    <a href="/archive/index.html">The LoseThos 64-bit PC Operating System</a>
+File:/LT/Adam/ToHtml.APZ
+This, and all LoseThos files, are public domain.  Do whatever you like.
+God is watching; God is just; God is never out-done in generosity.  He talks!
+
+LoseThos code compiles with the 64-bit LoseThos compiler/assembler I wrote.
+Boot the LoseThos CD and you can compile it.  Not in Kansas anymore!
+
+<a href="/archive/LTHtml/Demo/Lectures/FixedPoint.html">Click here for preliminary compiler information you need.</a>
+
+</span><a name="l1"></a><span class="cF0">#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Utils;Cmd Line (Typically);Ltf/Html"</span><span class="cF0">
+<a name="l2"></a>
+<a name="l3"></a></span><span class="cF2">//See </span><a href="/archive/LTHtml/Doc/Acknowledgements.html"><span class="cF4">::/LT/Doc/Acknowledgements.TXZ</span></a><span class="cF2"> (12).</span><span class="cF0">
+<a name="l4"></a>
+<a name="l5"></a></span><span class="cF1">U0</span><span class="cF0"> HtmlPutS(Ltf *l,</span><span class="cF1">I64</span><span class="cF0"> c,</span><span class="cF1">I64</span><span class="cF0"> *_old_c,</span><span class="cF1">U8</span><span class="cF0"> *st,</span><span class="cF1">I64</span><span class="cF0"> *_col,</span><span class="cF1">U8</span><span class="cF0"> *style_bitmap=NULL)
+<a name="l6"></a>{
+<a name="l7"></a>  </span><span class="cF1">U8</span><span class="cF0"> *ch;
+<a name="l8"></a>  </span><span class="cF1">if</span><span class="cF0"> (c!=*_old_c) </span><span class="cF7">{</span><span class="cF0">
+<a name="l9"></a>    </span><span class="cF1">if</span><span class="cF0"> (*_old_c!=-1)
+<a name="l10"></a>      LtfPutS(l,</span><span class="cF6">"&lt;/span&gt;"</span><span class="cF0">);
+<a name="l11"></a>    LtfPrintF(l,</span><span class="cF6">"&lt;span class=c%02X&gt;"</span><span class="cF0">,c);
+<a name="l12"></a>    *_old_c=c;
+<a name="l13"></a>    </span><span class="cF1">if</span><span class="cF0"> (style_bitmap)
+<a name="l14"></a>      LBts(style_bitmap,c);
+<a name="l15"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l16"></a>  </span><span class="cF1">while</span><span class="cF0"> (ch=*st++) </span><span class="cF7">{</span><span class="cF0">
+<a name="l17"></a>    </span><span class="cF1">switch</span><span class="cF0"> (ch) {
+<a name="l18"></a>      </span><span class="cF1">case</span><span class="cF0"> </span><span class="cF6">'&amp;'</span><span class="cF0">:
+<a name="l19"></a>        LtfPutS(l,</span><span class="cF6">"&amp;amp;"</span><span class="cF0">);
+<a name="l20"></a>        *_col=*_col+1;
+<a name="l21"></a>        </span><span class="cF1">break</span><span class="cF0">;
+<a name="l22"></a>      </span><span class="cF1">case</span><span class="cF0"> </span><span class="cF6">'&lt;'</span><span class="cF0">:
+<a name="l23"></a>        LtfPutS(l,</span><span class="cF6">"&amp;lt;"</span><span class="cF0">);
+<a name="l24"></a>        *_col=*_col+1;
+<a name="l25"></a>        </span><span class="cF1">break</span><span class="cF0">;
+<a name="l26"></a>      </span><span class="cF1">case</span><span class="cF0"> </span><span class="cF6">'&gt;'</span><span class="cF0">:
+<a name="l27"></a>        LtfPutS(l,</span><span class="cF6">"&amp;gt;"</span><span class="cF0">);
+<a name="l28"></a>        *_col=*_col+1;
+<a name="l29"></a>        </span><span class="cF1">break</span><span class="cF0">;
+<a name="l30"></a>      </span><span class="cF1">case</span><span class="cF0"> </span><span class="cF6">'"'</span><span class="cF0">:
+<a name="l31"></a>        LtfPutS(l,</span><span class="cF6">"&amp;quot;"</span><span class="cF0">);
+<a name="l32"></a>        *_col=*_col+1;
+<a name="l33"></a>        </span><span class="cF1">break</span><span class="cF0">;
+<a name="l34"></a>      </span><span class="cF1">case</span><span class="cF0"> CH_TAB:
+<a name="l35"></a>        </span><span class="cF1">do</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l36"></a>          LtfPutKey(l,CH_SPACE,0);
+<a name="l37"></a>          *_col=*_col+1;
+<a name="l38"></a>        </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">while</span><span class="cF0"> (*_col&amp;7);
+<a name="l39"></a>        </span><span class="cF1">break</span><span class="cF0">;
+<a name="l40"></a>      </span><span class="cF1">case</span><span class="cF0"> CH_SHIFT_SPACE:
+<a name="l41"></a>        LtfPutS(l,</span><span class="cF6">" "</span><span class="cF0">);
+<a name="l42"></a>        *_col=*_col+1;
+<a name="l43"></a>        </span><span class="cF1">break</span><span class="cF0">;
+<a name="l44"></a>      </span><span class="cF1">case</span><span class="cF0"> </span><span class="cF6">'pi'</span><span class="cF0">:
+<a name="l45"></a>        LtfPutS(l,</span><span class="cF6">"pi"</span><span class="cF0">);
+<a name="l46"></a>        *_col=*_col+1;
+<a name="l47"></a>        </span><span class="cF1">break</span><span class="cF0">;
+<a name="l48"></a>      </span><span class="cF1">case</span><span class="cF0"> </span><span class="cF6">'theta'</span><span class="cF0">:
+<a name="l49"></a>        LtfPutS(l,</span><span class="cF6">"theta"</span><span class="cF0">);
+<a name="l50"></a>        *_col=*_col+1;
+<a name="l51"></a>        </span><span class="cF1">break</span><span class="cF0">;
+<a name="l52"></a>      </span><span class="cF1">case</span><span class="cF0"> </span><span class="cF6">'phi'</span><span class="cF0">:
+<a name="l53"></a>        LtfPutS(l,</span><span class="cF6">"phi"</span><span class="cF0">);
+<a name="l54"></a>        *_col=*_col+1;
+<a name="l55"></a>        </span><span class="cF1">break</span><span class="cF0">;
+<a name="l56"></a>      </span><span class="cF1">case</span><span class="cF0"> </span><span class="cF6">'omega'</span><span class="cF0">:
+<a name="l57"></a>        LtfPutS(l,</span><span class="cF6">"omega"</span><span class="cF0">);
+<a name="l58"></a>        *_col=*_col+1;
+<a name="l59"></a>        </span><span class="cF1">break</span><span class="cF0">;
+<a name="l60"></a>      </span><span class="cF1">case</span><span class="cF0"> </span><span class="cF6">'inf'</span><span class="cF0">:
+<a name="l61"></a>        LtfPutS(l,</span><span class="cF6">"inf"</span><span class="cF0">);
+<a name="l62"></a>        *_col=*_col+1;
+<a name="l63"></a>        </span><span class="cF1">break</span><span class="cF0">;
+<a name="l64"></a>      </span><span class="cF1">default</span><span class="cF0">:
+<a name="l65"></a>        LtfPutKey(l,ch,0);
+<a name="l66"></a>        *_col=*_col+1;
+<a name="l67"></a>    }
+<a name="l68"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l69"></a>}
+<a name="l70"></a>
+<a name="l71"></a></span><span class="cF1">public</span><span class="cF0"> Ltf *Ltf2Html(Ltf *l_in,</span><span class="cF1">U8</span><span class="cF0"> *html_header=NULL,
+<a name="l72"></a>  </span><span class="cF1">U8</span><span class="cF0"> *body_header=NULL,</span><span class="cF1">U8</span><span class="cF0"> *body_footer=NULL,BoolI8 line_anchors=TRUE)
+<a name="l73"></a>{
+<a name="l74"></a>  LtfEntry *cl,*style,*cl2;
+<a name="l75"></a>  LtfSettingsStruct *s;
+<a name="l76"></a>  </span><span class="cF1">I64</span><span class="cF0"> i,y,old_y=MIN_I64,cur_u8_attr,col,old_c=-1;
+<a name="l77"></a>  </span><span class="cF1">U32</span><span class="cF0"> *hl,*src;
+<a name="l78"></a>  </span><span class="cF1">U8</span><span class="cF0"> st[2],*style_bitmap=CAlloc(256/8);
+<a name="l79"></a>  BGREntry p[16];
+<a name="l80"></a>  GetVGAPalette4(p);
+<a name="l81"></a>  Ltf *l_out=LtfNew;
+<a name="l82"></a>  BoolI8 unlock_l=LtfLock(l_in),no_backward;
+<a name="l83"></a>
+<a name="l84"></a>  </span><span class="cF1">for</span><span class="cF0"> (i=0xF0;i&lt;=0xFF;i++)
+<a name="l85"></a>    LBts(style_bitmap,i); </span><span class="cF2">//See </span><a href="https://web.archive.org/web/20120302232115/http://www.losethos.com/LTHtml/Demo/AcctExample/TSDistribute.html#l346"><span class="cF4">kludge</span></a><span class="cF0">
+<a name="l86"></a>
+<a name="l87"></a>  l_in-&gt;recalc_start=l_in;
+<a name="l88"></a>  LtfRecalc(l_in);
+<a name="l89"></a>
+<a name="l90"></a>  st[0]=0; st[1]=0;
+<a name="l91"></a>  l_out-&gt;flags|=LTFF_PLAIN_TEXT|LTFF_NO_CURSOR;
+<a name="l92"></a>  </span><span class="cF1">if</span><span class="cF0"> (!html_header) html_header=</span><span class="cF6">""</span><span class="cF0">;
+<a name="l93"></a>  </span><span class="cF1">if</span><span class="cF0"> (!body_header) body_header=</span><span class="cF6">""</span><span class="cF0">;
+<a name="l94"></a>  </span><span class="cF1">if</span><span class="cF0"> (!body_footer) body_footer=</span><span class="cF6">""</span><span class="cF0">;
+<a name="l95"></a>  LtfPrintF(l_out,
+<a name="l96"></a>    </span><span class="cF6">"&lt;!DOCTYPE HTML&gt;\n"</span><span class="cF0">
+<a name="l97"></a>    </span><span class="cF6">"&lt;html&gt;\n"</span><span class="cF0">
+<a name="l98"></a>    </span><span class="cF6">"&lt;head&gt;\n"</span><span class="cF0">
+<a name="l99"></a>    </span><span class="cF6">"&lt;meta http-equiv=\"Content-Type\" content=\"text/html;charset=US-ASCII\"&gt;\n"</span><span class="cF0">
+<a name="l100"></a>    </span><span class="cF6">"%s"</span><span class="cF0">
+<a name="l101"></a>    </span><span class="cF6">"&lt;meta name=\"generator\" content=\"LoseThos V%4.2f\"&gt;\n"</span><span class="cF0">
+<a name="l102"></a>    </span><span class="cF6">"&lt;style type=\"text/css\"&gt;\n"</span><span class="cF0">,html_header,os_version);
+<a name="l103"></a>  style=l_out-&gt;cur_entry-&gt;last;
+<a name="l104"></a>  LtfPutS(l_out,
+<a name="l105"></a>    </span><span class="cF6">"&lt;/style&gt;\n"</span><span class="cF0">
+<a name="l106"></a>    </span><span class="cF6">"&lt;/head&gt;\n"</span><span class="cF0">
+<a name="l107"></a>    </span><span class="cF6">"&lt;body&gt;\n"</span><span class="cF0">
+<a name="l108"></a>    </span><span class="cF6">"&lt;pre style=\"font-family:courier;font-size:10pt\"&gt;\n"</span><span class="cF0">);
+<a name="l109"></a>  LtfPutS(l_out,body_header);
+<a name="l110"></a>
+<a name="l111"></a>  cl=l_in-&gt;root.next;
+<a name="l112"></a>  s=LtfSettingsLast(cl);
+<a name="l113"></a>  col=cl-&gt;x;
+<a name="l114"></a>  y=cl-&gt;y;
+<a name="l115"></a>  cur_u8_attr=cl-&gt;type.u8[1];
+<a name="l116"></a>  </span><span class="cF1">while</span><span class="cF0"> (cl!=l_in) </span><span class="cF7">{</span><span class="cF0">
+<a name="l117"></a>    </span><span class="cF1">if</span><span class="cF0"> (!</span><span class="cF7">(</span><span class="cF0">cl-&gt;flags&amp;(LTFLF_SKIP|LTFLF_HARD_SKIP)</span><span class="cF7">)</span><span class="cF0">) {
+<a name="l118"></a>      </span><span class="cF1">if</span><span class="cF0"> (line_anchors &amp;&amp; y!=old_y) </span><span class="cF7">{</span><span class="cF0">
+<a name="l119"></a>        LtfPrintF(l_out,</span><span class="cF6">"&lt;a name=\"l%d\"&gt;&lt;/a&gt;"</span><span class="cF0">,y+1);
+<a name="l120"></a>        old_y=y;
+<a name="l121"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l122"></a>      </span><span class="cF1">while</span><span class="cF0"> (y&lt;cl-&gt;y) </span><span class="cF7">{</span><span class="cF0">
+<a name="l123"></a>        HtmlPutS(l_out,cur_u8_attr,&amp;old_c,</span><span class="cF6">"\n"</span><span class="cF0">,&amp;col,style_bitmap);
+<a name="l124"></a>        y++;
+<a name="l125"></a>        </span><span class="cF1">if</span><span class="cF0"> (line_anchors &amp;&amp; y!=old_y) {
+<a name="l126"></a>          LtfPrintF(l_out,</span><span class="cF6">"&lt;a name=\"l%d\"&gt;&lt;/a&gt;"</span><span class="cF0">,y+1);
+<a name="l127"></a>          old_y=y;
+<a name="l128"></a>        }
+<a name="l129"></a>        col=0;
+<a name="l130"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l131"></a>
+<a name="l132"></a>      no_backward=TRUE;
+<a name="l133"></a>      cl2=cl-&gt;next;
+<a name="l134"></a>      </span><span class="cF1">while</span><span class="cF0"> (cl2!=l_in &amp;&amp; cl2-&gt;y==cl-&gt;y) </span><span class="cF7">{</span><span class="cF0">
+<a name="l135"></a>        </span><span class="cF1">if</span><span class="cF0"> (cl2-&gt;x&lt;cl-&gt;x) {
+<a name="l136"></a>          no_backward=FALSE;
+<a name="l137"></a>          </span><span class="cF1">break</span><span class="cF0">;
+<a name="l138"></a>        }
+<a name="l139"></a>        cl2=cl2-&gt;next;
+<a name="l140"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l141"></a>      </span><span class="cF1">if</span><span class="cF0"> (no_backward)
+<a name="l142"></a>        </span><span class="cF1">while</span><span class="cF0"> (col&lt;cl-&gt;x)
+<a name="l143"></a>          HtmlPutS(l_out,cur_u8_attr,&amp;old_c,</span><span class="cF6">" "</span><span class="cF0">,&amp;col,style_bitmap);
+<a name="l144"></a>
+<a name="l145"></a>      </span><span class="cF1">if</span><span class="cF0"> (cl-&gt;flags&amp;LTFLF_HTML_LINK) </span><span class="cF7">{</span><span class="cF0">
+<a name="l146"></a>        </span><span class="cF1">if</span><span class="cF0"> (old_c!=-1) {
+<a name="l147"></a>          LtfPutS(l_out,</span><span class="cF6">"&lt;/span&gt;"</span><span class="cF0">);
+<a name="l148"></a>          old_c=-1;
+<a name="l149"></a>        }
+<a name="l150"></a>        LtfPrintF(l_out,</span><span class="cF6">"&lt;a href=\"%s\"&gt;"</span><span class="cF0">,cl-&gt;html_link);
+<a name="l151"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l152"></a>      </span><span class="cF1">if</span><span class="cF0"> (cl-&gt;settings)
+<a name="l153"></a>        s=cl-&gt;settings;
+<a name="l154"></a>      cur_u8_attr=cl-&gt;type.u8[1];
+<a name="l155"></a>      </span><span class="cF1">switch</span><span class="cF0"> (cl-&gt;type_u8) </span><span class="cF7">{</span><span class="cF0">
+<a name="l156"></a>        </span><span class="cF1">case</span><span class="cF0"> LTFT_TEXT:
+<a name="l157"></a>          </span><span class="cF1">if</span><span class="cF0"> (cl-&gt;flags&amp;LTFLF_HIGHLIGHT) {
+<a name="l158"></a>            src=hl=LtfHighlight(l_in,FALSE,cl,&amp;s,cl-&gt;tag,StrLen</span><span class="cF7">(</span><span class="cF0">cl-&gt;tag</span><span class="cF7">)</span><span class="cF0">,cur_u8_attr&lt;&lt;8);
+<a name="l159"></a>            </span><span class="cF1">while</span><span class="cF0"> (*src) </span><span class="cF7">{</span><span class="cF0">
+<a name="l160"></a>              st[0]=*src&amp;0xFF;
+<a name="l161"></a>              HtmlPutS(l_out,*src&gt;&gt;8,&amp;old_c,st,&amp;col,style_bitmap);
+<a name="l162"></a>              src++;
+<a name="l163"></a>            </span><span class="cF7">}</span><span class="cF0">
+<a name="l164"></a>            Free(hl);
+<a name="l165"></a>          } </span><span class="cF1">else</span><span class="cF0">
+<a name="l166"></a>            HtmlPutS(l_out,cur_u8_attr,&amp;old_c,cl-&gt;tag,&amp;col,style_bitmap);
+<a name="l167"></a>          </span><span class="cF1">break</span><span class="cF0">;
+<a name="l168"></a>        </span><span class="cF1">case</span><span class="cF0"> LTFT_TAB:
+<a name="l169"></a>          HtmlPutS(l_out,cur_u8_attr,&amp;old_c,</span><span class="cF6">"\t"</span><span class="cF0">,&amp;col,style_bitmap);
+<a name="l170"></a>          </span><span class="cF1">break</span><span class="cF0">;
+<a name="l171"></a>        </span><span class="cF1">case</span><span class="cF0"> LTFT_HTML_IMG:
+<a name="l172"></a>          </span><span class="cF1">if</span><span class="cF0"> (old_c!=-1) {
+<a name="l173"></a>            LtfPutS(l_out,</span><span class="cF6">"&lt;/span&gt;"</span><span class="cF0">);
+<a name="l174"></a>            old_c=-1;
+<a name="l175"></a>          }
+<a name="l176"></a>          LtfPrintF(l_out,</span><span class="cF6">"&lt;img src=\"%s\" width=\"640\" height=\"480\" alt=\"\"&gt;\n"</span><span class="cF0">,cl-&gt;tag);
+<a name="l177"></a>          </span><span class="cF1">break</span><span class="cF0">;
+<a name="l178"></a>        </span><span class="cF1">case</span><span class="cF0"> LTFT_HTML_VIDEO:
+<a name="l179"></a>          </span><span class="cF1">if</span><span class="cF0"> (old_c!=-1) {
+<a name="l180"></a>            LtfPutS(l_out,</span><span class="cF6">"&lt;/span&gt;"</span><span class="cF0">);
+<a name="l181"></a>            old_c=-1;
+<a name="l182"></a>          }
+<a name="l183"></a>          LtfPrintF(l_out,
+<a name="l184"></a>                </span><span class="cF6">"&lt;!--begin exclude--&gt;\n"</span><span class="cF0">
+<a name="l185"></a>                </span><span class="cF6">"&lt;object classid=\"clsid:22D6F312-B0F6-11D0-94AB-0080C74C7E95\" "</span><span class="cF0">
+<a name="l186"></a>                </span><span class="cF6">"codebase=\"http://activex.microsoft.com/activex/controls/mplayer/en/nsmp2inf.cab\" "</span><span class="cF0">
+<a name="l187"></a>                </span><span class="cF6">"width=\"640\" height=\"512\"&gt;\n"</span><span class="cF0">
+<a name="l188"></a>                </span><span class="cF6">"&lt;param name=\"FileName\" value=\"%s\"&gt;\n"</span><span class="cF0">
+<a name="l189"></a>                </span><span class="cF6">"&lt;param name=\"AutoStart\" value=\"false\"&gt;\n"</span><span class="cF0">
+<a name="l190"></a>                </span><span class="cF6">"&lt;param name=\"ShowTracker\" value=\"true\"&gt;\n"</span><span class="cF0">
+<a name="l191"></a>                </span><span class="cF6">"&lt;param name=\"ShowControls\" value=\"true\"&gt;\n"</span><span class="cF0">
+<a name="l192"></a>                </span><span class="cF6">"&lt;param name=\"ShowGotoBar\" value=\"false\"&gt;\n"</span><span class="cF0">
+<a name="l193"></a>                </span><span class="cF6">"&lt;param name=\"ShowDisplay\" value=\"false\"&gt;\n"</span><span class="cF0">
+<a name="l194"></a>                </span><span class="cF6">"&lt;param name=\"ShowStatusBar\" value=\"false\"&gt;\n"</span><span class="cF0">
+<a name="l195"></a>                </span><span class="cF6">"&lt;param name=\"AutoSize\" value=\"false\"&gt;\n"</span><span class="cF0">
+<a name="l196"></a>                </span><span class="cF6">"&lt;embed src=\"%s\" AutoStart=\"false\" ShowTracker=\"true\" ShowControls=\"true\" "</span><span class="cF0">
+<a name="l197"></a>                </span><span class="cF6">"ShowGotoBar=\"false\" ShowDisplay=\"false\" ShowStatusBar=\"false\" "</span><span class="cF0">
+<a name="l198"></a>                </span><span class="cF6">"AutoSize=\"false\" pluginspage=\"http://www.microsoft.com/windows/windowsmedia/download/\" "</span><span class="cF0">
+<a name="l199"></a>                </span><span class="cF6">"width=\"640\" height=\"512\"&gt;&lt;/embed&gt;&lt;/object&gt;\n"</span><span class="cF0">
+<a name="l200"></a>                </span><span class="cF6">"&lt;!--end exclude--&gt;\n"</span><span class="cF0">,cl-&gt;tag,cl-&gt;tag);
+<a name="l201"></a>          </span><span class="cF1">break</span><span class="cF0">;
+<a name="l202"></a>        </span><span class="cF1">case</span><span class="cF0"> LTFT_HTML_CODE:
+<a name="l203"></a>          </span><span class="cF1">if</span><span class="cF0"> (old_c!=-1) {
+<a name="l204"></a>            LtfPutS(l_out,</span><span class="cF6">"&lt;/span&gt;"</span><span class="cF0">);
+<a name="l205"></a>            old_c=-1;
+<a name="l206"></a>          }
+<a name="l207"></a>          LtfPutS(l_out,cl-&gt;tag);
+<a name="l208"></a>          </span><span class="cF1">break</span><span class="cF0">;
+<a name="l209"></a>        </span><span class="cF1">case</span><span class="cF0"> LTFT_PICTURE:
+<a name="l210"></a>          HtmlPutS(l_out,cur_u8_attr,&amp;old_c,cl-&gt;tag,&amp;col,style_bitmap);
+<a name="l211"></a>          HtmlPutS(l_out,s-&gt;comment_attr&amp;15+old_c&amp;0xF0,&amp;old_c,</span><span class="cF6">"/* Graphics Not Rendered in HTML */"</span><span class="cF0">,&amp;col,style_bitmap);
+<a name="l212"></a>          </span><span class="cF1">break</span><span class="cF0">;
+<a name="l213"></a>        </span><span class="cF1">default</span><span class="cF0">:
+<a name="l214"></a>          </span><span class="cF1">if</span><span class="cF0"> (Bt</span><span class="cF7">(</span><span class="cF0">ltf_tag_types,cl-&gt;type_u8</span><span class="cF7">)</span><span class="cF0">)
+<a name="l215"></a>            HtmlPutS(l_out,cur_u8_attr,&amp;old_c,cl-&gt;tag,&amp;col,style_bitmap);
+<a name="l216"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l217"></a>      </span><span class="cF1">if</span><span class="cF0"> (cl-&gt;flags&amp;LTFLF_HTML_LINK) </span><span class="cF7">{</span><span class="cF0">
+<a name="l218"></a>        </span><span class="cF1">if</span><span class="cF0"> (old_c!=-1) {
+<a name="l219"></a>          LtfPutS(l_out,</span><span class="cF6">"&lt;/span&gt;"</span><span class="cF0">);
+<a name="l220"></a>          old_c=-1;
+<a name="l221"></a>        }
+<a name="l222"></a>        LtfPutS(l_out,</span><span class="cF6">"&lt;/a&gt;"</span><span class="cF0">);
+<a name="l223"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l224"></a>    }
+<a name="l225"></a>    cl=cl-&gt;next;
+<a name="l226"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l227"></a>  </span><span class="cF1">while</span><span class="cF0"> (y&lt;cl-&gt;y) </span><span class="cF7">{</span><span class="cF0">
+<a name="l228"></a>    HtmlPutS(l_out,cur_u8_attr,&amp;old_c,</span><span class="cF6">"\n"</span><span class="cF0">,&amp;col,style_bitmap);
+<a name="l229"></a>    y++;
+<a name="l230"></a>    col=0;
+<a name="l231"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l232"></a>  </span><span class="cF1">if</span><span class="cF0"> (old_c!=-1) </span><span class="cF7">{</span><span class="cF0">
+<a name="l233"></a>    LtfPutS(l_out,</span><span class="cF6">"&lt;/span&gt;"</span><span class="cF0">);
+<a name="l234"></a>    old_c=-1;
+<a name="l235"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l236"></a>  LtfPutS(l_out,body_footer);
+<a name="l237"></a>  LtfPutS(l_out,</span><span class="cF6">"&lt;/pre&gt;&lt;/body&gt;\n&lt;/html&gt;\n"</span><span class="cF0">);
+<a name="l238"></a>
+<a name="l239"></a>  l_out-&gt;cur_entry=style-&gt;next;
+<a name="l240"></a>  </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;256;i++)
+<a name="l241"></a>    </span><span class="cF1">if</span><span class="cF0"> (Bt</span><span class="cF7">(</span><span class="cF0">style_bitmap,i</span><span class="cF7">)</span><span class="cF0">)
+<a name="l242"></a>      LtfPrintF(l_out,</span><span class="cF6">".c%02X{color:#%02x%02x%02x;background-color:#%02x%02x%02x;}\n"</span><span class="cF0">,i,p[i&amp;15].r,p[i&amp;15].g,p[i&amp;15].b,p[i/16].r,p[i/16].g,p[i/16].b);
+<a name="l243"></a>  l_out-&gt;cur_entry=&amp;l_out-&gt;root;
+<a name="l244"></a>  l_out-&gt;recalc_start=l_out;
+<a name="l245"></a>  LtfRecalc(l_out);
+<a name="l246"></a>
+<a name="l247"></a>  </span><span class="cF1">if</span><span class="cF0"> (unlock_l)
+<a name="l248"></a>    LtfUnlock(l_in);
+<a name="l249"></a>  </span><span class="cF1">return</span><span class="cF0"> l_out;
+<a name="l250"></a>}
+<a name="l251"></a>
+<a name="l252"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">U0</span><span class="cF0"> ToHtml(</span><span class="cF1">U8</span><span class="cF0"> *_in_name,</span><span class="cF1">U8</span><span class="cF0"> *_out_name=NULL,</span><span class="cF1">U8</span><span class="cF0"> *html_header=NULL,
+<a name="l253"></a>  </span><span class="cF1">U8</span><span class="cF0"> *body_header=NULL,</span><span class="cF1">U8</span><span class="cF0"> *body_footer=NULL,</span><span class="cF1">I64</span><span class="cF0"> width=80,BoolI8 line_anchors=TRUE)
+<a name="l254"></a>{
+<a name="l255"></a>  </span><span class="cF1">U8</span><span class="cF0"> *in_name,*out_name;
+<a name="l256"></a>  Ltf *l_in,*l_out;
+<a name="l257"></a>
+<a name="l258"></a>  SettingsPush; </span><span class="cF2">//See </span><a href="/archive/LTHtml/Adam/TaskSettings.html#l3"><span class="cF4">SettingsPush</span></a><span class="cF0">
+<a name="l259"></a>  SetWinHorz(0,width-1); </span><span class="cF2">//This sets doc width for word wrap</span><span class="cF0">
+<a name="l260"></a>
+<a name="l261"></a>  in_name=DftExt(_in_name,</span><span class="cF6">"CPZ"</span><span class="cF0">),
+<a name="l262"></a>  </span><span class="cF1">if</span><span class="cF0"> (_out_name)
+<a name="l263"></a>    out_name=DftExt(_out_name,</span><span class="cF6">"html"</span><span class="cF0">);
+<a name="l264"></a>  </span><span class="cF1">else</span><span class="cF0">
+<a name="l265"></a>    out_name=ChgExt(_in_name,</span><span class="cF6">"html"</span><span class="cF0">);
+<a name="l266"></a>
+<a name="l267"></a>  l_in=LtfRead(in_name);
+<a name="l268"></a>  l_out=Ltf2Html(l_in,html_header,body_header,body_footer,line_anchors);
+<a name="l269"></a>  StrCpy(&amp;l_out-&gt;filename.name,out_name);
+<a name="l270"></a>
+<a name="l271"></a>  SettingsPop;
+<a name="l272"></a>
+<a name="l273"></a>  LtfWrite(l_out);
+<a name="l274"></a>  LtfDel(l_in);
+<a name="l275"></a>  LtfDel(l_out);
+<a name="l276"></a>  Free(in_name);
+<a name="l277"></a>  Free(out_name);
+<a name="l278"></a>}
+<a name="l279"></a>
+<a name="l280"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">""</span><span class="cF0">
+</span></pre><div class="archive-note">Historical capture: 2012-03-02. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

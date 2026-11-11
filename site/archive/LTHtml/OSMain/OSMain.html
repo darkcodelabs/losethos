@@ -1,0 +1,341 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>OSMain</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V8.00" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cF5">                               <a href="/archive/LTHtml/Doc/TrivialSolutions.html">Trivial Solutions</a>
+                    <a href="/archive/index.html">The LoseThos 64-bit PC Operating System</a>
+File:/LT/OSMain/OSMain.CPZ
+This, and all LoseThos files, are public domain.  Do whatever you like.
+God is watching; God is just; God is never out-done in generosity.  He talks!
+
+LoseThos code compiles with the 64-bit LoseThos compiler/assembler I wrote.
+Boot the LoseThos CD and you can compile it.  Not in Kansas anymore!
+
+<a href="/archive/LTHtml/Demo/Lectures/FixedPoint.html">Click here for preliminary compiler information you need.</a>
+
+</span><a name="l1"></a><span class="cF8">Project: OSMain</span><span class="cF0">
+<a name="l2"></a>
+<a name="l3"></a></span><span class="cF1">U0</span><span class="cF0"> DateTimeFmtMapsRst()
+<a name="l4"></a>{
+<a name="l5"></a>  </span><span class="cF1">I64</span><span class="cF0"> i;
+<a name="l6"></a>  </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;NUM_DATE_FMTS;i++)
+<a name="l7"></a>    date_fmt_map[i]=i;
+<a name="l8"></a>  </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;NUM_TIME_FMTS;i++)
+<a name="l9"></a>    time_fmt_map[i]=i;
+<a name="l10"></a>}
+<a name="l11"></a>
+<a name="l12"></a></span><span class="cF1">U0</span><span class="cF0"> SysGlblsInit()
+<a name="l13"></a>{
+<a name="l14"></a>  </span><span class="cF1">I64</span><span class="cF0"> i,j;
+<a name="l15"></a>  </span><span class="cF1">U8</span><span class="cF0"> *m;
+<a name="l16"></a>  RaxRbxRcxRdx ee;
+<a name="l17"></a>
+<a name="l18"></a>  CpuId(0x1,&amp;ee);
+<a name="l19"></a>  sys_cache_line_width=ee.rbx.u8[1]*8;
+<a name="l20"></a>  sys_pci_dev_root.next=sys_pci_dev_root.last=&amp;sys_pci_dev_root;
+<a name="l21"></a>  sys_rnd_seed = 93186752^GetTimeStamp;
+<a name="l22"></a>  sys_focus_task=Fs;
+<a name="l23"></a>  sys_macro_root.next=sys_macro_root.last=&amp;sys_macro_root;
+<a name="l24"></a>  sys_dft_iso_name=</span><span class="cF6">"::/Temp/CDDVD.ISO"</span><span class="cF0">;
+<a name="l25"></a>  MemSet(mp_apic_ids,0,MP_MAX_PROCESSORS*</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF1">U8</span><span class="cF7">)</span><span class="cF0">);
+<a name="l26"></a>  MemSet(sys_usb_devs,0,MAX_USB*</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF0">LTUSB</span><span class="cF7">)</span><span class="cF0">);
+<a name="l27"></a>
+<a name="l28"></a>  InDbg(ON);
+<a name="l29"></a>
+<a name="l30"></a>  reverse_bits_table=CAlloc(256);
+<a name="l31"></a>  </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;256;i++)
+<a name="l32"></a>    </span><span class="cF1">for</span><span class="cF0"> (j=0;j&lt;8;j++)
+<a name="l33"></a>      </span><span class="cF1">if</span><span class="cF0"> (Bt</span><span class="cF7">(</span><span class="cF0">&amp;i,7-j</span><span class="cF7">)</span><span class="cF0">)
+<a name="l34"></a>        LBts(reverse_bits_table+i,j);
+<a name="l35"></a>  set_bits_table=CAlloc(256);
+<a name="l36"></a>  </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;256;i++)
+<a name="l37"></a>    </span><span class="cF1">for</span><span class="cF0"> (j=0;j&lt;8;j++)
+<a name="l38"></a>      </span><span class="cF1">if</span><span class="cF0"> (Bt</span><span class="cF7">(</span><span class="cF0">&amp;i,j</span><span class="cF7">)</span><span class="cF0">)
+<a name="l39"></a>        set_bits_table[i]++;
+<a name="l40"></a>
+<a name="l41"></a>  ext=CAlloc(EXT_TABLE_SIZE*</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF1">U0</span><span class="cF0"> *</span><span class="cF7">)</span><span class="cF0">);
+<a name="l42"></a>  ext[EXT_DEBUGGER]=&amp;SysDbgEnter;
+<a name="l43"></a>  ext[EXT_EXIT_DEBUGGER]=&amp;SysDbgExit;
+<a name="l44"></a>  fp_mgets=&amp;SysMGetS;
+<a name="l45"></a>
+<a name="l46"></a>  fp_ctrl_alt_let_cbs=CAlloc(26*</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF1">U0</span><span class="cF0"> *</span><span class="cF7">)</span><span class="cF0">);
+<a name="l47"></a>  ctrl_alt_let_descs=CAlloc(26*</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF1">U8</span><span class="cF0"> *</span><span class="cF7">)</span><span class="cF0">);;
+<a name="l48"></a>  ctrl_alt_let_in_irq_flags=0;
+<a name="l49"></a>
+<a name="l50"></a>  psect_cache=CAlloc(PSECT_CACHE_SIZE*</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF0">PSectCacheEntry</span><span class="cF7">)</span><span class="cF0">);
+<a name="l51"></a>  psect_cache_index=0;
+<a name="l52"></a>
+<a name="l53"></a>  StrCpy(sys_temp_filename,</span><span class="cF6">"HOME/Temp.TXZ"</span><span class="cF0">);
+<a name="l54"></a>  MemSet(&amp;sys_put_key_root,0,</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF0">KeyDevStruct</span><span class="cF7">)</span><span class="cF0">);
+<a name="l55"></a>  sys_put_key_root.next=sys_put_key_root.last=&amp;sys_put_key_root;
+<a name="l56"></a>  KeyDevAdd(&amp;AKDInputFilterPutKey,&amp;AKDInputFilterPutS,0x40000000,FALSE);
+<a name="l57"></a>  KeyDevAdd(&amp;AKDTaskPutKey,&amp;AKDTaskPutS,0x50000000,TRUE);
+<a name="l58"></a>  KeyDevAdd(&amp;AKDRawDisplayPutKey,&amp;AKDRawDisplayPutS,0x60000000,FALSE);
+<a name="l59"></a>  #</span><span class="cF1">exe</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l60"></a>    StreamPrintF(</span><span class="cF6">"sys_acct_name=\"%s\";"</span><span class="cF0">,osmain_cfg-&gt;acct_name);
+<a name="l61"></a>    StreamPutS(</span><span class="cF6">"#exe{OptOff(OPTf_PAREN_WARN);}"</span><span class="cF0">);
+<a name="l62"></a>    StreamPrintF(</span><span class="cF6">"LTDCInit(%s);"</span><span class="cF0">,osmain_cfg-&gt;dsk_cache_size_exp);
+<a name="l63"></a>    StreamPutS(</span><span class="cF6">"#exe{OptOn(OPTf_PAREN_WARN);}"</span><span class="cF0">);
+<a name="l64"></a>  </span><span class="cF7">}</span><span class="cF0">;
+<a name="l65"></a>  pow10_I64=CAlloc(</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF1">F64</span><span class="cF7">)</span><span class="cF0">*</span><span class="cF7">(</span><span class="cF0">308+308+1</span><span class="cF7">)</span><span class="cF0">);
+<a name="l66"></a>  </span><span class="cF1">for</span><span class="cF0"> (i=-308;i&lt;309;i++)
+<a name="l67"></a>    pow10_I64[i+309]=Pow10(i);
+<a name="l68"></a>
+<a name="l69"></a></span><span class="cF2">//</span><span class="cF8">Independent Heap Ctrl Example</span><span class="cF0">
+<a name="l70"></a>  i=1; </span><span class="cF2">//Request 1 blk, we might get more.</span><span class="cF0">
+<a name="l71"></a>  m=AllocUncachedMemBlks(&amp;i,sys_code_bp);
+<a name="l72"></a>  sys_uncached_heap=IndependentHeapCtrlInit(m,i*0x200000/0x200);
+<a name="l73"></a>  ProgressBarsRst;
+<a name="l74"></a>  date_fmt_map=MAlloc(NUM_DATE_FMTS);
+<a name="l75"></a>  time_fmt_map=MAlloc(NUM_TIME_FMTS);
+<a name="l76"></a>  DateTimeFmtMapsRst;
+<a name="l77"></a>}
+<a name="l78"></a>
+<a name="l79"></a></span><span class="cF1">U0</span><span class="cF0"> SysGrInit()
+<a name="l80"></a>{
+<a name="l81"></a></span><span class="cF2">//See </span><a href="https://web.archive.org/web/20120309144040/http://www.losethos.com/LTHtml/OSMain/OSStartUp.html#l140"><span class="cF4">SYS_BIOS_GR_MODE</span></a><span class="cF0">
+<a name="l82"></a></span><span class="cF2">//See </span><a href="https://web.archive.org/web/20120309144040/http://www.losethos.com/LTHtml/Adam/Gr/GrCfg.html"><span class="cF4">::/LT/Adam/Gr/GrCfg.APZ</span></a><span class="cF0">
+<a name="l83"></a>  gr_font=sys_font_8x8;
+<a name="l84"></a>  </span><span class="cF1">if</span><span class="cF0"> (bios_gr_mode==0x12 || bios_gr_mode==0x6A) </span><span class="cF7">{</span><span class="cF0">
+<a name="l85"></a>    text_mode=FALSE;
+<a name="l86"></a>
+<a name="l87"></a></span><span class="cF2">/*</span><span class="cF0">
+<a name="l88"></a></span><span class="cF2">Mode must be multiple of 32 wide</span><span class="cF0">
+<a name="l89"></a></span><a href="https://web.archive.org/web/20120309144040/http://www.losethos.com/LTHtml/Adam/Gr/GrAsm.html#l594"><span class="cF4">GrUpdateLine32</span></a><span class="cF2">().</span><span class="cF0">
+<a name="l90"></a></span><a href="/archive/LTHtml/Adam/Gr/GrBitMap.html#l761"><span class="cF4">GrDCBlotWithMask</span></a><span class="cF2">().</span><span class="cF0">
+<a name="l91"></a></span><span class="cF2">*/</span><span class="cF0">
+<a name="l92"></a>
+<a name="l93"></a>    </span><span class="cF1">if</span><span class="cF0"> (bios_gr_mode==0x6A) {
+<a name="l94"></a>      gr_width =800;
+<a name="l95"></a>      gr_height=600;
+<a name="l96"></a>    } </span><span class="cF1">else</span><span class="cF0"> {
+<a name="l97"></a>      gr_width =640;
+<a name="l98"></a>      gr_height=480;
+<a name="l99"></a>    }
+<a name="l100"></a>    text_cols=gr_width/FONT_WIDTH;
+<a name="l101"></a>    text_rows=gr_height/FONT_HEIGHT;
+<a name="l102"></a>    OutU8(VGA_SC_INDEX,VGA_MAP_MASK);
+<a name="l103"></a>    OutU8(VGA_SC_DATA,0x0F);
+<a name="l104"></a>    MemSet(VGA_GRAPHIC_MEM_BASE,0,gr_width*gr_height&gt;&gt;3);
+<a name="l105"></a>    sys_dc_screen_image=CAlloc(gr_width*gr_height/8);
+<a name="l106"></a>  </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l107"></a>    text_mode=TRUE;
+<a name="l108"></a>    gr_width =640;
+<a name="l109"></a>    gr_height=480;
+<a name="l110"></a>    text_cols=80;
+<a name="l111"></a>    text_rows=25;
+<a name="l112"></a>    MemSet(VGA_TEXT_MEM_BASE,0,text_rows*text_cols&lt;&lt;1);
+<a name="l113"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l114"></a>}
+<a name="l115"></a>
+<a name="l116"></a>
+<a name="l117"></a></span><span class="cF1">U0</span><span class="cF0"> TimersInit()
+<a name="l118"></a>{
+<a name="l119"></a>  </span><span class="cF1">U64</span><span class="cF0"> i,*qq;
+<a name="l120"></a>  </span><span class="cF1">U32</span><span class="cF0"> *_d;
+<a name="l121"></a>
+<a name="l122"></a>  OutU8(0x43,0x34);
+<a name="l123"></a>  OutU8(0x40,SYS_TIMER0_PERIOD);
+<a name="l124"></a>  OutU8(0x40,SYS_TIMER0_PERIOD&gt;&gt;8);
+<a name="l125"></a>
+<a name="l126"></a></span><span class="cF2">// High Precision Event Timer</span><span class="cF0">
+<a name="l127"></a>
+<a name="l128"></a>  </span><span class="cF1">if</span><span class="cF0"> (PCIReadU16</span><span class="cF7">(</span><span class="cF0">0,31,0,0</span><span class="cF7">)</span><span class="cF0">==0x8086) </span><span class="cF7">{</span><span class="cF0"> </span><span class="cF2">//Intel?</span><span class="cF0">
+<a name="l129"></a>    </span><span class="cF2">//D31 F0, cfg 0xF0=RCBA of PCI-LPC Bridge</span><span class="cF0">
+<a name="l130"></a>    _d=PCIReadU32(0,31,0,0xF0)&gt;&lt;(</span><span class="cF1">U8</span><span class="cF0"> *)&amp;~0x3FFF+0x3404; </span><span class="cF2">//HPET cfg</span><span class="cF0">
+<a name="l131"></a>  </span><span class="cF2">//7</span><span class="cF0">   </span><span class="cF2">enable</span><span class="cF0">
+<a name="l132"></a>  </span><span class="cF2">//1:0 HPET is at 0xFED00000,0xFED01000, 0xFED02000 or 0xFED03000.</span><span class="cF0">
+<a name="l133"></a>    *_d=*_d&amp;3|0x80;
+<a name="l134"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l135"></a>
+<a name="l136"></a>  qq=HPET_GCAP_ID;
+<a name="l137"></a>  i=*qq; </span><span class="cF2">//i.u32[1]= period in femtoS (10e-15)</span><span class="cF0">
+<a name="l138"></a>  </span><span class="cF1">if</span><span class="cF0"> (100000&lt;i.u32[1]&lt;1000000000) </span><span class="cF7">{</span><span class="cF0">
+<a name="l139"></a>    HPET_freq    =1000000000000000/i.u32[1];
+<a name="l140"></a>    HPET_kHz_freq=1000000000000/i.u32[1];
+<a name="l141"></a>    qq=HPET_GEN_CONF;
+<a name="l142"></a>    *qq|=1; </span><span class="cF2">//Enable counting</span><span class="cF0">
+<a name="l143"></a>  </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l144"></a>    HPET_freq=0;
+<a name="l145"></a>    HPET_kHz_freq=0;
+<a name="l146"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l147"></a>}
+<a name="l148"></a>
+<a name="l149"></a></span><span class="cF1">U0</span><span class="cF0"> IntsInit()
+<a name="l150"></a>{
+<a name="l151"></a></span><span class="cF2">//Init 8259</span><span class="cF0">
+<a name="l152"></a>  OutU8(0x20,0x11); </span><span class="cF2">//IW1</span><span class="cF0">
+<a name="l153"></a>  OutU8(0xA0,0x11); </span><span class="cF2">//IW1</span><span class="cF0">
+<a name="l154"></a>  PortNop;
+<a name="l155"></a>  OutU8(0x21,0x20); </span><span class="cF2">//IW2</span><span class="cF0">
+<a name="l156"></a>  OutU8(0xA1,0x28); </span><span class="cF2">//IW2</span><span class="cF0">
+<a name="l157"></a>  PortNop;
+<a name="l158"></a>  OutU8(0x21,0x04); </span><span class="cF2">//IW3</span><span class="cF0">
+<a name="l159"></a>  OutU8(0xA1,0x02); </span><span class="cF2">//IW3</span><span class="cF0">
+<a name="l160"></a>  PortNop;
+<a name="l161"></a>  OutU8(0x21,0x0D); </span><span class="cF2">//IW4</span><span class="cF0">
+<a name="l162"></a>  OutU8(0xA1,0x09); </span><span class="cF2">//IW4</span><span class="cF0">
+<a name="l163"></a>  PortNop;
+<a name="l164"></a>  OutU8(0x21,0xFA); </span><span class="cF2">//Mask all but IRQ0 (timer) and IRQ2 Cascade</span><span class="cF0">
+<a name="l165"></a>  OutU8(0xA1,0xFF);
+<a name="l166"></a>  PortNop;
+<a name="l167"></a>}
+<a name="l168"></a>
+<a name="l169"></a></span><span class="cF1">U0</span><span class="cF0"> Reboot()
+<a name="l170"></a>{
+<a name="l171"></a>  </span><span class="cF1">U16</span><span class="cF0"> *d=0x472;
+<a name="l172"></a>  Cli;
+<a name="l173"></a>  </span><span class="cF1">if</span><span class="cF0"> (mp_cnt&gt;1)
+<a name="l174"></a>    MPHalt;
+<a name="l175"></a>  MemMarkPresent(d,TRUE);
+<a name="l176"></a>  *d=0;
+<a name="l177"></a>  OutU8(0x70,0x8F);
+<a name="l178"></a>  OutU8(0x71,0x00);
+<a name="l179"></a>  OutU8(0x70,0x00);
+<a name="l180"></a>  OutU8(0x92,InU8</span><span class="cF7">(</span><span class="cF0">0x92</span><span class="cF7">)</span><span class="cF0">|1);
+<a name="l181"></a>  SysHlt;
+<a name="l182"></a>}
+<a name="l183"></a>
+<a name="l184"></a>BoolI64 AdamStartUpScripts()
+<a name="l185"></a>{
+<a name="l186"></a>  BoolI8 result=TRUE;
+<a name="l187"></a>  LexStruct *lx;
+<a name="l188"></a>  Cd(</span><span class="cF6">"/LT/OSMain"</span><span class="cF0">);
+<a name="l189"></a>  lx=LexNew(TextFileRead</span><span class="cF7">(</span><span class="cF6">"Adam1.APZ"</span><span class="cF7">)</span><span class="cF0">,1&lt;&lt;Lf_RAW_ERRORS,
+<a name="l190"></a>    StrNew</span><span class="cF7">(</span><span class="cF6">"::/LT/OSMain/Adam1.APZ"</span><span class="cF7">)</span><span class="cF0">);
+<a name="l191"></a>  InsQue(lx,Fs-&gt;last_lex);
+<a name="l192"></a>
+<a name="l193"></a>  </span><span class="cF2">//Continues Here </span><a href="/archive/LTHtml/OSMain/Adam1.html"><span class="cF4">/LT/OSMain/Adam1.APZ</span></a><span class="cF0">
+<a name="l194"></a>  </span><span class="cF1">try</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l195"></a>    Lex(lx);
+<a name="l196"></a>    ExeCmdLine(lx);
+<a name="l197"></a>    RemQue(lx);
+<a name="l198"></a>    LexDel(lx);
+<a name="l199"></a>  </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">catch</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l200"></a>    CatchAll;
+<a name="l201"></a>    result=FALSE;
+<a name="l202"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l203"></a>  </span><span class="cF1">return</span><span class="cF0"> result;
+<a name="l204"></a>}
+<a name="l205"></a>
+<a name="l206"></a></span><span class="cF1">U0</span><span class="cF0"> OSMain()
+<a name="l207"></a>{ </span><span class="cF2">//Continued from </span><a href="https://web.archive.org/web/20120309144040/http://www.losethos.com/LTHtml/OSMain/OSStartUp.html#l468"><span class="cF4">OSMain</span></a><span class="cF0">
+<a name="l208"></a>  adam_task=Fs;
+<a name="l209"></a>  HeapsInit;
+<a name="l210"></a>  LBts(&amp;sys_run_level,RLf_FULL_HEAP);
+<a name="l211"></a>  Fs-&gt;hash_table=HashTableNew(ADAM_HASH_SIZE,Fs);
+<a name="l212"></a>
+<a name="l213"></a>  SysGlblsInit;
+<a name="l214"></a>  Mem32BitDevInit;
+<a name="l215"></a>  MemMarkPagesNotPresent;
+<a name="l216"></a>  LoadOSMain;
+<a name="l217"></a>  SysGrInit;
+<a name="l218"></a>  StrCpy(Fs-&gt;task_name,</span><span class="cF6">"Adam Task CPU#0"</span><span class="cF0">);
+<a name="l219"></a>  StrCpy(Fs-&gt;task_title,Fs-&gt;task_name);
+<a name="l220"></a>  Fs-&gt;text_attr=WHITE&lt;&lt;4+PURPLE;
+<a name="l221"></a>  Fs-&gt;border_attr=WHITE&lt;&lt;4+LTPURPLE;
+<a name="l222"></a>  Fs-&gt;win_right=text_cols-2;
+<a name="l223"></a>  Fs-&gt;win_top++;
+<a name="l224"></a>  TaskDerivedValsUpdate;
+<a name="l225"></a>
+<a name="l226"></a>  LoadSysStrs;
+<a name="l227"></a>  MPInit;
+<a name="l228"></a>  IDTInit;
+<a name="l229"></a>
+<a name="l230"></a></span><span class="cF2">//Before this point use </span><a href="https://web.archive.org/web/20120309144040/http://www.losethos.com/LTHtml/OSMain/Misc1a.html#l408"><span class="cF4">Snd</span></a><span class="cF2">() and </span><a href="https://web.archive.org/web/20120309144040/http://www.losethos.com/LTHtml/OSMain/Misc1a.html#l262"><span class="cF4">BusyWait</span></a><span class="cF2">()</span><span class="cF0">
+<a name="l231"></a></span><span class="cF2">//to debug.  After this point, use </span><a href="https://web.archive.org/web/20120309144040/http://www.losethos.com/LTHtml/OSMain/Dbg1a.html#l183"><span class="cF4">DbgNum</span></a><span class="cF2">()</span><span class="cF0">
+<a name="l232"></a>  LBts(&amp;sys_run_level,RLf_RAW);
+<a name="l233"></a>
+<a name="l234"></a>  </span><span class="cF1">if</span><span class="cF0"> (BIOSTotalMem&lt;250*0x100000)
+<a name="l235"></a>    Dbg(</span><span class="cF6">"Requires 256 Meg of RAM Memory"</span><span class="cF0">);
+<a name="l236"></a>
+<a name="l237"></a>  TimersInit;
+<a name="l238"></a>  IntsInit;
+<a name="l239"></a>  IntsInit; </span><span class="cF2">//Maybe we had slave IRQ pending, so do it again</span><span class="cF0">
+<a name="l240"></a>
+<a name="l241"></a>  </span><span class="cF6">"Enable IRQ's\n"</span><span class="cF0">;
+<a name="l242"></a>  SetFlags(SYS_NORMAL_RFLAGS);
+<a name="l243"></a>  BusyWait(2000);
+<a name="l244"></a>  IDTInitComplete;
+<a name="l245"></a>  LBts(&amp;sys_run_level,RLf_INTERRUPTS);
+<a name="l246"></a>  TimeStampFreqCal;
+<a name="l247"></a>  Preempt(ON);
+<a name="l248"></a>
+<a name="l249"></a>#</span><span class="cF1">exe</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l250"></a>  </span><span class="cF1">if</span><span class="cF0"> (!osmain_cfg-&gt;opts[CFG_NO_MP])
+<a name="l251"></a>    StreamPutS(</span><span class="cF6">"\"MultiCore Start\\r\\n\";"</span><span class="cF0">
+<a name="l252"></a>               </span><span class="cF6">"MPStart;"</span><span class="cF0">);
+<a name="l253"></a></span><span class="cF7">}</span><span class="cF0">;
+<a name="l254"></a>  LBts(&amp;sys_run_level,RLf_MP);
+<a name="l255"></a>
+<a name="l256"></a></span><span class="cF2">//  USBInitAll;</span><span class="cF0">
+<a name="l257"></a>
+<a name="l258"></a>  KbdMouseVarsInit;
+<a name="l259"></a>  IPVarsInit;
+<a name="l260"></a>  KbdInit;
+<a name="l261"></a>
+<a name="l262"></a>  </span><span class="cF2">//Just call directly if debugging</span><span class="cF0">
+<a name="l263"></a>  </span><span class="cF2">//MouseDriverInstall;</span><span class="cF0">
+<a name="l264"></a>  </span><span class="cF1">if</span><span class="cF0"> (mp_cnt&gt;1)
+<a name="l265"></a>    MPSpawn(&amp;MouseDriverInstall);
+<a name="l266"></a>  </span><span class="cF1">else</span><span class="cF0">
+<a name="l267"></a>    Spawn(&amp;MouseDriverInstall);
+<a name="l268"></a>
+<a name="l269"></a>  </span><span class="cF6">"BlkDevsInitAll\n"</span><span class="cF0">;
+<a name="l270"></a>  BlkDevsInitAll;
+<a name="l271"></a>  </span><span class="cF6">"BlkDevsInitAll Done\n"</span><span class="cF0">;
+<a name="l272"></a>#</span><span class="cF1">exe</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l273"></a>  </span><span class="cF1">if</span><span class="cF0"> (osmain_cfg-&gt;cdrom_ports_pmt)
+<a name="l274"></a>    StreamPutS(</span><span class="cF6">"if (boot_drv_pmt) PutDefine(\"ST_CDROM_PORTS_PMT\");"</span><span class="cF0">);
+<a name="l275"></a></span><span class="cF7">}</span><span class="cF0">;
+<a name="l276"></a>  DrvDftSelect;
+<a name="l277"></a>  HomeDirRst;
+<a name="l278"></a>  LBts(&amp;sys_run_level,RLf_DSK);
+<a name="l279"></a>
+<a name="l280"></a>  </span><span class="cF6">"Loading Compiler\n"</span><span class="cF0">;
+<a name="l281"></a>  Cd(</span><span class="cF6">"/LT/Compiler"</span><span class="cF0">);
+<a name="l282"></a>  Load(</span><span class="cF6">"Compiler"</span><span class="cF0">,LDF_SILENT);
+<a name="l283"></a>
+<a name="l284"></a>  time_stamp_freq_initial=TimeStampFreqCal;
+<a name="l285"></a>  InDbg(OFF);
+<a name="l286"></a>  LBts(&amp;sys_run_level,RLf_COMPILER);
+<a name="l287"></a>
+<a name="l288"></a>  </span><span class="cF6">"Adam Start-Up Scripts...\n"</span><span class="cF0">;
+<a name="l289"></a>  </span><span class="cF1">if</span><span class="cF0"> (!AdamStartUpScripts)
+<a name="l290"></a>    Dbg(</span><span class="cF6">"Adam Start-Up Error"</span><span class="cF0">);
+<a name="l291"></a>
+<a name="l292"></a>  LBts(&amp;sys_run_level,RLf_ADAM_SERVER);
+<a name="l293"></a>  ServantTaskCont; </span><span class="cF2">//Never to return</span><span class="cF0">
+<a name="l294"></a>}
+<a name="l295"></a>
+<a name="l296"></a></span><span class="cF1">asm</span><span class="cF0"> {   </span><span class="cF1">ALIGN</span><span class="cF0">   16,OC_NOP
+<a name="l297"></a>SYS_OSMAIN_END::}
+</span></pre><div class="archive-note">Historical capture: 2012-03-09. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

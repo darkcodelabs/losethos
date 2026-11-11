@@ -1,0 +1,98 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>StkGrow</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V8.00" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cF5">                               <a href="/archive/LTHtml/Doc/TrivialSolutions.html">Trivial Solutions</a>
+                    <a href="/archive/index.html">The LoseThos 64-bit PC Operating System</a>
+File:/LT/Demo/StkGrow.CPZ
+This, and all LoseThos files, are public domain.  Do whatever you like.
+God is watching; God is just; God is never out-done in generosity.  He talks!
+
+LoseThos code compiles with the 64-bit LoseThos compiler/assembler I wrote.
+Boot the LoseThos CD and you can compile it.  Not in Kansas anymore!
+
+<a href="/archive/LTHtml/Demo/Lectures/FixedPoint.html">Click here for preliminary compiler information you need.</a>
+
+</span><a name="l1"></a><span class="cF1">I64</span><span class="cF0"> Recurse(</span><span class="cF1">I64</span><span class="cF0"> n)
+<a name="l2"></a>{
+<a name="l3"></a>  </span><span class="cF1">if</span><span class="cF0"> (n)
+<a name="l4"></a>    </span><span class="cF1">return</span><span class="cF0"> 1+CallStkGrow(0x800,0x1000000,&amp;Recurse,n-1);
+<a name="l5"></a>  </span><span class="cF1">else</span><span class="cF0">
+<a name="l6"></a>    </span><span class="cF1">return</span><span class="cF0"> 0;
+<a name="l7"></a>}
+<a name="l8"></a>
+<a name="l9"></a></span><span class="cF1">I64</span><span class="cF0"> Recurse2(</span><span class="cF1">I64</span><span class="cF0"> n)
+<a name="l10"></a>{
+<a name="l11"></a>  </span><span class="cF1">if</span><span class="cF0"> (n)
+<a name="l12"></a>    </span><span class="cF1">return</span><span class="cF0"> 1+Recurse2(n-1);
+<a name="l13"></a>  </span><span class="cF1">else</span><span class="cF0">
+<a name="l14"></a>    </span><span class="cF1">return</span><span class="cF0"> 0;
+<a name="l15"></a>}
+<a name="l16"></a>
+<a name="l17"></a></span><span class="cF1">I64</span><span class="cF0"> Recurse3(</span><span class="cF1">I64</span><span class="cF0"> n,</span><span class="cF1">I64</span><span class="cF0"> lo,</span><span class="cF1">I64</span><span class="cF0"> hi)
+<a name="l18"></a>{
+<a name="l19"></a>  </span><span class="cF1">if</span><span class="cF0"> (lo&lt;=n&lt;hi)
+<a name="l20"></a>    </span><span class="cF1">return</span><span class="cF0"> 1+Recurse3(n-1,lo,hi);
+<a name="l21"></a>  </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF1">if</span><span class="cF0"> (n)
+<a name="l22"></a>    </span><span class="cF1">return</span><span class="cF0"> Recurse3(n-1,lo,hi);
+<a name="l23"></a>  </span><span class="cF1">else</span><span class="cF0">
+<a name="l24"></a>    </span><span class="cF1">return</span><span class="cF0"> 0;
+<a name="l25"></a>}
+<a name="l26"></a>
+<a name="l27"></a>#</span><span class="cF1">define</span><span class="cF0"> DEPTH   (2*1024*1024)
+<a name="l28"></a>
+<a name="l29"></a></span><span class="cF1">U0</span><span class="cF0"> StkGrowDemo()
+<a name="l30"></a>{
+<a name="l31"></a>  </span><span class="cF1">F64</span><span class="cF0"> t0;
+<a name="l32"></a>
+<a name="l33"></a>  t0=tP;
+<a name="l34"></a>  </span><span class="cF6">"%X:%X\n"</span><span class="cF0">,DEPTH,Recurse(DEPTH);
+<a name="l35"></a>  </span><span class="cF6">"Time:%7.5fs\n"</span><span class="cF0">,tP-t0;
+<a name="l36"></a>
+<a name="l37"></a>  </span><span class="cF2">//If you know the max stack ahead of time...</span><span class="cF0">
+<a name="l38"></a>  </span><span class="cF2">//Recurse2's stack is 16 because you have 1 arg,</span><span class="cF0">
+<a name="l39"></a>  </span><span class="cF2">//a return addr and no local variables.</span><span class="cF0">
+<a name="l40"></a>  t0=tP;
+<a name="l41"></a>  </span><span class="cF6">"%X:%X\n"</span><span class="cF0">,DEPTH,CallStkGrow(DEPTH*16+0x800,DEPTH*16+0x800,&amp;Recurse2,DEPTH);
+<a name="l42"></a>  </span><span class="cF6">"Time:%7.5fs\n"</span><span class="cF0">,tP-t0;
+<a name="l43"></a>
+<a name="l44"></a>
+<a name="l45"></a>  </span><span class="cF2">//</span><a href="/archive/LTHtml/OSMain/Task1a.html#l67"><span class="cF4">CallStkGrow</span></a><span class="cF2">() works with multiple args.</span><span class="cF0">
+<a name="l46"></a>  t0=tP;
+<a name="l47"></a>  </span><span class="cF6">"%X:%X\n"</span><span class="cF0">,DEPTH,CallStkGrow(DEPTH*32+0x800,DEPTH*32+0x800,
+<a name="l48"></a>    &amp;Recurse3,DEPTH,1000,2000);
+<a name="l49"></a>  </span><span class="cF6">"Time:%7.5fs\n"</span><span class="cF0">,tP-t0;
+<a name="l50"></a>}
+<a name="l51"></a>
+<a name="l52"></a>StkGrowDemo;
+<a name="l53"></a>
+<a name="l54"></a></span><span class="cF2">//Be careful because you can fragment memory.</span><span class="cF0">
+</span></pre><div class="archive-note">Historical capture: 2012-03-09. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

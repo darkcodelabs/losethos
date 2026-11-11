@@ -1,0 +1,1199 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V7.07" name="generator"/>
+<style type="text/css">
+.c00{color:#000000;background-color:#000000;}
+.c02{color:#00a800;background-color:#000000;}
+.c03{color:#00a8a8;background-color:#000000;}
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cF5">                               <a href="/archive/doc/TrivialSolutions.html">Trivial Solutions</a>
+                    <a href="/archive/index.html">The LoseThos 64-bit PC Operating System</a>
+File:/LT/Apps/X-Caliber/X-Caliber.CPZ
+This, and all LoseThos files, are public domain.  Do whatever you like.
+God is watching; God is just; God is never out-done in generosity.  He talks!
+
+LoseThos code compiles with the 64-bit LoseThos compiler/assembler I wrote.
+Boot the LoseThos CD and you can compile it.  Not in Kansas anymore!
+
+<a href="/archive/code/FixedPoint.html">Click here for preliminary compiler information you need.</a>
+
+</span><a name="l1"></a><span class="cF2">/* I did not limit myself to real physics.  It's a game.</span><span class="cF0">
+<a name="l2"></a></span><span class="cF2">I suppose it shoots plazma blobs that have a delayed</span><span class="cF0">
+<a name="l3"></a></span><span class="cF2">explosion due to a chemical reaction timer.</span><span class="cF0">
+<a name="l4"></a>
+<a name="l5"></a></span><span class="cF2">The caliber of the gun is adjustible.</span><span class="cF0">
+<a name="l6"></a>
+<a name="l7"></a></span><span class="cF2">I did a simple anti-spin ctrller when you press cursor-down.</span><span class="cF0">
+<a name="l8"></a></span><span class="cF2">It's intentionally not very good.  It needs to take into</span><span class="cF0">
+<a name="l9"></a></span><span class="cF2">account flexing of the struts.  You'll notice when you</span><span class="cF0">
+<a name="l10"></a></span><span class="cF2">try to shoot the laser.</span><span class="cF0">
+<a name="l11"></a>
+<a name="l12"></a></span><span class="cF2">If you are interested in control theory, you might download</span><span class="cF0">
+<a name="l13"></a></span><span class="cF2">simstructure, a program I wrote.</span><span class="cF0">
+<a name="l14"></a>
+<a name="l15"></a></span><span class="cF2">http://www.losethos.com/files/SimStrSetup.exe</span><span class="cF0">
+<a name="l16"></a></span><span class="cF2">Product Key: L00-W10-M70</span><span class="cF0">
+<a name="l17"></a>
+<a name="l18"></a></span><span class="cF2">There's not sound in space and explosions</span><span class="cF0">
+<a name="l19"></a></span><span class="cF2">don't make shock waves, or something like that.</span><span class="cF0">
+<a name="l20"></a></span><span class="cF2">In X-Caliber, ships are destroyed by</span><span class="cF0">
+<a name="l21"></a></span><span class="cF2">causing springs to break due to acceleration</span><span class="cF0">
+<a name="l22"></a></span><span class="cF2">differences on different masses in a ship.</span><span class="cF0">
+<a name="l23"></a>
+<a name="l24"></a></span><span class="cF2">A real game would be dull with guided</span><span class="cF0">
+<a name="l25"></a></span><span class="cF2">missiles that always hit and lasers</span><span class="cF0">
+<a name="l26"></a></span><span class="cF2">that never miss.</span><span class="cF0">
+<a name="l27"></a>
+<a name="l28"></a></span><span class="cF2">Don't be anal.  If you aspire to making</span><span class="cF0">
+<a name="l29"></a></span><span class="cF2">games, do like Hollywood.  They know the</span><span class="cF0">
+<a name="l30"></a></span><span class="cF2">public isn't interested in realism.</span><span class="cF0">
+<a name="l31"></a>
+<a name="l32"></a></span><span class="cF2">*/</span><span class="cF0">
+<a name="l33"></a>
+<a name="l34"></a></span><span class="cF2">// ********************************** Glbls</span><span class="cF0">
+<a name="l35"></a>AcctRegSetDftEntry(</span><span class="cF6">"LT/XCaliber"</span><span class="cF0">,</span><span class="cF6">"I64 best_score=0;\r\n"</span><span class="cF0">);
+<a name="l36"></a>AcctRegExecuteBranch(</span><span class="cF6">"LT/XCaliber"</span><span class="cF0">);
+<a name="l37"></a>
+<a name="l38"></a></span><span class="cF1">class</span><span class="cF0"> MyMass:MassStruct
+<a name="l39"></a>{
+<a name="l40"></a>  </span><span class="cF1">F64</span><span class="cF0"> temperature;
+<a name="l41"></a>  </span><span class="cF1">F64</span><span class="cF0"> radius;
+<a name="l42"></a>  </span><span class="cF1">I64</span><span class="cF0"> color;
+<a name="l43"></a>};
+<a name="l44"></a>
+<a name="l45"></a></span><span class="cF1">class</span><span class="cF0"> MySpring:SpringStruct
+<a name="l46"></a>{
+<a name="l47"></a>  </span><span class="cF1">F64</span><span class="cF0"> strength;
+<a name="l48"></a>  </span><span class="cF1">I64</span><span class="cF0"> color;
+<a name="l49"></a>};
+<a name="l50"></a>
+<a name="l51"></a>
+<a name="l52"></a>#</span><span class="cF1">define</span><span class="cF0"> SPIN_GAIN               0.25
+<a name="l53"></a>#</span><span class="cF1">define</span><span class="cF0"> MAX_MASSES              8
+<a name="l54"></a>#</span><span class="cF1">define</span><span class="cF0"> MAX_SPRINGS             16
+<a name="l55"></a>#</span><span class="cF1">define</span><span class="cF0"> ST_HUMAN1               0
+<a name="l56"></a>#</span><span class="cF1">define</span><span class="cF0"> ST_ENEMY1               1
+<a name="l57"></a>#</span><span class="cF1">define</span><span class="cF0"> ST_ENEMY2               2
+<a name="l58"></a></span><span class="cF1">class</span><span class="cF0"> Ship
+<a name="l59"></a>{
+<a name="l60"></a>  Ship *next,*last;
+<a name="l61"></a>  </span><span class="cF1">I64</span><span class="cF0"> type,masses,springs;
+<a name="l62"></a>  MyMass   p[MAX_MASSES];
+<a name="l63"></a>  MySpring s[MAX_SPRINGS];
+<a name="l64"></a>  </span><span class="cF1">F64</span><span class="cF0"> fire_rate;
+<a name="l65"></a>  </span><span class="cF1">F64</span><span class="cF0"> reload_timeout,spacewalk_timeout;
+<a name="l66"></a>  </span><span class="cF1">F64</span><span class="cF0"> die_time,die_timeout;
+<a name="l67"></a>  </span><span class="cF1">I64</span><span class="cF0"> spacewalk_side;
+<a name="l68"></a>  </span><span class="cF1">F64</span><span class="cF0"> laser_temperature;
+<a name="l69"></a>  BoolI8 lasering,exploding,laser_overheat;
+<a name="l70"></a>} *human;
+<a name="l71"></a>
+<a name="l72"></a></span><span class="cF1">F64</span><span class="cF0"> human_t_left,human_t_right,human_antispin;
+<a name="l73"></a>
+<a name="l74"></a></span><span class="cF1">class</span><span class="cF0"> Bullet
+<a name="l75"></a>{
+<a name="l76"></a>  Bullet *next,*last;
+<a name="l77"></a>  </span><span class="cF1">F64</span><span class="cF0"> radius;
+<a name="l78"></a>  </span><span class="cF1">F64</span><span class="cF0"> fuse_time,die_timeout;
+<a name="l79"></a>  MyMass p;
+<a name="l80"></a>  BoolI8 exploding;
+<a name="l81"></a>};
+<a name="l82"></a>
+<a name="l83"></a>#</span><span class="cF1">define</span><span class="cF0"> MAX_THRUST      200.0
+<a name="l84"></a>#</span><span class="cF1">define</span><span class="cF0"> MAX_ANTISPIN    25.0
+<a name="l85"></a>#</span><span class="cF1">define</span><span class="cF0"> SPACEWALK_TIME  7.5
+<a name="l86"></a>
+<a name="l87"></a>#</span><span class="cF1">define</span><span class="cF0"> CMD_NULL        0
+<a name="l88"></a>#</span><span class="cF1">define</span><span class="cF0"> CMD_SPIN_LEFT   1
+<a name="l89"></a>#</span><span class="cF1">define</span><span class="cF0"> CMD_SPIN_RIGHT  2
+<a name="l90"></a>#</span><span class="cF1">define</span><span class="cF0"> CMD_THRUST      3
+<a name="l91"></a>#</span><span class="cF1">define</span><span class="cF0"> CMD_FIRE        4
+<a name="l92"></a>#</span><span class="cF1">define</span><span class="cF0"> CMD_EXIT        5
+<a name="l93"></a>BoolI8 game_over,show_level_msg;
+<a name="l94"></a>
+<a name="l95"></a>#</span><span class="cF1">define</span><span class="cF0"> NUM_STARS       100
+<a name="l96"></a></span><span class="cF1">I64</span><span class="cF0"> stars_x[NUM_STARS],stars_y[NUM_STARS];
+<a name="l97"></a>
+<a name="l98"></a>Ship ship_root;
+<a name="l99"></a>Bullet bullet_root;
+<a name="l100"></a>Ode *ode=NULL;
+<a name="l101"></a></span><span class="cF1">I64</span><span class="cF0"> level,score,remaining;
+<a name="l102"></a>
+<a name="l103"></a></span><span class="cF2">// ********************************** Pictures</span><span class="cF0">
+<a name="l104"></a>
+<a name="l105"></a>
+<a name="l106"></a></span><span class="c00">
+<a name="l107"></a></span><span class="c03">&lt;thruster&gt;</span><span class="c02">/* Graphics Not Rendered in HTML */</span><span class="c00">
+<a name="l108"></a>
+<a name="l109"></a></span><span class="c03">&lt;gun_ready&gt;</span><span class="c02">/* Graphics Not Rendered in HTML */</span><span class="c00">
+<a name="l110"></a>
+<a name="l111"></a></span><span class="c03">&lt;gun_busy&gt;</span><span class="c02">/* Graphics Not Rendered in HTML */</span><span class="c00">
+<a name="l112"></a>
+<a name="l113"></a>
+<a name="l114"></a></span><span class="c03">&lt;spacewalk&gt;</span><span class="c02">/* Graphics Not Rendered in HTML */</span><span class="c00">
+<a name="l115"></a>
+<a name="l116"></a>
+<a name="l117"></a></span><span class="c03">&lt;EnemySide&gt;</span><span class="c02">/* Graphics Not Rendered in HTML */</span><span class="c00">
+<a name="l118"></a>
+<a name="l119"></a>
+<a name="l120"></a></span><span class="c03">&lt;Laser&gt;</span><span class="c02">/* Graphics Not Rendered in HTML */</span><span class="c00">
+<a name="l121"></a>
+<a name="l122"></a></span><span class="cF0">
+<a name="l123"></a></span><span class="cF2">// ********************************** Ship</span><span class="cF0">
+<a name="l124"></a>BoolI64 CheckOverlap()
+<a name="l125"></a>{
+<a name="l126"></a>  D3 p;
+<a name="l127"></a>  MyMass *tempm,*tempm1;
+<a name="l128"></a>  tempm=ode-&gt;next_mass;
+<a name="l129"></a>  </span><span class="cF1">while</span><span class="cF0"> (tempm!=&amp;ode-&gt;next_mass) </span><span class="cF7">{</span><span class="cF0">
+<a name="l130"></a>    tempm1=ode-&gt;next_mass;
+<a name="l131"></a>    </span><span class="cF1">while</span><span class="cF0"> (tempm1!=&amp;ode-&gt;next_mass) {
+<a name="l132"></a>      </span><span class="cF1">if</span><span class="cF0"> (tempm!=tempm1) </span><span class="cF7">{</span><span class="cF0">
+<a name="l133"></a>        D3Sub(&amp;tempm-&gt;x,&amp;tempm1-&gt;x,&amp;p);
+<a name="l134"></a>        </span><span class="cF1">if</span><span class="cF0"> (D3SqrNorm</span><span class="cF7">(</span><span class="cF0">&amp;p</span><span class="cF7">)</span><span class="cF0">&lt;=Sqr</span><span class="cF7">(</span><span class="cF0">tempm-&gt;radius+tempm1-&gt;radius</span><span class="cF7">)</span><span class="cF0">)
+<a name="l135"></a>          </span><span class="cF1">return</span><span class="cF0"> TRUE;
+<a name="l136"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l137"></a>      tempm1=tempm1-&gt;next;
+<a name="l138"></a>    }
+<a name="l139"></a>    tempm=tempm-&gt;next;
+<a name="l140"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l141"></a>  </span><span class="cF1">return</span><span class="cF0"> FALSE;
+<a name="l142"></a>}
+<a name="l143"></a>
+<a name="l144"></a>Ship *ShipNew(</span><span class="cF1">I64</span><span class="cF0"> x,</span><span class="cF1">I64</span><span class="cF0"> y,</span><span class="cF1">I64</span><span class="cF0"> type)
+<a name="l145"></a>{
+<a name="l146"></a>  </span><span class="cF1">I64</span><span class="cF0"> i;
+<a name="l147"></a>  Ship *temps=CAlloc(</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF0">Ship</span><span class="cF7">)</span><span class="cF0">);
+<a name="l148"></a>
+<a name="l149"></a>  </span><span class="cF1">switch</span><span class="cF0"> (temps-&gt;type=type) </span><span class="cF7">{</span><span class="cF0">
+<a name="l150"></a>    </span><span class="cF1">case</span><span class="cF0"> ST_HUMAN1:
+<a name="l151"></a>      temps-&gt;fire_rate=25;
+<a name="l152"></a>      temps-&gt;masses=5;
+<a name="l153"></a>      temps-&gt;p[0].x=x;
+<a name="l154"></a>      temps-&gt;p[0].y=y;
+<a name="l155"></a>      temps-&gt;p[1].x=x+3;
+<a name="l156"></a>      temps-&gt;p[1].y=y+10;
+<a name="l157"></a>      temps-&gt;p[2].x=x-3;
+<a name="l158"></a>      temps-&gt;p[2].y=y+10;
+<a name="l159"></a>      temps-&gt;p[3].x=x+20;
+<a name="l160"></a>      temps-&gt;p[3].y=y+20;
+<a name="l161"></a>      temps-&gt;p[4].x=x-20;
+<a name="l162"></a>      temps-&gt;p[4].y=y+20;
+<a name="l163"></a>
+<a name="l164"></a>      </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;temps-&gt;masses;i++) {
+<a name="l165"></a>        temps-&gt;p[i].mass=1;
+<a name="l166"></a>        </span><span class="cF1">if</span><span class="cF0"> (i&lt;3)
+<a name="l167"></a>          temps-&gt;p[i].radius=2.5;
+<a name="l168"></a>        </span><span class="cF1">else</span><span class="cF0">
+<a name="l169"></a>          temps-&gt;p[i].radius=4;
+<a name="l170"></a>        temps-&gt;p[i].drag_profile_factor=3;
+<a name="l171"></a>        InsQue(&amp;temps-&gt;p[i],ode-&gt;last_mass);
+<a name="l172"></a>      }
+<a name="l173"></a>      temps-&gt;p[3].mass/=10.0;
+<a name="l174"></a>      temps-&gt;p[4].mass/=10.0;
+<a name="l175"></a>
+<a name="l176"></a>      temps-&gt;springs=7;
+<a name="l177"></a>      temps-&gt;s[0].end1=&amp;temps-&gt;p[0];
+<a name="l178"></a>      temps-&gt;s[0].end2=&amp;temps-&gt;p[1];
+<a name="l179"></a>      temps-&gt;s[1].end1=&amp;temps-&gt;p[2];
+<a name="l180"></a>      temps-&gt;s[1].end2=&amp;temps-&gt;p[0];
+<a name="l181"></a>      temps-&gt;s[2].end1=&amp;temps-&gt;p[1];
+<a name="l182"></a>      temps-&gt;s[2].end2=&amp;temps-&gt;p[2];
+<a name="l183"></a>      temps-&gt;s[3].end1=&amp;temps-&gt;p[1];
+<a name="l184"></a>      temps-&gt;s[3].end2=&amp;temps-&gt;p[3];
+<a name="l185"></a>      temps-&gt;s[4].end1=&amp;temps-&gt;p[0];
+<a name="l186"></a>      temps-&gt;s[4].end2=&amp;temps-&gt;p[3];
+<a name="l187"></a>      temps-&gt;s[5].end1=&amp;temps-&gt;p[2];
+<a name="l188"></a>      temps-&gt;s[5].end2=&amp;temps-&gt;p[4];
+<a name="l189"></a>      temps-&gt;s[6].end1=&amp;temps-&gt;p[0];
+<a name="l190"></a>      temps-&gt;s[6].end2=&amp;temps-&gt;p[4];
+<a name="l191"></a>
+<a name="l192"></a>      </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;temps-&gt;springs;i++) {
+<a name="l193"></a>        temps-&gt;s[i].rest_len=D3Dist(&amp;temps-&gt;s[i].end1-&gt;x,&amp;temps-&gt;s[i].end2-&gt;x);
+<a name="l194"></a>        temps-&gt;s[i].constant=10000;
+<a name="l195"></a>        temps-&gt;s[i].strength  =30000;
+<a name="l196"></a>        </span><span class="cF1">if</span><span class="cF0"> (i&lt;=2)
+<a name="l197"></a>          temps-&gt;s[i].color=LTCYAN;
+<a name="l198"></a>        </span><span class="cF1">else</span><span class="cF0">
+<a name="l199"></a>          temps-&gt;s[i].color=LTGRAY;
+<a name="l200"></a>        InsQue(&amp;temps-&gt;s[i],ode-&gt;last_spring);
+<a name="l201"></a>      }
+<a name="l202"></a>      remaining=0;
+<a name="l203"></a>
+<a name="l204"></a>      </span><span class="cF1">break</span><span class="cF0">;
+<a name="l205"></a>    </span><span class="cF1">case</span><span class="cF0"> ST_ENEMY1:
+<a name="l206"></a>      temps-&gt;fire_rate=2.5;
+<a name="l207"></a>      temps-&gt;masses=3;
+<a name="l208"></a>      temps-&gt;p[0].x=x;
+<a name="l209"></a>      temps-&gt;p[0].y=y;
+<a name="l210"></a>      temps-&gt;p[1].x=x+15;
+<a name="l211"></a>      temps-&gt;p[1].y=y;
+<a name="l212"></a>      temps-&gt;p[2].x=x;
+<a name="l213"></a>      temps-&gt;p[2].y=y+15;
+<a name="l214"></a>
+<a name="l215"></a>      </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;temps-&gt;masses;i++) {
+<a name="l216"></a>        temps-&gt;p[i].mass=1;
+<a name="l217"></a>        temps-&gt;p[i].radius=7;
+<a name="l218"></a>        temps-&gt;p[i].drag_profile_factor=3;
+<a name="l219"></a>        InsQue(&amp;temps-&gt;p[i],ode-&gt;last_mass);
+<a name="l220"></a>      }
+<a name="l221"></a>
+<a name="l222"></a>      temps-&gt;springs=3;
+<a name="l223"></a>      temps-&gt;s[0].end1=&amp;temps-&gt;p[0];
+<a name="l224"></a>      temps-&gt;s[0].end2=&amp;temps-&gt;p[1];
+<a name="l225"></a>      temps-&gt;s[1].end1=&amp;temps-&gt;p[1];
+<a name="l226"></a>      temps-&gt;s[1].end2=&amp;temps-&gt;p[2];
+<a name="l227"></a>      temps-&gt;s[2].end1=&amp;temps-&gt;p[2];
+<a name="l228"></a>      temps-&gt;s[2].end2=&amp;temps-&gt;p[0];
+<a name="l229"></a>
+<a name="l230"></a>      </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;temps-&gt;springs;i++) {
+<a name="l231"></a>        temps-&gt;s[i].rest_len=D3Dist(&amp;temps-&gt;s[i].end1-&gt;x,&amp;temps-&gt;s[i].end2-&gt;x);
+<a name="l232"></a>        temps-&gt;s[i].constant=10000;
+<a name="l233"></a>        temps-&gt;s[i].strength  =20000;
+<a name="l234"></a>        temps-&gt;s[i].color=BLACK;
+<a name="l235"></a>        InsQue(&amp;temps-&gt;s[i],ode-&gt;last_spring);
+<a name="l236"></a>      }
+<a name="l237"></a>      remaining++;
+<a name="l238"></a>      </span><span class="cF1">break</span><span class="cF0">;
+<a name="l239"></a>    </span><span class="cF1">case</span><span class="cF0"> ST_ENEMY2:
+<a name="l240"></a>      temps-&gt;fire_rate=5.0;
+<a name="l241"></a>      temps-&gt;masses=5;
+<a name="l242"></a>      temps-&gt;p[0].x=x;
+<a name="l243"></a>      temps-&gt;p[0].y=y;
+<a name="l244"></a>      temps-&gt;p[1].x=x-7;
+<a name="l245"></a>      temps-&gt;p[1].y=y+10;
+<a name="l246"></a>      temps-&gt;p[2].x=x+7;
+<a name="l247"></a>      temps-&gt;p[2].y=y+10;
+<a name="l248"></a>      temps-&gt;p[3].x=x-14;
+<a name="l249"></a>      temps-&gt;p[3].y=y+20;
+<a name="l250"></a>      temps-&gt;p[4].x=x+14;
+<a name="l251"></a>      temps-&gt;p[4].y=y+20;
+<a name="l252"></a>
+<a name="l253"></a>      </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;temps-&gt;masses;i++) {
+<a name="l254"></a>        temps-&gt;p[i].mass=1;
+<a name="l255"></a>        temps-&gt;p[i].radius=6;
+<a name="l256"></a>        temps-&gt;p[i].drag_profile_factor=5;
+<a name="l257"></a>        temps-&gt;p[i].color=PURPLE;
+<a name="l258"></a>        InsQue(&amp;temps-&gt;p[i],ode-&gt;last_mass);
+<a name="l259"></a>      }
+<a name="l260"></a>
+<a name="l261"></a>      temps-&gt;springs=7;
+<a name="l262"></a>      temps-&gt;s[0].end1=&amp;temps-&gt;p[0];
+<a name="l263"></a>      temps-&gt;s[0].end2=&amp;temps-&gt;p[1];
+<a name="l264"></a>      temps-&gt;s[1].end1=&amp;temps-&gt;p[0];
+<a name="l265"></a>      temps-&gt;s[1].end2=&amp;temps-&gt;p[2];
+<a name="l266"></a>      temps-&gt;s[2].end1=&amp;temps-&gt;p[1];
+<a name="l267"></a>      temps-&gt;s[2].end2=&amp;temps-&gt;p[2];
+<a name="l268"></a>      temps-&gt;s[3].end1=&amp;temps-&gt;p[1];
+<a name="l269"></a>      temps-&gt;s[3].end2=&amp;temps-&gt;p[3];
+<a name="l270"></a>      temps-&gt;s[4].end1=&amp;temps-&gt;p[2];
+<a name="l271"></a>      temps-&gt;s[4].end2=&amp;temps-&gt;p[4];
+<a name="l272"></a>      temps-&gt;s[5].end1=&amp;temps-&gt;p[2];
+<a name="l273"></a>      temps-&gt;s[5].end2=&amp;temps-&gt;p[3];
+<a name="l274"></a>      temps-&gt;s[6].end1=&amp;temps-&gt;p[1];
+<a name="l275"></a>      temps-&gt;s[6].end2=&amp;temps-&gt;p[4];
+<a name="l276"></a>
+<a name="l277"></a>      </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;temps-&gt;springs;i++) {
+<a name="l278"></a>        temps-&gt;s[i].rest_len=D3Dist(&amp;temps-&gt;s[i].end1-&gt;x,&amp;temps-&gt;s[i].end2-&gt;x);
+<a name="l279"></a>        temps-&gt;s[i].constant= 40000;
+<a name="l280"></a>        temps-&gt;s[i].strength  =75000;
+<a name="l281"></a>        </span><span class="cF1">if</span><span class="cF0"> (i&gt;=3)
+<a name="l282"></a>          temps-&gt;s[i].color=LTPURPLE;
+<a name="l283"></a>        </span><span class="cF1">else</span><span class="cF0">
+<a name="l284"></a>          temps-&gt;s[i].color=BLACK;
+<a name="l285"></a>        InsQue(&amp;temps-&gt;s[i],ode-&gt;last_spring);
+<a name="l286"></a>      }
+<a name="l287"></a>      remaining++;
+<a name="l288"></a>      </span><span class="cF1">break</span><span class="cF0">;
+<a name="l289"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l290"></a>  InsQue(temps,ship_root.last);
+<a name="l291"></a>  </span><span class="cF1">return</span><span class="cF0"> temps;
+<a name="l292"></a>}
+<a name="l293"></a>
+<a name="l294"></a></span><span class="cF1">U0</span><span class="cF0"> ShipDel(Ship *temps)
+<a name="l295"></a>{
+<a name="l296"></a>  </span><span class="cF1">I64</span><span class="cF0"> i;
+<a name="l297"></a>  </span><span class="cF1">if</span><span class="cF0"> (!temps) </span><span class="cF1">return</span><span class="cF0">;
+<a name="l298"></a>  </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;temps-&gt;masses;i++)
+<a name="l299"></a>    RemQue(&amp;temps-&gt;p[i]);
+<a name="l300"></a>  </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;temps-&gt;springs;i++)
+<a name="l301"></a>    RemQue(&amp;temps-&gt;s[i]);
+<a name="l302"></a>  RemQue(temps);
+<a name="l303"></a>  Free(temps);
+<a name="l304"></a>  remaining--;
+<a name="l305"></a>}
+<a name="l306"></a>
+<a name="l307"></a></span><span class="cF1">U0</span><span class="cF0"> PlaceShip(</span><span class="cF1">I64</span><span class="cF0"> type)
+<a name="l308"></a>{
+<a name="l309"></a>  Ship *ee;
+<a name="l310"></a>  </span><span class="cF1">if</span><span class="cF0"> (CheckOverlap)
+<a name="l311"></a>    </span><span class="cF1">return</span><span class="cF0">;
+<a name="l312"></a>  </span><span class="cF1">while</span><span class="cF0"> (TRUE) </span><span class="cF7">{</span><span class="cF0">
+<a name="l313"></a>    ee=ShipNew(RandU16%</span><span class="cF7">(</span><span class="cF0">Fs-&gt;win_pixel_width-20</span><span class="cF7">)</span><span class="cF0">+10,RandU16%</span><span class="cF7">(</span><span class="cF0">Fs-&gt;win_pixel_height-20</span><span class="cF7">)</span><span class="cF0">+10,type);
+<a name="l314"></a>    </span><span class="cF1">if</span><span class="cF0"> (CheckOverlap)
+<a name="l315"></a>      ShipDel(ee);
+<a name="l316"></a>    </span><span class="cF1">else</span><span class="cF0">
+<a name="l317"></a>      </span><span class="cF1">break</span><span class="cF0">;
+<a name="l318"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l319"></a>}
+<a name="l320"></a>
+<a name="l321"></a></span><span class="cF2">// ********************************** Human Ship</span><span class="cF0">
+<a name="l322"></a>
+<a name="l323"></a></span><span class="cF1">I64</span><span class="cF0"> Tweaked()
+<a name="l324"></a>{
+<a name="l325"></a>  D3 p,p1,p2;
+<a name="l326"></a>  </span><span class="cF1">if</span><span class="cF0"> (human) </span><span class="cF7">{</span><span class="cF0">
+<a name="l327"></a>    D3Sub(&amp;human-&gt;p[0].x,&amp;human-&gt;p[1].x,&amp;p1);
+<a name="l328"></a>    D3Sub(&amp;human-&gt;p[0].x,&amp;human-&gt;p[2].x,&amp;p2);
+<a name="l329"></a>    D3Add(&amp;p1,&amp;p2,&amp;p);
+<a name="l330"></a>    D3Unit(&amp;p);
+<a name="l331"></a>    D3Sub(&amp;human-&gt;p[0].x,&amp;human-&gt;p[3].x,&amp;p1);
+<a name="l332"></a>    D3Sub(&amp;human-&gt;p[0].x,&amp;human-&gt;p[4].x,&amp;p2);
+<a name="l333"></a>    D3Unit(&amp;p1);
+<a name="l334"></a>    D3Unit(&amp;p2);
+<a name="l335"></a>    </span><span class="cF1">if</span><span class="cF0"> (!</span><span class="cF7">(</span><span class="cF0">human-&gt;s[3].flags&amp;SSF_INACTIVE</span><span class="cF7">)</span><span class="cF0"> &amp;&amp; D3Dot</span><span class="cF7">(</span><span class="cF0">&amp;p,&amp;p1</span><span class="cF7">)</span><span class="cF0">&gt;Cos</span><span class="cF7">(</span><span class="cF0">20*pi/180</span><span class="cF7">)</span><span class="cF0">)
+<a name="l336"></a>      </span><span class="cF1">return</span><span class="cF0"> 3;
+<a name="l337"></a>    </span><span class="cF1">if</span><span class="cF0"> (!</span><span class="cF7">(</span><span class="cF0">human-&gt;s[5].flags&amp;SSF_INACTIVE</span><span class="cF7">)</span><span class="cF0"> &amp;&amp; D3Dot</span><span class="cF7">(</span><span class="cF0">&amp;p,&amp;p2</span><span class="cF7">)</span><span class="cF0">&gt;Cos</span><span class="cF7">(</span><span class="cF0">20*pi/180</span><span class="cF7">)</span><span class="cF0">)
+<a name="l338"></a>      </span><span class="cF1">return</span><span class="cF0"> 4;
+<a name="l339"></a>    </span><span class="cF1">return</span><span class="cF0"> 0;
+<a name="l340"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l341"></a>}
+<a name="l342"></a>
+<a name="l343"></a></span><span class="cF1">U0</span><span class="cF0"> AllDel(Ode *ode)
+<a name="l344"></a>{
+<a name="l345"></a>  Ship *temps,*temps1;
+<a name="l346"></a>  Bullet *tempb=bullet_root.next,*tempb1;
+<a name="l347"></a>  RemQue(ode);
+<a name="l348"></a>  temps=ship_root.next;
+<a name="l349"></a>  </span><span class="cF1">while</span><span class="cF0"> (temps!=&amp;ship_root) </span><span class="cF7">{</span><span class="cF0">
+<a name="l350"></a>    temps1=temps-&gt;next;
+<a name="l351"></a>    ShipDel(temps);
+<a name="l352"></a>    temps=temps1;
+<a name="l353"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l354"></a>  human=NULL;
+<a name="l355"></a>  </span><span class="cF1">while</span><span class="cF0"> (tempb!=&amp;bullet_root) </span><span class="cF7">{</span><span class="cF0">
+<a name="l356"></a>    tempb1=tempb-&gt;next;
+<a name="l357"></a>    RemQue(tempb);
+<a name="l358"></a>    Free(tempb);
+<a name="l359"></a>    tempb=tempb1;
+<a name="l360"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l361"></a>  OdeDel(ode);
+<a name="l362"></a>}
+<a name="l363"></a>
+<a name="l364"></a>BoolI64 LaserPlot(GrBitMap *base,</span><span class="cF1">I64</span><span class="cF0"> x,</span><span class="cF1">I64</span><span class="cF0"> y,</span><span class="cF1">I64</span><span class="cF0"> z)
+<a name="l365"></a>{
+<a name="l366"></a>  </span><span class="cF1">I64</span><span class="cF0"> c;
+<a name="l367"></a>  </span><span class="cF1">nounusedwarn</span><span class="cF0"> z;
+<a name="l368"></a>  c=GrPeek(base,x,y);
+<a name="l369"></a>  </span><span class="cF1">if</span><span class="cF0"> (c!=BLACK &amp;&amp; c!=WHITE)
+<a name="l370"></a>    </span><span class="cF1">return</span><span class="cF0"> FALSE;
+<a name="l371"></a>  </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l372"></a>    GrPlot(base,x,y);
+<a name="l373"></a>    </span><span class="cF1">return</span><span class="cF0"> TRUE;
+<a name="l374"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l375"></a>}
+<a name="l376"></a>
+<a name="l377"></a></span><span class="cF2">// **********************************</span><span class="cF0">
+<a name="l378"></a></span><span class="cF1">U0</span><span class="cF0"> UpdateWin(TaskStruct *task)
+<a name="l379"></a>{
+<a name="l380"></a>  </span><span class="cF1">I64</span><span class="cF0"> i,j;
+<a name="l381"></a>  GrBitMap *base=GrAlias(gr_refreshed_base,task);
+<a name="l382"></a>  </span><span class="cF1">F64</span><span class="cF0"> arg;
+<a name="l383"></a>  Ship *temps;
+<a name="l384"></a>  Bullet *tempb;
+<a name="l385"></a>  D3 p,p1,p2;
+<a name="l386"></a>  </span><span class="cF1">F64</span><span class="cF0"> t_left,t_right,spin,d,x,y;
+<a name="l387"></a>  MySpring *tempss;
+<a name="l388"></a>  </span><span class="cF1">U8</span><span class="cF0"> *img;
+<a name="l389"></a>  BoolI8 draw_laser_line=FALSE;
+<a name="l390"></a>
+<a name="l391"></a>  </span><span class="cF1">if</span><span class="cF0"> (ode!=task-&gt;last_ode) </span><span class="cF1">goto</span><span class="cF0"> done_draw;
+<a name="l392"></a>
+<a name="l393"></a>  base-&gt;color=WHITE;
+<a name="l394"></a>  GrPrintF(base,0,0,</span><span class="cF6">"Level:%d Score:%d High Score:%d"</span><span class="cF0">,level,score,best_score);
+<a name="l395"></a>  </span><span class="cF1">if</span><span class="cF0"> (game_over) </span><span class="cF7">{</span><span class="cF0">
+<a name="l396"></a>    </span><span class="cF1">if</span><span class="cF0"> (Blink</span><span class="cF7">(</span><span class="cF0">,tP(task)</span><span class="cF7">)</span><span class="cF0">)
+<a name="l397"></a>      GrPutS(base,</span><span class="cF7">(</span><span class="cF0">task-&gt;win_pixel_width-9*FONT_WIDTH</span><span class="cF7">)</span><span class="cF0">/2,
+<a name="l398"></a>          </span><span class="cF7">(</span><span class="cF0">task-&gt;win_pixel_height-FONT_HEIGHT</span><span class="cF7">)</span><span class="cF0">/2,</span><span class="cF6">"Game Over"</span><span class="cF0">);
+<a name="l399"></a>  </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF1">if</span><span class="cF0"> (show_level_msg) </span><span class="cF7">{</span><span class="cF0">
+<a name="l400"></a>    </span><span class="cF1">if</span><span class="cF0"> (Blink</span><span class="cF7">(</span><span class="cF0">,tP(task)</span><span class="cF7">)</span><span class="cF0">)
+<a name="l401"></a>      GrPrintF(base,</span><span class="cF7">(</span><span class="cF0">task-&gt;win_pixel_width-8*FONT_WIDTH</span><span class="cF7">)</span><span class="cF0">/2,
+<a name="l402"></a>          </span><span class="cF7">(</span><span class="cF0">task-&gt;win_pixel_height-FONT_HEIGHT</span><span class="cF7">)</span><span class="cF0">/2+50,</span><span class="cF6">"Level %d"</span><span class="cF0">,level);
+<a name="l403"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l404"></a>
+<a name="l405"></a>  </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;NUM_STARS;i++)
+<a name="l406"></a>    GrPlot(base,stars_x[i],stars_y[i]);
+<a name="l407"></a>
+<a name="l408"></a>  tempss=ode-&gt;next_spring;
+<a name="l409"></a>  </span><span class="cF1">while</span><span class="cF0"> (tempss!=&amp;ode-&gt;next_spring) </span><span class="cF7">{</span><span class="cF0">
+<a name="l410"></a>    </span><span class="cF1">if</span><span class="cF0"> (!</span><span class="cF7">(</span><span class="cF0">tempss-&gt;flags&amp;SSF_INACTIVE</span><span class="cF7">)</span><span class="cF0">) {
+<a name="l411"></a>      base-&gt;color=tempss-&gt;color;
+<a name="l412"></a>      GrLine(base,tempss-&gt;end1-&gt;x,tempss-&gt;end1-&gt;y,
+<a name="l413"></a>          tempss-&gt;end2-&gt;x,tempss-&gt;end2-&gt;y);
+<a name="l414"></a>    }
+<a name="l415"></a>    tempss=tempss-&gt;next;
+<a name="l416"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l417"></a>
+<a name="l418"></a>  temps=ship_root.next;
+<a name="l419"></a>  </span><span class="cF1">while</span><span class="cF0"> (temps!=&amp;ship_root) </span><span class="cF7">{</span><span class="cF0">
+<a name="l420"></a>    </span><span class="cF1">if</span><span class="cF0"> (!temps-&gt;exploding)
+<a name="l421"></a>      </span><span class="cF1">switch</span><span class="cF0"> (temps-&gt;type) {
+<a name="l422"></a>        </span><span class="cF1">case</span><span class="cF0"> ST_HUMAN1:
+<a name="l423"></a>          </span><span class="cF1">if</span><span class="cF0"> (temps-&gt;spacewalk_side) </span><span class="cF7">{</span><span class="cF0">
+<a name="l424"></a>            t_left=0;
+<a name="l425"></a>            t_right=0;
+<a name="l426"></a>          </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l427"></a>            </span><span class="cF1">if</span><span class="cF0"> (d=D3Norm</span><span class="cF7">(</span><span class="cF0">D3Sub(&amp;temps-&gt;p[0].x,&amp;temps-&gt;p[1].x,&amp;p1)</span><span class="cF7">)</span><span class="cF0">) {
+<a name="l428"></a>              D3Sub(&amp;temps-&gt;p[0].DxDt,&amp;temps-&gt;p[1].DxDt,&amp;p2);
+<a name="l429"></a>              D3Cross(&amp;p1,&amp;p2,&amp;p);
+<a name="l430"></a>              spin=p.z/d;
+<a name="l431"></a>            } </span><span class="cF1">else</span><span class="cF0">
+<a name="l432"></a>              spin=0;
+<a name="l433"></a>            t_left =Limit(human_t_left+SPIN_GAIN*spin*human_antispin,0,MAX_THRUST);
+<a name="l434"></a>
+<a name="l435"></a>            </span><span class="cF1">if</span><span class="cF0"> (d=D3Norm</span><span class="cF7">(</span><span class="cF0">D3Sub(&amp;temps-&gt;p[0].x,&amp;temps-&gt;p[2].x,&amp;p1)</span><span class="cF7">)</span><span class="cF0">) {
+<a name="l436"></a>              D3Sub(&amp;temps-&gt;p[0].DxDt,&amp;temps-&gt;p[2].DxDt,&amp;p2);
+<a name="l437"></a>              D3Cross(&amp;p1,&amp;p2,&amp;p);
+<a name="l438"></a>              spin=p.z/d;
+<a name="l439"></a>            } </span><span class="cF1">else</span><span class="cF0">
+<a name="l440"></a>              spin=0;
+<a name="l441"></a>            t_right=Limit(human_t_right-SPIN_GAIN*spin*human_antispin,0,MAX_THRUST);
+<a name="l442"></a>          </span><span class="cF7">}</span><span class="cF0">
+<a name="l443"></a>
+<a name="l444"></a>
+<a name="l445"></a>          D3Sub(&amp;temps-&gt;p[1].x,&amp;temps-&gt;p[0].x,&amp;p1);
+<a name="l446"></a>          D3Sub(&amp;temps-&gt;p[2].x,&amp;temps-&gt;p[0].x,&amp;p2);
+<a name="l447"></a>          D3Unit(D3Add</span><span class="cF7">(</span><span class="cF0">&amp;p1,&amp;p2,&amp;p</span><span class="cF7">)</span><span class="cF0">);
+<a name="l448"></a>
+<a name="l449"></a>          </span><span class="cF1">if</span><span class="cF0"> (!</span><span class="cF7">(</span><span class="cF0">temps-&gt;s[3].flags&amp;SSF_INACTIVE</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF7">{</span><span class="cF0">
+<a name="l450"></a>            base-&gt;color=YELLOW;
+<a name="l451"></a>            D3AddEqu(D3Mul</span><span class="cF7">(</span><span class="cF0">t_left/25,&amp;p,&amp;p1</span><span class="cF7">)</span><span class="cF0">,&amp;temps-&gt;p[3].x);
+<a name="l452"></a>            GrLine(base,temps-&gt;p[1].x,temps-&gt;p[1].y,p1.x,p1.y);
+<a name="l453"></a>            arg=Arg(p.x,p.y);
+<a name="l454"></a>            GrElemsPlotRotZ3b(base,temps-&gt;p[3].x,temps-&gt;p[3].y,0,</span><span class="cF3">&lt;thruster&gt;</span><span class="cF0">,arg);
+<a name="l455"></a>          </span><span class="cF7">}</span><span class="cF0">
+<a name="l456"></a>
+<a name="l457"></a>          </span><span class="cF1">if</span><span class="cF0"> (!</span><span class="cF7">(</span><span class="cF0">temps-&gt;s[5].flags&amp;SSF_INACTIVE</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF7">{</span><span class="cF0">
+<a name="l458"></a>            base-&gt;color=YELLOW;
+<a name="l459"></a>            D3AddEqu(D3Mul</span><span class="cF7">(</span><span class="cF0">t_right/25,&amp;p,&amp;p2</span><span class="cF7">)</span><span class="cF0">,&amp;temps-&gt;p[4].x);
+<a name="l460"></a>            GrLine(base,temps-&gt;p[2].x,temps-&gt;p[2].y,p2.x,p2.y);
+<a name="l461"></a>            arg=Arg(p.x,p.y);
+<a name="l462"></a>            GrElemsPlotRotZ3b(base,temps-&gt;p[4].x,temps-&gt;p[4].y,0,</span><span class="cF3">&lt;thruster&gt;</span><span class="cF0">,arg);
+<a name="l463"></a>          </span><span class="cF7">}</span><span class="cF0">
+<a name="l464"></a>
+<a name="l465"></a>          </span><span class="cF1">if</span><span class="cF0"> (tP</span><span class="cF7">(</span><span class="cF0">task</span><span class="cF7">)</span><span class="cF0">&gt;temps-&gt;reload_timeout)
+<a name="l466"></a>            img=</span><span class="cF3">&lt;gun_ready&gt;</span><span class="cF0">;
+<a name="l467"></a>          </span><span class="cF1">else</span><span class="cF0">
+<a name="l468"></a>            img=</span><span class="cF3">&lt;gun_busy&gt;</span><span class="cF0">;
+<a name="l469"></a>          arg=Arg(p.x,p.y);
+<a name="l470"></a>          </span><span class="cF1">switch</span><span class="cF0"> (level) </span><span class="cF7">{</span><span class="cF0">
+<a name="l471"></a>            </span><span class="cF1">case</span><span class="cF0"> 3:
+<a name="l472"></a>              </span><span class="cF1">if</span><span class="cF0"> (!</span><span class="cF7">(</span><span class="cF0">temps-&gt;s[3].flags&amp;SSF_INACTIVE</span><span class="cF7">)</span><span class="cF0">)
+<a name="l473"></a>                GrElemsPlotRotZ3b(base,temps-&gt;p[3].x,temps-&gt;p[3].y,0,img,arg);
+<a name="l474"></a>              </span><span class="cF1">if</span><span class="cF0"> (!</span><span class="cF7">(</span><span class="cF0">temps-&gt;s[5].flags&amp;SSF_INACTIVE</span><span class="cF7">)</span><span class="cF0">)
+<a name="l475"></a>                GrElemsPlotRotZ3b(base,temps-&gt;p[4].x,temps-&gt;p[4].y,0,img,arg);
+<a name="l476"></a>            </span><span class="cF1">case</span><span class="cF0"> 2:
+<a name="l477"></a>              </span><span class="cF1">if</span><span class="cF0"> (!</span><span class="cF7">(</span><span class="cF0">temps-&gt;s[1].flags&amp;SSF_INACTIVE</span><span class="cF7">)</span><span class="cF0">)
+<a name="l478"></a>                GrElemsPlotRotZ3b(base,temps-&gt;p[1].x,temps-&gt;p[1].y,0,img,arg);
+<a name="l479"></a>              </span><span class="cF1">if</span><span class="cF0"> (!</span><span class="cF7">(</span><span class="cF0">temps-&gt;s[2].flags&amp;SSF_INACTIVE</span><span class="cF7">)</span><span class="cF0">)
+<a name="l480"></a>                GrElemsPlotRotZ3b(base,temps-&gt;p[2].x,temps-&gt;p[2].y,0,img,arg);
+<a name="l481"></a>            </span><span class="cF1">case</span><span class="cF0"> 1:
+<a name="l482"></a>              GrElemsPlotRotZ3b(base,temps-&gt;p[0].x,temps-&gt;p[0].y,0,img,arg);
+<a name="l483"></a>              </span><span class="cF1">break</span><span class="cF0">;
+<a name="l484"></a>            </span><span class="cF1">default</span><span class="cF0">:
+<a name="l485"></a>              GrElemsPlotRotZ3b(base,temps-&gt;p[0].x,temps-&gt;p[0].y,0,</span><span class="cF3">&lt;Laser&gt;</span><span class="cF0">,arg);
+<a name="l486"></a>              </span><span class="cF1">if</span><span class="cF0"> (temps-&gt;lasering &amp;&amp; !temps-&gt;laser_overheat) {
+<a name="l487"></a>                draw_laser_line=TRUE;
+<a name="l488"></a>                Snd(1000);
+<a name="l489"></a>              }
+<a name="l490"></a>              </span><span class="cF1">break</span><span class="cF0">;
+<a name="l491"></a>          </span><span class="cF7">}</span><span class="cF0">
+<a name="l492"></a>
+<a name="l493"></a>          ctrl_panel.laser_temperature=temps-&gt;laser_temperature;
+<a name="l494"></a>
+<a name="l495"></a>          </span><span class="cF1">if</span><span class="cF0"> (temps-&gt;spacewalk_side) </span><span class="cF7">{</span><span class="cF0">
+<a name="l496"></a>            d=1.0-(temps-&gt;spacewalk_timeout-tP</span><span class="cF7">(</span><span class="cF0">task</span><span class="cF7">)</span><span class="cF0">)/SPACEWALK_TIME;
+<a name="l497"></a>            </span><span class="cF1">if</span><span class="cF0"> (d&gt;1.0) {
+<a name="l498"></a>              temps-&gt;spacewalk_side=0;
+<a name="l499"></a>              ctrl_panel.spacewalk=FALSE;
+<a name="l500"></a>            } </span><span class="cF1">else</span><span class="cF0"> {
+<a name="l501"></a>              </span><span class="cF1">if</span><span class="cF0"> (d&lt;0.5) </span><span class="cF7">{</span><span class="cF0">
+<a name="l502"></a>                d=d*2;
+<a name="l503"></a>                x=temps-&gt;p[0].x*(1.0-d)+temps-&gt;p[temps-&gt;spacewalk_side].x*(d);
+<a name="l504"></a>                y=temps-&gt;p[0].y*(1.0-d)+temps-&gt;p[temps-&gt;spacewalk_side].y*(d);
+<a name="l505"></a>              </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l506"></a>                d=(d-0.5)*2;
+<a name="l507"></a>                x=temps-&gt;p[temps-&gt;spacewalk_side].x*(1.0-d)+temps-&gt;p[0].x*(d);
+<a name="l508"></a>                y=temps-&gt;p[temps-&gt;spacewalk_side].y*(1.0-d)+temps-&gt;p[0].y*(d);
+<a name="l509"></a>              </span><span class="cF7">}</span><span class="cF0">
+<a name="l510"></a>              GrElemsPlotRotZ3b(base,x,y,0,</span><span class="cF3">&lt;spacewalk&gt;</span><span class="cF0">,arg+0.75*Sin</span><span class="cF7">(</span><span class="cF0">tP(task)*2</span><span class="cF7">)</span><span class="cF0">);
+<a name="l511"></a>            }
+<a name="l512"></a>          </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l513"></a>            </span><span class="cF1">if</span><span class="cF0"> (ctrl_panel.spacewalk) {
+<a name="l514"></a>              </span><span class="cF1">if</span><span class="cF0"> (temps-&gt;spacewalk_side=Tweaked)
+<a name="l515"></a>                temps-&gt;spacewalk_timeout=tP(task)+SPACEWALK_TIME;
+<a name="l516"></a>              </span><span class="cF1">else</span><span class="cF0">
+<a name="l517"></a>                ctrl_panel.spacewalk=FALSE;
+<a name="l518"></a>            }
+<a name="l519"></a>          </span><span class="cF7">}</span><span class="cF0">
+<a name="l520"></a>          </span><span class="cF1">break</span><span class="cF0">;
+<a name="l521"></a>        </span><span class="cF1">case</span><span class="cF0"> ST_ENEMY2:
+<a name="l522"></a>          </span><span class="cF1">for</span><span class="cF0"> (i=3;i&lt;temps-&gt;masses;i++) </span><span class="cF7">{</span><span class="cF0">
+<a name="l523"></a>            base-&gt;color=temps-&gt;p[i].color;
+<a name="l524"></a>            GrCircle(base,temps-&gt;p[i].x,temps-&gt;p[i].y,temps-&gt;p[i].radius);
+<a name="l525"></a>            GrFloodFill(base,temps-&gt;p[i].x,temps-&gt;p[i].y+2,TRUE);
+<a name="l526"></a>            base-&gt;color=WHITE;
+<a name="l527"></a>            GrCircle(base,temps-&gt;p[i].x,temps-&gt;p[i].y,temps-&gt;p[i].radius);
+<a name="l528"></a>          </span><span class="cF7">}</span><span class="cF0">
+<a name="l529"></a>          </span><span class="cF1">case</span><span class="cF0"> ST_ENEMY1:
+<a name="l530"></a>          D3DivEqu(D3Sub</span><span class="cF7">(</span><span class="cF0">&amp;temps-&gt;p[1].x,&amp;temps-&gt;p[0].x,&amp;p1</span><span class="cF7">)</span><span class="cF0">,2.0);
+<a name="l531"></a>          D3DivEqu(D3Sub</span><span class="cF7">(</span><span class="cF0">&amp;temps-&gt;p[2].x,&amp;temps-&gt;p[0].x,&amp;p2</span><span class="cF7">)</span><span class="cF0">,2.0);
+<a name="l532"></a>          D3Unit(D3Add</span><span class="cF7">(</span><span class="cF0">&amp;p1,&amp;p2,&amp;p</span><span class="cF7">)</span><span class="cF0">);
+<a name="l533"></a>          </span><span class="cF1">if</span><span class="cF0"> (tP</span><span class="cF7">(</span><span class="cF0">task</span><span class="cF7">)</span><span class="cF0">&gt;temps-&gt;reload_timeout)
+<a name="l534"></a>            img=</span><span class="cF3">&lt;gun_ready&gt;</span><span class="cF0">;
+<a name="l535"></a>          </span><span class="cF1">else</span><span class="cF0">
+<a name="l536"></a>            img=</span><span class="cF3">&lt;gun_busy&gt;</span><span class="cF0">;
+<a name="l537"></a>          arg=Arg(p.x,p.y);
+<a name="l538"></a>          GrElemsPlotRotZ3b(base,temps-&gt;p[0].x,temps-&gt;p[0].y,0,img,arg);
+<a name="l539"></a>          arg=Arg(p1.x,p1.y);
+<a name="l540"></a>          GrElemsPlotRotZ3b(base,temps-&gt;p[0].x+p1.x,temps-&gt;p[0].y+p1.y,0,</span><span class="cF3">&lt;EnemySide&gt;</span><span class="cF0">,arg);
+<a name="l541"></a>          arg=Arg(p2.x,p2.y);
+<a name="l542"></a>          GrElemsPlotRotZ3b(base,temps-&gt;p[0].x+p2.x,temps-&gt;p[0].y+p2.y,0,</span><span class="cF3">&lt;EnemySide&gt;</span><span class="cF0">,arg);
+<a name="l543"></a>          </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;temps-&gt;masses;i++) </span><span class="cF7">{</span><span class="cF0">
+<a name="l544"></a>            base-&gt;color=YELLOW;
+<a name="l545"></a>            </span><span class="cF1">if</span><span class="cF0"> (temps-&gt;p[i].temperature&gt;=1.0)
+<a name="l546"></a>              GrCircle(base,temps-&gt;p[i].x,temps-&gt;p[i].y,temps-&gt;p[i].temperature);
+<a name="l547"></a>          </span><span class="cF7">}</span><span class="cF0">
+<a name="l548"></a>          </span><span class="cF1">break</span><span class="cF0">;
+<a name="l549"></a>      }
+<a name="l550"></a>    </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF1">if</span><span class="cF0"> (temps-&gt;die_time&lt;=tP</span><span class="cF7">(</span><span class="cF0">task</span><span class="cF7">)</span><span class="cF0">&lt;=temps-&gt;die_timeout)
+<a name="l551"></a>      </span><span class="cF1">for</span><span class="cF0"> (j=0;j&lt;temps-&gt;masses;j++) {
+<a name="l552"></a>        d=(tP</span><span class="cF7">(</span><span class="cF0">task</span><span class="cF7">)</span><span class="cF0">-temps-&gt;die_time)/(temps-&gt;die_timeout-temps-&gt;die_time);
+<a name="l553"></a>        d=7*Sin(pi*d)*(6+j)+1;
+<a name="l554"></a>        </span><span class="cF1">for</span><span class="cF0"> (i=1;i&lt;d;i++) </span><span class="cF7">{</span><span class="cF0">
+<a name="l555"></a>          </span><span class="cF1">if</span><span class="cF0"> (i&amp;1)
+<a name="l556"></a>            base-&gt;color=YELLOW;
+<a name="l557"></a>          </span><span class="cF1">else</span><span class="cF0">
+<a name="l558"></a>            base-&gt;color=LTRED;
+<a name="l559"></a>          GrCircle(base,temps-&gt;p[j].x,temps-&gt;p[j].y,i);
+<a name="l560"></a>        </span><span class="cF7">}</span><span class="cF0">
+<a name="l561"></a>      }
+<a name="l562"></a>    temps=temps-&gt;next;
+<a name="l563"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l564"></a>
+<a name="l565"></a>  tempb=bullet_root.next;
+<a name="l566"></a>  </span><span class="cF1">while</span><span class="cF0"> (tempb!=&amp;bullet_root) </span><span class="cF7">{</span><span class="cF0">
+<a name="l567"></a>    </span><span class="cF1">if</span><span class="cF0"> (tP</span><span class="cF7">(</span><span class="cF0">task</span><span class="cF7">)</span><span class="cF0">&gt;tempb-&gt;fuse_time) {
+<a name="l568"></a>      d=(tP</span><span class="cF7">(</span><span class="cF0">task</span><span class="cF7">)</span><span class="cF0">-tempb-&gt;fuse_time)/(tempb-&gt;die_timeout-tempb-&gt;fuse_time);
+<a name="l569"></a>      d=7*Sin(pi*d)*tempb-&gt;radius+1;
+<a name="l570"></a>      </span><span class="cF1">for</span><span class="cF0"> (i=1;i&lt;d;i++) </span><span class="cF7">{</span><span class="cF0">
+<a name="l571"></a>        </span><span class="cF1">if</span><span class="cF0"> (i&amp;1)
+<a name="l572"></a>          base-&gt;color=YELLOW;
+<a name="l573"></a>        </span><span class="cF1">else</span><span class="cF0">
+<a name="l574"></a>          base-&gt;color=LTRED;
+<a name="l575"></a>        GrCircle(base,tempb-&gt;p.x,tempb-&gt;p.y,i);
+<a name="l576"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l577"></a>      } </span><span class="cF1">else</span><span class="cF0"> {
+<a name="l578"></a>      </span><span class="cF1">if</span><span class="cF0"> (tempb-&gt;radius&lt;1.0) </span><span class="cF7">{</span><span class="cF0">
+<a name="l579"></a>        base-&gt;color=LTGREEN;
+<a name="l580"></a>        GrPlot(base,tempb-&gt;p.x,tempb-&gt;p.y);
+<a name="l581"></a>      </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l582"></a>        base-&gt;color=YELLOW;
+<a name="l583"></a>        GrCircle(base,tempb-&gt;p.x,tempb-&gt;p.y,tempb-&gt;radius);
+<a name="l584"></a>        </span><span class="cF1">if</span><span class="cF0"> (tempb-&gt;radius&gt;=2.0)
+<a name="l585"></a>          GrFloodFill(base,tempb-&gt;p.x,tempb-&gt;p.y,TRUE);
+<a name="l586"></a>        base-&gt;color=LTGREEN;
+<a name="l587"></a>        GrCircle(base,tempb-&gt;p.x,tempb-&gt;p.y,tempb-&gt;radius);
+<a name="l588"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l589"></a>    }
+<a name="l590"></a>    tempb=tempb-&gt;next;
+<a name="l591"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l592"></a>
+<a name="l593"></a>  </span><span class="cF1">if</span><span class="cF0"> (human &amp;&amp; draw_laser_line) </span><span class="cF7">{</span><span class="cF0">
+<a name="l594"></a>    D3Sub(&amp;human-&gt;p[1].x,&amp;human-&gt;p[0].x,&amp;p1);
+<a name="l595"></a>    D3Sub(&amp;human-&gt;p[2].x,&amp;human-&gt;p[0].x,&amp;p2);
+<a name="l596"></a>    D3Unit(D3Add</span><span class="cF7">(</span><span class="cF0">&amp;p1,&amp;p2,&amp;p</span><span class="cF7">)</span><span class="cF0">);
+<a name="l597"></a>    base-&gt;color=LTBLUE;
+<a name="l598"></a>    Line(base,human-&gt;p[0].x-10*p.x,human-&gt;p[0].y-10*p.y,0,human-&gt;p[0].x-800*p.x,human-&gt;p[0].y-800*p.y,0,&amp;LaserPlot);
+<a name="l599"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l600"></a>
+<a name="l601"></a>done_draw:
+<a name="l602"></a>  GrDel(base);
+<a name="l603"></a>}
+<a name="l604"></a>
+<a name="l605"></a></span><span class="cF1">U0</span><span class="cF0"> Explosion(MyMass *tempm1,</span><span class="cF1">F64</span><span class="cF0"> r)
+<a name="l606"></a>{
+<a name="l607"></a>  MyMass *tempm;
+<a name="l608"></a>  D3 p1;
+<a name="l609"></a>  </span><span class="cF1">F64</span><span class="cF0"> d;
+<a name="l610"></a>
+<a name="l611"></a>  tempm=ode-&gt;next_mass;
+<a name="l612"></a>  </span><span class="cF1">while</span><span class="cF0"> (tempm!=&amp;ode-&gt;next_mass) </span><span class="cF7">{</span><span class="cF0">
+<a name="l613"></a>    </span><span class="cF1">if</span><span class="cF0"> (tempm!=tempm1) {
+<a name="l614"></a>      D3Sub(&amp;tempm-&gt;state-&gt;x,&amp;tempm1-&gt;state-&gt;x,&amp;p1);
+<a name="l615"></a>      d=D3SqrNorm(&amp;p1)-tempm-&gt;radius*tempm-&gt;radius;
+<a name="l616"></a>      </span><span class="cF1">if</span><span class="cF0"> (d&lt;100.0*100.0) </span><span class="cF7">{</span><span class="cF0">
+<a name="l617"></a>        </span><span class="cF1">if</span><span class="cF0"> (d&lt;1)
+<a name="l618"></a>          d=1;
+<a name="l619"></a>        </span><span class="cF1">else</span><span class="cF0">
+<a name="l620"></a>          d=Sqrt(d);
+<a name="l621"></a>        d=2e8*r`7/d`6;
+<a name="l622"></a>        </span><span class="cF1">if</span><span class="cF0"> (d&gt;1e5) d=1e5;
+<a name="l623"></a>        D3MulEqu(&amp;p1,d);
+<a name="l624"></a>        D3AddEqu(&amp;tempm-&gt;DstateDt-&gt;DxDt,&amp;p1);
+<a name="l625"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l626"></a>    }
+<a name="l627"></a>    tempm=tempm-&gt;next;
+<a name="l628"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l629"></a>}
+<a name="l630"></a>
+<a name="l631"></a></span><span class="cF1">U0</span><span class="cF0"> MyDerivative(Ode *ode,</span><span class="cF1">F64</span><span class="cF0"> t,Order2D3 *state,Order2D3 *DstateDt)
+<a name="l632"></a>{
+<a name="l633"></a>  </span><span class="cF1">nounusedwarn</span><span class="cF0"> t,state,DstateDt;
+<a name="l634"></a>  </span><span class="cF1">I64</span><span class="cF0"> i;
+<a name="l635"></a>  </span><span class="cF1">F64</span><span class="cF0"> d,dd,dd2,spin,t_left,t_right;
+<a name="l636"></a>  TaskStruct *task=ode-&gt;win_task;
+<a name="l637"></a>  D3 p,p1,p2;
+<a name="l638"></a>  Bullet *tempb;
+<a name="l639"></a>  Ship *temps;
+<a name="l640"></a>  MyMass *tempm,*tempm1;
+<a name="l641"></a>
+<a name="l642"></a>  tempm=ode-&gt;next_mass;
+<a name="l643"></a>  </span><span class="cF1">while</span><span class="cF0"> (tempm!=&amp;ode-&gt;next_mass) </span><span class="cF7">{</span><span class="cF0">
+<a name="l644"></a>    d=tempm-&gt;state-&gt;x;
+<a name="l645"></a>    </span><span class="cF1">if</span><span class="cF0"> (d-tempm-&gt;radius&lt;0)
+<a name="l646"></a>      tempm-&gt;DstateDt-&gt;DxDt+=Sqr(Sqr</span><span class="cF7">(</span><span class="cF0">Sqr(d-tempm-&gt;radius)</span><span class="cF7">)</span><span class="cF0">);
+<a name="l647"></a>    </span><span class="cF1">if</span><span class="cF0"> (d+tempm-&gt;radius&gt;task-&gt;win_pixel_width)
+<a name="l648"></a>      tempm-&gt;DstateDt-&gt;DxDt-=Sqr(Sqr</span><span class="cF7">(</span><span class="cF0">Sqr(</span><span class="cF7">(</span><span class="cF0">d+tempm-&gt;radius</span><span class="cF7">)</span><span class="cF0">-task-&gt;win_pixel_width)</span><span class="cF7">)</span><span class="cF0">);
+<a name="l649"></a>
+<a name="l650"></a>    d=tempm-&gt;state-&gt;y;
+<a name="l651"></a>    </span><span class="cF1">if</span><span class="cF0"> (d-tempm-&gt;radius&lt;0)
+<a name="l652"></a>      tempm-&gt;DstateDt-&gt;DyDt+=Sqr(Sqr</span><span class="cF7">(</span><span class="cF0">Sqr(d-tempm-&gt;radius)</span><span class="cF7">)</span><span class="cF0">);
+<a name="l653"></a>    </span><span class="cF1">if</span><span class="cF0"> (d+tempm-&gt;radius&gt;task-&gt;win_pixel_height)
+<a name="l654"></a>      tempm-&gt;DstateDt-&gt;DyDt-=Sqr(Sqr</span><span class="cF7">(</span><span class="cF0">Sqr(</span><span class="cF7">(</span><span class="cF0">d+tempm-&gt;radius</span><span class="cF7">)</span><span class="cF0">-task-&gt;win_pixel_height)</span><span class="cF7">)</span><span class="cF0">);
+<a name="l655"></a>    tempm1=ode-&gt;next_mass;
+<a name="l656"></a>    </span><span class="cF1">while</span><span class="cF0"> (tempm1!=&amp;ode-&gt;next_mass) {
+<a name="l657"></a>      </span><span class="cF1">if</span><span class="cF0"> (tempm!=tempm1) </span><span class="cF7">{</span><span class="cF0">
+<a name="l658"></a>        D3Sub(&amp;tempm-&gt;state-&gt;x,&amp;tempm1-&gt;state-&gt;x,&amp;p);
+<a name="l659"></a>        dd=D3SqrNorm(&amp;p);
+<a name="l660"></a>        dd2=Sqr(tempm-&gt;radius+tempm1-&gt;radius);
+<a name="l661"></a>        </span><span class="cF1">if</span><span class="cF0"> (dd&lt;=dd2) {
+<a name="l662"></a>          d=Sqrt(dd)+0.0001;
+<a name="l663"></a>          D3MulEqu(&amp;p,Sqr</span><span class="cF7">(</span><span class="cF0">Sqr(dd2-dd)</span><span class="cF7">)</span><span class="cF0">/d);
+<a name="l664"></a>          D3AddEqu(&amp;tempm -&gt;DstateDt-&gt;DxDt,&amp;p);
+<a name="l665"></a>          D3SubEqu(&amp;tempm1-&gt;DstateDt-&gt;DxDt,&amp;p);
+<a name="l666"></a>        }
+<a name="l667"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l668"></a>      tempm1=tempm1-&gt;next;
+<a name="l669"></a>    }
+<a name="l670"></a>    tempm=tempm-&gt;next;
+<a name="l671"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l672"></a>
+<a name="l673"></a>
+<a name="l674"></a>  temps=ship_root.next;
+<a name="l675"></a>  </span><span class="cF1">while</span><span class="cF0"> (temps!=&amp;ship_root) </span><span class="cF7">{</span><span class="cF0">
+<a name="l676"></a>    </span><span class="cF1">if</span><span class="cF0"> (temps-&gt;exploding &amp;&amp; temps-&gt;die_time&lt;=tP</span><span class="cF7">(</span><span class="cF0">ode-&gt;win_task</span><span class="cF7">)</span><span class="cF0">&lt;=temps-&gt;die_timeout)
+<a name="l677"></a>      </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;temps-&gt;masses;i++)
+<a name="l678"></a>        Explosion(&amp;temps-&gt;p[i],temps-&gt;p[i].radius/3.0);
+<a name="l679"></a>    </span><span class="cF1">switch</span><span class="cF0"> (temps-&gt;type) {
+<a name="l680"></a>      </span><span class="cF1">case</span><span class="cF0"> ST_HUMAN1:
+<a name="l681"></a>        </span><span class="cF1">if</span><span class="cF0"> (!temps-&gt;exploding) </span><span class="cF7">{</span><span class="cF0">
+<a name="l682"></a>          </span><span class="cF1">if</span><span class="cF0"> (temps-&gt;spacewalk_side) {
+<a name="l683"></a>            t_left=0;
+<a name="l684"></a>            t_right=0;
+<a name="l685"></a>            d=1.0-(temps-&gt;spacewalk_timeout-tP</span><span class="cF7">(</span><span class="cF0">ode-&gt;win_task</span><span class="cF7">)</span><span class="cF0">)/SPACEWALK_TIME;
+<a name="l686"></a>            </span><span class="cF1">if</span><span class="cF0"> (0.485&lt;d&lt;0.515) </span><span class="cF7">{</span><span class="cF0">
+<a name="l687"></a>              D3Unit(D3Sub</span><span class="cF7">(</span><span class="cF0">&amp;temps-&gt;p[2].state-&gt;x,&amp;temps-&gt;p[1].state-&gt;x,&amp;p</span><span class="cF7">)</span><span class="cF0">);
+<a name="l688"></a>              </span><span class="cF1">if</span><span class="cF0"> (temps-&gt;spacewalk_side==3) {
+<a name="l689"></a>                temps-&gt;p[3].DstateDt-&gt;DxDt-=10*MAX_THRUST*p.x;
+<a name="l690"></a>                temps-&gt;p[3].DstateDt-&gt;DyDt-=10*MAX_THRUST*p.y;
+<a name="l691"></a>                temps-&gt;p[1].DstateDt-&gt;DxDt+=10*MAX_THRUST*p.x;
+<a name="l692"></a>                temps-&gt;p[1].DstateDt-&gt;DyDt+=10*MAX_THRUST*p.y;
+<a name="l693"></a>              } </span><span class="cF1">else</span><span class="cF0"> {
+<a name="l694"></a>                temps-&gt;p[4].DstateDt-&gt;DxDt+=10*MAX_THRUST*p.x;
+<a name="l695"></a>                temps-&gt;p[4].DstateDt-&gt;DyDt+=10*MAX_THRUST*p.y;
+<a name="l696"></a>                temps-&gt;p[2].DstateDt-&gt;DxDt-=10*MAX_THRUST*p.x;
+<a name="l697"></a>                temps-&gt;p[2].DstateDt-&gt;DyDt-=10*MAX_THRUST*p.y;
+<a name="l698"></a>              }
+<a name="l699"></a>            </span><span class="cF7">}</span><span class="cF0">
+<a name="l700"></a>          } </span><span class="cF1">else</span><span class="cF0"> {
+<a name="l701"></a>            </span><span class="cF1">if</span><span class="cF0"> (d=D3Norm</span><span class="cF7">(</span><span class="cF0">D3Sub(&amp;temps-&gt;p[0].state-&gt;x,&amp;temps-&gt;p[1].state-&gt;x,&amp;p1)</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF7">{</span><span class="cF0">
+<a name="l702"></a>              D3Sub(&amp;temps-&gt;p[0].state-&gt;DxDt,&amp;temps-&gt;p[1].state-&gt;DxDt,&amp;p2);
+<a name="l703"></a>              D3Cross(&amp;p1,&amp;p2,&amp;p);
+<a name="l704"></a>              spin=p.z/d;
+<a name="l705"></a>            </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0">
+<a name="l706"></a>              spin=0;
+<a name="l707"></a>            t_left =Limit(human_t_left+SPIN_GAIN*spin*human_antispin,0,MAX_THRUST);
+<a name="l708"></a>
+<a name="l709"></a>            </span><span class="cF1">if</span><span class="cF0"> (d=D3Norm</span><span class="cF7">(</span><span class="cF0">D3Sub(&amp;temps-&gt;p[0].state-&gt;x,&amp;temps-&gt;p[2].state-&gt;x,&amp;p1)</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF7">{</span><span class="cF0">
+<a name="l710"></a>              D3Sub(&amp;temps-&gt;p[0].state-&gt;DxDt,&amp;temps-&gt;p[2].state-&gt;DxDt,&amp;p2);
+<a name="l711"></a>              D3Cross(&amp;p1,&amp;p2,&amp;p);
+<a name="l712"></a>              spin=p.z/d;
+<a name="l713"></a>            </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0">
+<a name="l714"></a>              spin=0;
+<a name="l715"></a>            t_right=Limit(human_t_right-SPIN_GAIN*spin*human_antispin,0,MAX_THRUST);
+<a name="l716"></a>
+<a name="l717"></a>            D3Sub(&amp;temps-&gt;p[0].state-&gt;x,&amp;temps-&gt;p[1].state-&gt;x,&amp;p1);
+<a name="l718"></a>            D3Sub(&amp;temps-&gt;p[0].state-&gt;x,&amp;temps-&gt;p[2].state-&gt;x,&amp;p2);
+<a name="l719"></a>            D3Unit(D3Add</span><span class="cF7">(</span><span class="cF0">&amp;p1,&amp;p2,&amp;p</span><span class="cF7">)</span><span class="cF0">);
+<a name="l720"></a>            </span><span class="cF1">if</span><span class="cF0"> (!</span><span class="cF7">(</span><span class="cF0">temps-&gt;s[3].flags&amp;SSF_INACTIVE</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF7">{</span><span class="cF0">
+<a name="l721"></a>              D3Mul(t_left,&amp;p,&amp;p1);
+<a name="l722"></a>              D3AddEqu(&amp;temps-&gt;p[3].DstateDt-&gt;DxDt,&amp;p1);
+<a name="l723"></a>            </span><span class="cF7">}</span><span class="cF0">
+<a name="l724"></a>            </span><span class="cF1">if</span><span class="cF0"> (!</span><span class="cF7">(</span><span class="cF0">temps-&gt;s[5].flags&amp;SSF_INACTIVE</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF7">{</span><span class="cF0">
+<a name="l725"></a>              D3Mul(t_right,&amp;p,&amp;p2);
+<a name="l726"></a>              D3AddEqu(&amp;temps-&gt;p[4].DstateDt-&gt;DxDt,&amp;p2);
+<a name="l727"></a>            </span><span class="cF7">}</span><span class="cF0">
+<a name="l728"></a>          }
+<a name="l729"></a>        </span><span class="cF7">}</span><span class="cF0">
+<a name="l730"></a>        </span><span class="cF1">break</span><span class="cF0">;
+<a name="l731"></a>    }
+<a name="l732"></a>    temps=temps-&gt;next;
+<a name="l733"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l734"></a>
+<a name="l735"></a>  tempb=bullet_root.next;
+<a name="l736"></a>  </span><span class="cF1">while</span><span class="cF0"> (tempb!=&amp;bullet_root) </span><span class="cF7">{</span><span class="cF0">
+<a name="l737"></a>    </span><span class="cF1">if</span><span class="cF0"> (tempb-&gt;fuse_time&lt;=tP</span><span class="cF7">(</span><span class="cF0">ode-&gt;win_task</span><span class="cF7">)</span><span class="cF0">&lt;=tempb-&gt;die_timeout)
+<a name="l738"></a>      Explosion(&amp;tempb-&gt;p,tempb-&gt;radius);
+<a name="l739"></a>    tempb=tempb-&gt;next;
+<a name="l740"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l741"></a>}
+<a name="l742"></a>
+<a name="l743"></a>
+<a name="l744"></a></span><span class="cF1">U0</span><span class="cF0"> CheckDamage()
+<a name="l745"></a>{
+<a name="l746"></a>  </span><span class="cF1">I64</span><span class="cF0"> i,j,k;
+<a name="l747"></a>  Ship *temps,*temps1;
+<a name="l748"></a>  MyMass *tempm,*best_mass;
+<a name="l749"></a>  D3 p,p1,p2;
+<a name="l750"></a>  </span><span class="cF1">F64</span><span class="cF0"> d,best_distance;
+<a name="l751"></a>
+<a name="l752"></a>  tempm=ode-&gt;next_mass;
+<a name="l753"></a>  </span><span class="cF1">while</span><span class="cF0"> (tempm!=&amp;ode-&gt;next_mass) </span><span class="cF7">{</span><span class="cF0">
+<a name="l754"></a>    tempm-&gt;temperature*=0.9;
+<a name="l755"></a>    tempm=tempm-&gt;next;
+<a name="l756"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l757"></a>  </span><span class="cF1">if</span><span class="cF0"> (human) </span><span class="cF7">{</span><span class="cF0">
+<a name="l758"></a>    human-&gt;laser_temperature*=0.975;
+<a name="l759"></a>
+<a name="l760"></a>    </span><span class="cF1">if</span><span class="cF0"> (human-&gt;laser_overheat) {
+<a name="l761"></a>      </span><span class="cF1">if</span><span class="cF0"> (human-&gt;laser_temperature&lt;LASER_THRESHOLD_TEMP)
+<a name="l762"></a>        human-&gt;laser_overheat=FALSE;
+<a name="l763"></a>    }
+<a name="l764"></a>    </span><span class="cF1">if</span><span class="cF0"> (!human-&gt;laser_overheat &amp;&amp; human-&gt;lasering) {
+<a name="l765"></a>      </span><span class="cF1">if</span><span class="cF0"> (human-&gt;laser_temperature&gt;=LASER_MAX_TEMP) </span><span class="cF7">{</span><span class="cF0">
+<a name="l766"></a>        human-&gt;laser_overheat=TRUE;
+<a name="l767"></a>        Snd(0);
+<a name="l768"></a>      </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l769"></a>        human-&gt;laser_temperature+=1.0;
+<a name="l770"></a>        D3Sub(&amp;human-&gt;p[0].x,&amp;human-&gt;p[1].x,&amp;p1);
+<a name="l771"></a>        D3Sub(&amp;human-&gt;p[0].x,&amp;human-&gt;p[2].x,&amp;p2);
+<a name="l772"></a>        D3Unit(D3Add</span><span class="cF7">(</span><span class="cF0">&amp;p1,&amp;p2,&amp;p</span><span class="cF7">)</span><span class="cF0">);
+<a name="l773"></a>        p2.x=p.y;
+<a name="l774"></a>        p2.y=-p.x;
+<a name="l775"></a>        p2.z=0;
+<a name="l776"></a>        best_mass=NULL;
+<a name="l777"></a>        best_distance=MAX_F64;
+<a name="l778"></a>        tempm=ode-&gt;next_mass;
+<a name="l779"></a>        </span><span class="cF1">while</span><span class="cF0"> (tempm!=&amp;ode-&gt;next_mass) {
+<a name="l780"></a>          D3Sub(&amp;human-&gt;p[0].x,&amp;tempm-&gt;x,&amp;p1);
+<a name="l781"></a>          </span><span class="cF1">if</span><span class="cF0"> (Abs</span><span class="cF7">(</span><span class="cF0">D3Dot(&amp;p1,&amp;p2)</span><span class="cF7">)</span><span class="cF0">&lt;tempm-&gt;radius &amp;&amp;
+<a name="l782"></a>              D3Dot</span><span class="cF7">(</span><span class="cF0">&amp;p1,&amp;p</span><span class="cF7">)</span><span class="cF0">&lt;0.0) </span><span class="cF7">{</span><span class="cF0">
+<a name="l783"></a>            d=D3SqrNorm(&amp;p1);
+<a name="l784"></a>            </span><span class="cF1">if</span><span class="cF0"> (d&lt;best_distance) {
+<a name="l785"></a>              best_distance=d;
+<a name="l786"></a>              best_mass=tempm;
+<a name="l787"></a>            }
+<a name="l788"></a>          </span><span class="cF7">}</span><span class="cF0">
+<a name="l789"></a>          tempm=tempm-&gt;next;
+<a name="l790"></a>        }
+<a name="l791"></a>        </span><span class="cF1">if</span><span class="cF0"> (best_mass)
+<a name="l792"></a>          best_mass-&gt;temperature+=1.0;
+<a name="l793"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l794"></a>    }
+<a name="l795"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l796"></a>
+<a name="l797"></a>  temps=ship_root.next;
+<a name="l798"></a>  </span><span class="cF1">while</span><span class="cF0"> (temps!=&amp;ship_root) </span><span class="cF7">{</span><span class="cF0">
+<a name="l799"></a>    temps1=temps-&gt;next;
+<a name="l800"></a>    </span><span class="cF1">switch</span><span class="cF0"> (temps-&gt;type) {
+<a name="l801"></a>      </span><span class="cF1">case</span><span class="cF0"> ST_HUMAN1:
+<a name="l802"></a>        </span><span class="cF1">if</span><span class="cF0"> (temps-&gt;exploding) </span><span class="cF7">{</span><span class="cF0">
+<a name="l803"></a>          </span><span class="cF1">if</span><span class="cF0"> (tP&gt;temps-&gt;die_timeout)  {
+<a name="l804"></a>            ShipDel(temps);
+<a name="l805"></a>            human=NULL;
+<a name="l806"></a>          }
+<a name="l807"></a>        </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0">
+<a name="l808"></a>          </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;temps-&gt;springs;i++) </span><span class="cF7">{</span><span class="cF0">
+<a name="l809"></a>            </span><span class="cF1">if</span><span class="cF0"> (Abs</span><span class="cF7">(</span><span class="cF0">temps-&gt;s[i].f</span><span class="cF7">)</span><span class="cF0">&gt;temps-&gt;s[i].strength)
+<a name="l810"></a>              temps-&gt;s[i].flags|=SSF_INACTIVE;
+<a name="l811"></a>            </span><span class="cF1">if</span><span class="cF0"> (temps-&gt;s[i].flags&amp;SSF_INACTIVE) {
+<a name="l812"></a>              </span><span class="cF1">if</span><span class="cF0"> (i&lt;3) </span><span class="cF7">{</span><span class="cF0">
+<a name="l813"></a>                </span><span class="cF1">if</span><span class="cF0"> (!temps-&gt;exploding) {
+<a name="l814"></a>                  temps-&gt;exploding=TRUE;
+<a name="l815"></a>                  temps-&gt;die_time=tP;
+<a name="l816"></a>                  temps-&gt;die_timeout=tP+0.75;
+<a name="l817"></a>                  game_over=TRUE;
+<a name="l818"></a>                  Noise(750,1000,2000);
+<a name="l819"></a>                  </span><span class="cF1">break</span><span class="cF0">;
+<a name="l820"></a>                }
+<a name="l821"></a>              </span><span class="cF7">}</span><span class="cF0">
+<a name="l822"></a>            }
+<a name="l823"></a>          </span><span class="cF7">}</span><span class="cF0">
+<a name="l824"></a>          </span><span class="cF1">break</span><span class="cF0">;
+<a name="l825"></a>      </span><span class="cF1">default</span><span class="cF0">:
+<a name="l826"></a>        </span><span class="cF1">if</span><span class="cF0"> (temps-&gt;exploding) </span><span class="cF7">{</span><span class="cF0">
+<a name="l827"></a>          </span><span class="cF1">if</span><span class="cF0"> (tP&gt;temps-&gt;die_timeout) {
+<a name="l828"></a>            ShipDel(temps);
+<a name="l829"></a>            score+=level;
+<a name="l830"></a>            </span><span class="cF1">if</span><span class="cF0"> (score&gt;best_score)
+<a name="l831"></a>              best_score=score;
+<a name="l832"></a>          }
+<a name="l833"></a>        </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l834"></a>          j=0;
+<a name="l835"></a>          </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;temps-&gt;springs;i++) {
+<a name="l836"></a>            </span><span class="cF1">if</span><span class="cF0"> (temps-&gt;s[i].flags&amp;SSF_INACTIVE)
+<a name="l837"></a>              j++;
+<a name="l838"></a>            </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF1">if</span><span class="cF0"> (Abs</span><span class="cF7">(</span><span class="cF0">temps-&gt;s[i].f</span><span class="cF7">)</span><span class="cF0">&gt;temps-&gt;s[i].strength) </span><span class="cF7">{</span><span class="cF0">
+<a name="l839"></a>              temps-&gt;s[i].flags|=SSF_INACTIVE;
+<a name="l840"></a>              j++;
+<a name="l841"></a>            </span><span class="cF7">}</span><span class="cF0">
+<a name="l842"></a>          }
+<a name="l843"></a>          k=0;
+<a name="l844"></a>          </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;temps-&gt;masses;i++) {
+<a name="l845"></a>            </span><span class="cF1">if</span><span class="cF0"> (temps-&gt;p[i].temperature&gt;MASS_MAX_TEMP)
+<a name="l846"></a>              k++;
+<a name="l847"></a>          }
+<a name="l848"></a>          </span><span class="cF1">if</span><span class="cF0"> (j&gt;1 || k) {
+<a name="l849"></a>            temps-&gt;exploding=TRUE;
+<a name="l850"></a>            temps-&gt;die_time=tP;
+<a name="l851"></a>            temps-&gt;die_timeout=tP+0.75;
+<a name="l852"></a>            Noise(750,1000,3000);
+<a name="l853"></a>          }
+<a name="l854"></a>        </span><span class="cF7">}</span><span class="cF0">
+<a name="l855"></a>        </span><span class="cF1">break</span><span class="cF0">;
+<a name="l856"></a>    }
+<a name="l857"></a>    temps=temps1;
+<a name="l858"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l859"></a>}
+<a name="l860"></a>
+<a name="l861"></a></span><span class="cF2">// ********************************** Bullets</span><span class="cF0">
+<a name="l862"></a>
+<a name="l863"></a></span><span class="cF1">U0</span><span class="cF0"> FireOneGun(Ship *temps,</span><span class="cF1">I64</span><span class="cF0"> g,</span><span class="cF1">F64</span><span class="cF0"> r,</span><span class="cF1">F64</span><span class="cF0"> fuse_time)
+<a name="l864"></a>{
+<a name="l865"></a>  D3 p,p1,p2;
+<a name="l866"></a>  Bullet *tempb;
+<a name="l867"></a>
+<a name="l868"></a>  tempb=CAlloc(</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF0">Bullet</span><span class="cF7">)</span><span class="cF0">);
+<a name="l869"></a>  D3Copy(&amp;tempb-&gt;p.x,&amp;temps-&gt;p[g].x);
+<a name="l870"></a>  tempb-&gt;radius=r;
+<a name="l871"></a>  tempb-&gt;fuse_time=tP+1.5*fuse_time;
+<a name="l872"></a>  tempb-&gt;die_timeout=tempb-&gt;fuse_time+0.125;
+<a name="l873"></a>  tempb-&gt;p.mass=0.3*r*r*r;
+<a name="l874"></a>  D3Sub(&amp;temps-&gt;p[0].x,&amp;temps-&gt;p[1].x,&amp;p1);
+<a name="l875"></a>  D3Sub(&amp;temps-&gt;p[0].x,&amp;temps-&gt;p[2].x,&amp;p2);
+<a name="l876"></a>  D3Add(&amp;p1,&amp;p2,&amp;p);
+<a name="l877"></a>  D3AddEqu(&amp;tempb-&gt;p.x,D3MulEqu</span><span class="cF7">(</span><span class="cF0">D3Copy(&amp;p1,D3Unit</span><span class="cF7">(</span><span class="cF0">&amp;p</span><span class="cF7">)</span><span class="cF0">),r+temps-&gt;p[0].radius+5</span><span class="cF7">)</span><span class="cF0">);
+<a name="l878"></a>  D3AddEqu(D3MulEqu</span><span class="cF7">(</span><span class="cF0">&amp;p,1000/(r+1)</span><span class="cF7">)</span><span class="cF0">,&amp;temps-&gt;p[g].DxDt);
+<a name="l879"></a>  D3Copy(&amp;tempb-&gt;p.DxDt,&amp;p);
+<a name="l880"></a>  D3MulEqu(&amp;p,tempb-&gt;p.mass/temps-&gt;p[g].mass/100.0);
+<a name="l881"></a>  D3SubEqu(&amp;temps-&gt;p[g].DxDt,&amp;p);
+<a name="l882"></a>  InsQue(&amp;tempb-&gt;p,ode-&gt;last_mass);
+<a name="l883"></a>  InsQue(tempb,bullet_root.last);
+<a name="l884"></a>  temps-&gt;reload_timeout=tP+r/temps-&gt;fire_rate;
+<a name="l885"></a>  Noise(100,r*200,r*400);
+<a name="l886"></a>}
+<a name="l887"></a>
+<a name="l888"></a></span><span class="cF1">U0</span><span class="cF0"> HumanFireBegin()
+<a name="l889"></a>{
+<a name="l890"></a>
+<a name="l891"></a>  </span><span class="cF1">F64</span><span class="cF0"> r=3.0*ctrl_panel.bullet_radius/CTRL_PANEL_RANGE+0.5,
+<a name="l892"></a>     fuse_time=ToF64(ctrl_panel.fuse_time+1)/CTRL_PANEL_RANGE;
+<a name="l893"></a>  </span><span class="cF1">if</span><span class="cF0"> (human) </span><span class="cF7">{</span><span class="cF0">
+<a name="l894"></a>    </span><span class="cF1">if</span><span class="cF0"> (!human-&gt;exploding &amp;&amp; !human-&gt;spacewalk_side &amp;&amp; tP&gt;human-&gt;reload_timeout)
+<a name="l895"></a>      </span><span class="cF1">switch</span><span class="cF0"> (level) {
+<a name="l896"></a>        </span><span class="cF1">case</span><span class="cF0"> 3:
+<a name="l897"></a>          </span><span class="cF1">if</span><span class="cF0"> (!</span><span class="cF7">(</span><span class="cF0">human-&gt;s[3].flags&amp;SSF_INACTIVE</span><span class="cF7">)</span><span class="cF0">)
+<a name="l898"></a>            FireOneGun(human,3,r,fuse_time);
+<a name="l899"></a>          </span><span class="cF1">if</span><span class="cF0"> (!</span><span class="cF7">(</span><span class="cF0">human-&gt;s[5].flags&amp;SSF_INACTIVE</span><span class="cF7">)</span><span class="cF0">)
+<a name="l900"></a>            FireOneGun(human,4,r,fuse_time);
+<a name="l901"></a>        </span><span class="cF1">case</span><span class="cF0"> 2:
+<a name="l902"></a>          </span><span class="cF1">if</span><span class="cF0"> (!</span><span class="cF7">(</span><span class="cF0">human-&gt;s[1].flags&amp;SSF_INACTIVE</span><span class="cF7">)</span><span class="cF0">)
+<a name="l903"></a>            FireOneGun(human,1,r,fuse_time);
+<a name="l904"></a>          </span><span class="cF1">if</span><span class="cF0"> (!</span><span class="cF7">(</span><span class="cF0">human-&gt;s[2].flags&amp;SSF_INACTIVE</span><span class="cF7">)</span><span class="cF0">)
+<a name="l905"></a>            FireOneGun(human,2,r,fuse_time);
+<a name="l906"></a>        </span><span class="cF1">case</span><span class="cF0"> 1:
+<a name="l907"></a>          FireOneGun(human,0,r,fuse_time);
+<a name="l908"></a>          </span><span class="cF1">break</span><span class="cF0">;
+<a name="l909"></a>        </span><span class="cF1">default</span><span class="cF0">:
+<a name="l910"></a>          human-&gt;lasering=TRUE;
+<a name="l911"></a>          </span><span class="cF1">break</span><span class="cF0">;
+<a name="l912"></a>      }
+<a name="l913"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l914"></a>}
+<a name="l915"></a>
+<a name="l916"></a></span><span class="cF1">U0</span><span class="cF0"> HumanFireEnd()
+<a name="l917"></a>{
+<a name="l918"></a>  </span><span class="cF1">if</span><span class="cF0"> (human &amp;&amp; !human-&gt;exploding)
+<a name="l919"></a>    </span><span class="cF1">switch</span><span class="cF0"> (level) </span><span class="cF7">{</span><span class="cF0">
+<a name="l920"></a>      </span><span class="cF1">case</span><span class="cF0"> 3:
+<a name="l921"></a>      </span><span class="cF1">case</span><span class="cF0"> 2:
+<a name="l922"></a>      </span><span class="cF1">case</span><span class="cF0"> 1:
+<a name="l923"></a>        </span><span class="cF1">break</span><span class="cF0">;
+<a name="l924"></a>      </span><span class="cF1">default</span><span class="cF0">:
+<a name="l925"></a>        human-&gt;lasering=FALSE;
+<a name="l926"></a>        Snd(0);
+<a name="l927"></a>        </span><span class="cF1">break</span><span class="cF0">;
+<a name="l928"></a>    </span><span class="cF7">}</span><span class="cF0">
+<a name="l929"></a>}
+<a name="l930"></a>
+<a name="l931"></a></span><span class="cF1">U0</span><span class="cF0"> ExpireShots()
+<a name="l932"></a>{
+<a name="l933"></a>  Bullet *tempb=bullet_root.next,*tempb1;
+<a name="l934"></a>  </span><span class="cF1">while</span><span class="cF0"> (tempb!=&amp;bullet_root) </span><span class="cF7">{</span><span class="cF0">
+<a name="l935"></a>    tempb1=tempb-&gt;next;
+<a name="l936"></a>    </span><span class="cF1">if</span><span class="cF0"> (tP&gt;tempb-&gt;fuse_time &amp;&amp; !tempb-&gt;exploding) {
+<a name="l937"></a>      tempb-&gt;exploding=TRUE;
+<a name="l938"></a>      Noise(50,3000,6000);
+<a name="l939"></a>    }
+<a name="l940"></a>    </span><span class="cF1">if</span><span class="cF0"> (tP&gt;tempb-&gt;die_timeout) {
+<a name="l941"></a>      RemQue(tempb);
+<a name="l942"></a>      RemQue(&amp;tempb-&gt;p);
+<a name="l943"></a>      Free(tempb);
+<a name="l944"></a>    }
+<a name="l945"></a>    tempb=tempb1;
+<a name="l946"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l947"></a>}
+<a name="l948"></a>
+<a name="l949"></a></span><span class="cF2">// ********************************** AI</span><span class="cF0">
+<a name="l950"></a>
+<a name="l951"></a></span><span class="cF1">U0</span><span class="cF0"> AI()
+<a name="l952"></a>{
+<a name="l953"></a>  D3 p,p1,p2;
+<a name="l954"></a>  Ship *temps=ship_root.next;
+<a name="l955"></a>  </span><span class="cF1">if</span><span class="cF0"> (human &amp;&amp; !human-&gt;exploding) </span><span class="cF7">{</span><span class="cF0">
+<a name="l956"></a>    </span><span class="cF1">while</span><span class="cF0"> (temps!=&amp;ship_root) {
+<a name="l957"></a>      D3Sub(&amp;temps-&gt;p[0].x,&amp;temps-&gt;p[1].x,&amp;p1);
+<a name="l958"></a>      D3Sub(&amp;temps-&gt;p[0].x,&amp;temps-&gt;p[2].x,&amp;p2);
+<a name="l959"></a>      D3Add(&amp;p1,&amp;p2,&amp;p);
+<a name="l960"></a>      D3Sub(&amp;human-&gt;p[0].x,&amp;temps-&gt;p[0].x,&amp;p1);
+<a name="l961"></a>      </span><span class="cF1">if</span><span class="cF0"> (D3Dot</span><span class="cF7">(</span><span class="cF0">D3Unit(&amp;p),D3Unit(&amp;p1)</span><span class="cF7">)</span><span class="cF0">&gt;0.995 &amp;&amp;
+<a name="l962"></a>        tP&gt;temps-&gt;reload_timeout) </span><span class="cF7">{</span><span class="cF0">
+<a name="l963"></a>        FireOneGun(temps,0,1.5+.5,.4);
+<a name="l964"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l965"></a>      temps=temps-&gt;next;
+<a name="l966"></a>    }
+<a name="l967"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l968"></a>}
+<a name="l969"></a>
+<a name="l970"></a></span><span class="cF2">// ********************************** Init</span><span class="cF0">
+<a name="l971"></a>
+<a name="l972"></a>
+<a name="l973"></a></span><span class="cF1">U0</span><span class="cF0"> InitLevel()
+<a name="l974"></a>{
+<a name="l975"></a>  </span><span class="cF1">I64</span><span class="cF0"> i;
+<a name="l976"></a>  human=ShipNew(Fs-&gt;win_pixel_width/2,Fs-&gt;win_pixel_height/2,ST_HUMAN1);
+<a name="l977"></a>  </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;level+2;i++)
+<a name="l978"></a>    PlaceShip(ST_ENEMY1);
+<a name="l979"></a>  PlaceShip(ST_ENEMY2);
+<a name="l980"></a>  show_level_msg=TRUE;
+<a name="l981"></a>  ode-&gt;flags|=ODEF_PAUSED;
+<a name="l982"></a>}
+<a name="l983"></a>
+<a name="l984"></a></span><span class="cF1">U0</span><span class="cF0"> Init()
+<a name="l985"></a>{
+<a name="l986"></a>  </span><span class="cF1">I64</span><span class="cF0"> i;
+<a name="l987"></a>  game_over=FALSE;
+<a name="l988"></a>  score=0;
+<a name="l989"></a>  level=1;
+<a name="l990"></a>
+<a name="l991"></a>  ship_root.next=ship_root.last=&amp;ship_root;
+<a name="l992"></a>  bullet_root.next=bullet_root.last=&amp;bullet_root;
+<a name="l993"></a>
+<a name="l994"></a>  </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;NUM_STARS;i++) </span><span class="cF7">{</span><span class="cF0">
+<a name="l995"></a>    stars_x[i]=RandU16%GR_WIDTH;
+<a name="l996"></a>    stars_y[i]=RandU16%GR_HEIGHT;
+<a name="l997"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l998"></a>
+<a name="l999"></a>  human_t_left=0;
+<a name="l1000"></a>  human_t_right=0;
+<a name="l1001"></a>  human_antispin=0;
+<a name="l1002"></a>
+<a name="l1003"></a>  InitLevel;
+<a name="l1004"></a>}
+<a name="l1005"></a>
+<a name="l1006"></a>
+<a name="l1007"></a></span><span class="cF2">// ********************************** Main</span><span class="cF0">
+<a name="l1008"></a>
+<a name="l1009"></a></span><span class="cF1">U0</span><span class="cF0"> XCaliber()
+<a name="l1010"></a>{
+<a name="l1011"></a>  </span><span class="cF1">U64</span><span class="cF0"> ch,msg_code,p1,p2,sc;
+<a name="l1012"></a>  Ctrl *cp=CtrlPanelNew;
+<a name="l1013"></a>
+<a name="l1014"></a>  SettingsPush; </span><span class="cF2">//See </span><a href="/archive/code/TaskSettings.html#l3"><span class="cF4">SettingsPush</span></a><span class="cF0">
+<a name="l1015"></a>  Preempt(OFF);
+<a name="l1016"></a>  Fs-&gt;text_attr=BLACK&lt;&lt;4+WHITE;
+<a name="l1017"></a>  MenuPush(
+<a name="l1018"></a>  </span><span class="cF6">"File {"</span><span class="cF0">
+<a name="l1019"></a>  </span><span class="cF6">"  Abort(,CH_SHIFT_ESC);"</span><span class="cF0">
+<a name="l1020"></a>  </span><span class="cF6">"  Exit(,CH_ESC);"</span><span class="cF0">
+<a name="l1021"></a>  </span><span class="cF6">"}"</span><span class="cF0">
+<a name="l1022"></a>  </span><span class="cF6">"Play {"</span><span class="cF0">
+<a name="l1023"></a>  </span><span class="cF6">"  Restart(,CH_CR);"</span><span class="cF0">
+<a name="l1024"></a>  </span><span class="cF6">"  Fire(,CH_SPACE);"</span><span class="cF0">
+<a name="l1025"></a>  </span><span class="cF6">"  Thrust(,,SC_CURSOR_UP);"</span><span class="cF0">
+<a name="l1026"></a>  </span><span class="cF6">"  StopSpin(,,SC_CURSOR_DOWN);"</span><span class="cF0">
+<a name="l1027"></a>  </span><span class="cF6">"  Left(,,SC_CURSOR_LEFT);"</span><span class="cF0">
+<a name="l1028"></a>  </span><span class="cF6">"  Right(,,SC_CURSOR_RIGHT);"</span><span class="cF0">
+<a name="l1029"></a>  </span><span class="cF6">"  Spackwalk(,'w');"</span><span class="cF0">
+<a name="l1030"></a>  </span><span class="cF6">"  LongerFuse(,,SC_CURSOR_RIGHT|SCF_SHIFT);"</span><span class="cF0">
+<a name="l1031"></a>  </span><span class="cF6">"  ShorterFuse(,,SC_CURSOR_LEFT|SCF_SHIFT);"</span><span class="cF0">
+<a name="l1032"></a>  </span><span class="cF6">"  LargerShot(,,SC_CURSOR_UP|SCF_SHIFT);"</span><span class="cF0">
+<a name="l1033"></a>  </span><span class="cF6">"  SmallerShot(,,SC_CURSOR_DOWN|SCF_SHIFT);"</span><span class="cF0">
+<a name="l1034"></a>      </span><span class="cF6">"}"</span><span class="cF0">
+<a name="l1035"></a>      );
+<a name="l1036"></a>  WinMax;
+<a name="l1037"></a>  WordStat(OFF);
+<a name="l1038"></a>  WinBorder(ON);
+<a name="l1039"></a>  Fs-&gt;win_inhibit=WIF_ALL-WIF_BORDER-WIF_MENU-WIF_CTRLS;
+<a name="l1040"></a>  Fs-&gt;update_win=&amp;UpdateWin;
+<a name="l1041"></a>  </span><span class="cF1">do</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l1042"></a>    ode=OdeNew(0,0.01,ODEF_HAS_MASSES);
+<a name="l1043"></a>    ode-&gt;derivative=&amp;MyDerivative;
+<a name="l1044"></a>    ode-&gt;min_tolerance=1e-9;
+<a name="l1045"></a>    ode-&gt;drag_v3=0.00001;
+<a name="l1046"></a>    Init;
+<a name="l1047"></a>    InsQue(ode,Fs-&gt;last_ode);
+<a name="l1048"></a>    ch=0;
+<a name="l1049"></a>    </span><span class="cF1">do</span><span class="cF0"> {
+<a name="l1050"></a>      </span><span class="cF1">while</span><span class="cF0"> (!game_over &amp;&amp; !show_level_msg &amp;&amp;
+<a name="l1051"></a>          </span><span class="cF7">(</span><span class="cF0">msg_code=ScanMsg(&amp;p1,&amp;p2,1&lt;&lt;MSG_KEY_DOWN|1&lt;&lt;MSG_KEY_UP)</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF7">{</span><span class="cF0">
+<a name="l1052"></a>        </span><span class="cF1">switch</span><span class="cF0"> (msg_code) {
+<a name="l1053"></a>          </span><span class="cF1">case</span><span class="cF0"> MSG_KEY_DOWN:
+<a name="l1054"></a>            ch=p1; sc=p2;
+<a name="l1055"></a>            </span><span class="cF1">switch</span><span class="cF0"> (ch) </span><span class="cF7">{</span><span class="cF0">
+<a name="l1056"></a>              </span><span class="cF1">case</span><span class="cF0"> 0:
+<a name="l1057"></a>                </span><span class="cF1">switch</span><span class="cF0"> (sc.u8[0]) {
+<a name="l1058"></a>                  </span><span class="cF1">case</span><span class="cF0"> SC_CURSOR_RIGHT:
+<a name="l1059"></a>                    </span><span class="cF1">if</span><span class="cF0"> (sc&amp;SCF_SHIFT)
+<a name="l1060"></a>                      ctrl_panel.fuse_time+=2;
+<a name="l1061"></a>                    </span><span class="cF1">else</span><span class="cF0">
+<a name="l1062"></a>                      human_t_right=MAX_THRUST;
+<a name="l1063"></a>                    </span><span class="cF1">break</span><span class="cF0">;
+<a name="l1064"></a>                  </span><span class="cF1">case</span><span class="cF0"> SC_CURSOR_LEFT:
+<a name="l1065"></a>                    </span><span class="cF1">if</span><span class="cF0"> (sc&amp;SCF_SHIFT)
+<a name="l1066"></a>                      ctrl_panel.fuse_time-=2;
+<a name="l1067"></a>                    </span><span class="cF1">else</span><span class="cF0">
+<a name="l1068"></a>                      human_t_left =MAX_THRUST;
+<a name="l1069"></a>                    </span><span class="cF1">break</span><span class="cF0">;
+<a name="l1070"></a>                  </span><span class="cF1">case</span><span class="cF0"> SC_CURSOR_UP:
+<a name="l1071"></a>                    </span><span class="cF1">if</span><span class="cF0"> (sc&amp;SCF_SHIFT)
+<a name="l1072"></a>                      ctrl_panel.bullet_radius+=2;
+<a name="l1073"></a>                    </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l1074"></a>                      human_t_right=MAX_THRUST;
+<a name="l1075"></a>                      human_t_left =MAX_THRUST;
+<a name="l1076"></a>                    </span><span class="cF7">}</span><span class="cF0">
+<a name="l1077"></a>                    </span><span class="cF1">break</span><span class="cF0">;
+<a name="l1078"></a>                  </span><span class="cF1">case</span><span class="cF0"> SC_CURSOR_DOWN:
+<a name="l1079"></a>                    </span><span class="cF1">if</span><span class="cF0"> (sc&amp;SCF_SHIFT)
+<a name="l1080"></a>                      ctrl_panel.bullet_radius-=2;
+<a name="l1081"></a>                    </span><span class="cF1">else</span><span class="cF0">
+<a name="l1082"></a>                      human_antispin=MAX_ANTISPIN;
+<a name="l1083"></a>                    </span><span class="cF1">break</span><span class="cF0">;
+<a name="l1084"></a>                }
+<a name="l1085"></a>                </span><span class="cF1">break</span><span class="cF0">;
+<a name="l1086"></a>              </span><span class="cF1">case</span><span class="cF0"> CH_SPACE:
+<a name="l1087"></a>                HumanFireBegin;
+<a name="l1088"></a>                </span><span class="cF1">break</span><span class="cF0">;
+<a name="l1089"></a>              </span><span class="cF1">case</span><span class="cF0"> </span><span class="cF6">'w'</span><span class="cF0">:
+<a name="l1090"></a>                ctrl_panel.spacewalk=TRUE;
+<a name="l1091"></a>                </span><span class="cF1">break</span><span class="cF0">;
+<a name="l1092"></a>            </span><span class="cF7">}</span><span class="cF0">
+<a name="l1093"></a>            </span><span class="cF1">break</span><span class="cF0">;
+<a name="l1094"></a>          </span><span class="cF1">case</span><span class="cF0"> MSG_KEY_UP:
+<a name="l1095"></a>            ch=p1; sc=p2;
+<a name="l1096"></a>            </span><span class="cF1">switch</span><span class="cF0"> (ch) </span><span class="cF7">{</span><span class="cF0">
+<a name="l1097"></a>              </span><span class="cF1">case</span><span class="cF0"> 0:
+<a name="l1098"></a>                </span><span class="cF1">switch</span><span class="cF0"> (sc.u8[0]) {
+<a name="l1099"></a>                  </span><span class="cF1">case</span><span class="cF0"> SC_CURSOR_RIGHT:
+<a name="l1100"></a>                    human_t_right=0;
+<a name="l1101"></a>                    </span><span class="cF1">break</span><span class="cF0">;
+<a name="l1102"></a>                  </span><span class="cF1">case</span><span class="cF0"> SC_CURSOR_LEFT:
+<a name="l1103"></a>                    human_t_left =0;
+<a name="l1104"></a>                    </span><span class="cF1">break</span><span class="cF0">;
+<a name="l1105"></a>                  </span><span class="cF1">case</span><span class="cF0"> SC_CURSOR_UP:
+<a name="l1106"></a>                    human_t_right=0;
+<a name="l1107"></a>                    human_t_left =0;
+<a name="l1108"></a>                    </span><span class="cF1">break</span><span class="cF0">;
+<a name="l1109"></a>                  </span><span class="cF1">case</span><span class="cF0"> SC_CURSOR_DOWN:
+<a name="l1110"></a>                    human_antispin=0;
+<a name="l1111"></a>                    </span><span class="cF1">break</span><span class="cF0">;
+<a name="l1112"></a>                }
+<a name="l1113"></a>                </span><span class="cF1">break</span><span class="cF0">;
+<a name="l1114"></a>              </span><span class="cF1">case</span><span class="cF0"> CH_CR:
+<a name="l1115"></a>                ch=0;
+<a name="l1116"></a>                </span><span class="cF1">break</span><span class="cF0">;
+<a name="l1117"></a>              </span><span class="cF1">case</span><span class="cF0"> CH_SPACE:
+<a name="l1118"></a>                HumanFireEnd;
+<a name="l1119"></a>                </span><span class="cF1">break</span><span class="cF0">;
+<a name="l1120"></a>            </span><span class="cF7">}</span><span class="cF0">
+<a name="l1121"></a>            </span><span class="cF1">break</span><span class="cF0">;
+<a name="l1122"></a>        }
+<a name="l1123"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l1124"></a>      AI;
+<a name="l1125"></a>      ExpireShots;
+<a name="l1126"></a>      CheckDamage;
+<a name="l1127"></a>      WinSync; </span><span class="cF2">//msgs are only queued by winmngr</span><span class="cF0">
+<a name="l1128"></a>      </span><span class="cF1">if</span><span class="cF0"> (show_level_msg) </span><span class="cF7">{</span><span class="cF0">
+<a name="l1129"></a>        ch=GetKey(&amp;sc);
+<a name="l1130"></a>        </span><span class="cF1">if</span><span class="cF0"> (ch==CH_CR)
+<a name="l1131"></a>          ch=0;
+<a name="l1132"></a>        ode-&gt;flags&amp;=~ODEF_PAUSED;
+<a name="l1133"></a>        show_level_msg=FALSE;
+<a name="l1134"></a>      </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF1">if</span><span class="cF0"> (game_over) </span><span class="cF7">{</span><span class="cF0">
+<a name="l1135"></a>        ch=ScanChar;
+<a name="l1136"></a>      </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l1137"></a>        </span><span class="cF1">if</span><span class="cF0"> (!remaining) {
+<a name="l1138"></a>          level++;
+<a name="l1139"></a>          ShipDel(human);
+<a name="l1140"></a>          human=NULL;
+<a name="l1141"></a>          InitLevel;
+<a name="l1142"></a>        }
+<a name="l1143"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l1144"></a>    } </span><span class="cF1">while</span><span class="cF0"> (ch!=CH_ESC &amp;&amp; ch!=CH_CR &amp;&amp; ch!=CH_SHIFT_ESC);
+<a name="l1145"></a>    AllDel(ode);
+<a name="l1146"></a>  </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">while</span><span class="cF0"> (ch!=CH_ESC &amp;&amp; ch!=CH_SHIFT_ESC);
+<a name="l1147"></a>  SettingsPop;
+<a name="l1148"></a>  CtrlPanelDel(cp);
+<a name="l1149"></a>  MenuPop;
+<a name="l1150"></a>  AcctRegWriteBranch(</span><span class="cF6">"LT/XCaliber"</span><span class="cF0">,</span><span class="cF6">"I64 best_score=%d;\r\n"</span><span class="cF0">,best_score);
+<a name="l1151"></a>}
+<a name="l1152"></a>
+</span></pre><div class="archive-note">Historical capture: 2011-10-22. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

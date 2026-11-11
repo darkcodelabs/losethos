@@ -1,0 +1,496 @@
+<html>
+<head><meta charset="utf-8"/>
+<style>
+</style>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+Project: OSMain
+asm {
+NORMAL_KEY_SCAN_DECODE_TABLE::
+        DU1     0,CH_ESC,"1234567890-=",8,9;
+        DU1     "qwertyuiop[]",CH_CR,0,"as";
+        DU1     "dfghjkl;'\`",0,"\\zxcv";
+        DU1     "bnm,./",0,'*',0,CH_SPACE,0,0,0,0,0,0;
+        DU1     0,0,0,0,0,0,0,0,0,0,'-',0,0,0,'+',0;
+SHIFT_KEY_SCAN_DECODE_TABLE::
+        DU1     0,CH_ESC,"!@#$%^&amp;*()_+",8,9;
+        DU1     "QWERTYUIOP{}",CH_CR,0,"AS";
+        DU1     "DFGHJKL:\"~",0,"|ZXCV";
+        DU1     "BNM&lt;&gt;?",0,'*',0,CH_SHIFT_SPACE,0,0,0,0,0,0;
+        DU1     0,0,0,0,0,0,0,0,0,0,'-',0,0,0,'+',0;
+CTRL_KEY_SCAN_DECODE_TABLE::
+        DU1     0,CH_ESC,"1234567890-=",8,9;
+        DU1     17,23,5,18,20,25,21,9,15,16,"[]",CH_CR,0,1,19;
+        DU1     4,6,7,8,CH_LINE_FEED,11,12,";'\`",0,"\\",26,24,3,22;
+        DU1     2,14,13,",./",0,'*',0,CH_SPACE,0,0,0,0,0,0;
+        DU1     0,0,0,0,0,0,0,0,0,0,'-',0,0,0,'+',0;
+}
+
+U0 KbdCmdSend(U8 port, U1 val)
+{
+  LTDate timeout=BootTime+LTDATE_FREQ/8;
+  while (BootTime&lt;timeout) {
+    if (!(InU1(KEYB_CTRL)&amp;2)) {
+      OutU1(port,val);
+      return;
+    }
+  }
+  throw (EXCEPT_LOCAL);
+}
+
+I8 KbdCmdRead()
+{
+  LTDate timeout=BootTime+LTDATE_FREQ/8;
+  while (BootTime&lt;timeout)
+    if (InU1(KEYB_CTRL)&amp;1)
+      return InU1(KEYB_PORT);
+  throw (EXCEPT_LOCAL);
+}
+
+U0 KbdCmdFlush()
+{
+  LTDate timeout=BootTime+LTDATE_FREQ/32;
+  while (BootTime&lt;timeout)
+    InU1(KEYB_PORT);
+}
+
+U0 KbdSetLEDs(U8 sc)
+{
+  BoolI1 old_preempt=Preempt(OFF);
+  U1 v=0;
+  BEqu(&amp;v,0,Bt(&amp;sc,SCf_SCROLL));
+  BEqu(&amp;v,1,Bt(&amp;sc,SCf_NUM));
+  BEqu(&amp;v,2,Bt(&amp;sc,SCf_CAPS));
+  try {
+    KbdCmdSend(KEYB_PORT,0xED);
+    KbdCmdSend(KEYB_PORT,v);
+  } catch
+    Fs-&gt;catch_except=TRUE;
+  Preempt(old_preempt);
+}
+
+U0 KbdMouseCmdAck(U1 val)
+{
+  I8 ack,timeout=5;
+  do {
+    ack=0;
+    try {
+      KbdCmdSend(KEYB_CTRL,0xD4);
+      KbdCmdSend(KEYB_PORT,val);
+      ack=KbdCmdRead;
+    } catch {
+      KbdCmdFlush;
+      Fs-&gt;catch_except=TRUE;
+    }
+  } while (ack!=0xFA &amp;&amp; --timeout);
+  if (!timeout)
+    throw (EXCEPT_LOCAL);
+}
+
+U0 SetTypeMatic(U1 delay)
+{
+  try {
+    KbdCmdSend(KEYB_CTRL,0xA7); //Disable Mouse
+    KbdCmdSend(KEYB_CTRL,0xAE); //Enable Keyboard
+    KbdCmdSend(KEYB_PORT,0xF3);
+    KbdCmdSend(KEYB_PORT,delay); //Typematic rate
+    KbdCmdSend(KEYB_CTRL,0xA8); //Enable Mouse
+  } catch {
+    KbdCmdFlush;
+    Fs-&gt;catch_except=TRUE;
+  }
+}
+
+U8 A2ScanCode(U8 ch,U8 sc_flags=0)
+{ //ASCII value to scan code (Slow)
+  I8 i;
+  U1 *table;
+  if (sc_flags) {
+    table=NORMAL_KEY_SCAN_DECODE_TABLE;
+    if (sc_flags &amp; SCF_CTRL || ch&lt;26)
+      table=CTRL_KEY_SCAN_DECODE_TABLE;
+    else if (sc_flags &amp; SCF_SHIFT || 'A'&lt;=ch&lt;='Z') {
+      if (!(sc_flags &amp; SCF_CAPS))
+        table=SHIFT_KEY_SCAN_DECODE_TABLE;
+    } else {
+      if (sc_flags &amp; SCF_CAPS)
+        table=SHIFT_KEY_SCAN_DECODE_TABLE;
+    }
+    for (i=0;i&lt;0x50;i++)
+      if (table[i]==ch)
+        return i|sc_flags;
+    return sc_flags;
+  } else {
+    table=NORMAL_KEY_SCAN_DECODE_TABLE;
+    for (i=0;i&lt;0x50;i++)
+      if (table[i]==ch)
+        return i;
+    table=SHIFT_KEY_SCAN_DECODE_TABLE;
+    for (i=0;i&lt;0x50;i++)
+      if (table[i]==ch)
+        return i|SCF_SHIFT;
+    table=CTRL_KEY_SCAN_DECODE_TABLE;
+    for (i=0;i&lt;0x50;i++)
+      if (table[i]==ch)
+        return i|SCF_CTRL;
+    return 0;
+  }
+}
+
+
+U1 ScanCode2A(U8 sc)
+{//Scan Code to ASCII value
+  U1 *table=NORMAL_KEY_SCAN_DECODE_TABLE;
+  if (sc &amp; SCF_E0_PREFIX)
+    return 0;
+  if (sc &amp; SCF_CTRL)
+    table=CTRL_KEY_SCAN_DECODE_TABLE;
+  else if (sc &amp; SCF_SHIFT) {
+    if (!(sc &amp; SCF_CAPS))
+      table=SHIFT_KEY_SCAN_DECODE_TABLE;
+  } else {
+    if (sc &amp; SCF_CAPS)
+      table=SHIFT_KEY_SCAN_DECODE_TABLE;
+  }
+  sc&amp;=0x7F;
+  if (sc&gt;=0x50)
+    return 0;
+  else
+    return table[sc];
+}
+
+U1 scan_code_map[0x100]={
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,SC_SHIFT,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,SC_CR,SC_CTRL,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0x35,0,0,SC_ALT,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,SC_HOME,SC_CURSOR_UP,SC_PAGE_UP,0,SC_CURSOR_LEFT,0,SC_CURSOR_RIGHT,0,SC_END,
+  SC_CURSOR_DOWN,SC_PAGE_DOWN,SC_INSERT,SC_DELETE,0,0,0,0,0,0,0,0,SC_GUI,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+};
+
+
+U1 num_lock_map[0x100]={
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,8,9,10,0,5,6,7,0,2,
+  3,4,11,0x34,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,SC_CR,SC_CTRL,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0x35,0,0,SC_ALT,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,SC_HOME,SC_CURSOR_UP,SC_PAGE_UP,0,SC_CURSOR_LEFT,0,SC_CURSOR_RIGHT,0,SC_END,
+  SC_CURSOR_DOWN,SC_PAGE_DOWN,SC_INSERT,SC_DELETE,0,0,0,0,0,0,0,0,SC_GUI,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+};
+
+U1 *A2KeyName(U8 ch,BoolI1 include_ctrl=TRUE)
+{//ASCII value to key name
+  U8 i;
+  U1 buf[64];
+  *buf=0;
+  if (ch) {
+    if (ch&lt;=27) {
+      if (ch==CH_CR)
+        StrCat(buf,"ENTER");
+      else if (ch==CH_ESC)
+        StrCat(buf,"ESC");
+      else if (ch==CH_BACKSPACE)
+        StrCat(buf,"BACKSPACE");
+      else if (ch==CH_TAB)
+        StrCat(buf,"TAB");
+      else if (ch==CH_CURSOR)
+        StrCat(buf,"CURSOR");
+      else {
+        if (include_ctrl)
+          StrCat(buf,"CTRL");
+        buf[i=StrLen(buf)]=ch-1+'a';
+        buf[i+1]=0;
+      }
+    } else if (Bt(printable_chars_bitmap,ch)) {
+      if (ch==CH_SPACE)
+        StrCat(buf,"SPACE");
+      else if (ch==CH_SHIFT_SPACE)
+        StrCat(buf,"SHIFT_SPACE");
+      else {
+        buf[i=StrLen(buf)]=ch;
+        buf[i+1]=0;
+      }
+    }
+  }
+  return StrNew(buf);
+}
+
+U1 *ScanCode2KeyName(U8 sc)
+{
+  U8 ch;
+  U1 buf[64],*st;
+  *buf=0;
+  if (sc&amp;SCF_CTRL)
+    StrCat(buf,"CTRL");
+  if (sc&amp;SCF_ALT)
+    StrCat(buf,"ALT");
+  if (sc&amp;SCF_SHIFT)
+    StrCat(buf,"SHIFT");
+  if (ch=ScanCode2A(sc.u1[0])) {
+    st=A2KeyName(ch,FALSE);
+    StrCpy(buf+StrLen(buf),st);
+    Free(st);
+  } else {
+    switch (sc.u1[0]) {
+      case SC_BACKSPACE:StrCat(buf,"BACK"); break;
+      case SC_CAPS:     StrCat(buf,"CAPS"); break;
+      case SC_NUM:      StrCat(buf,"NUM"); break;
+      case SC_SCROLL:   StrCat(buf,"SCROLL"); break;
+      case SC_CURSOR_UP:StrCat(buf,"UP"); break;
+      case SC_CURSOR_DOWN:StrCat(buf,"DOWN"); break;
+      case SC_CURSOR_LEFT:StrCat(buf,"LEFT"); break;
+      case SC_CURSOR_RIGHT:StrCat(buf,"RIGHT"); break;
+      case SC_PAGE_UP:StrCat(buf,"PAGE_UP"); break;
+      case SC_PAGE_DOWN:StrCat(buf,"PAGE_DOWN"); break;
+      case SC_HOME:     StrCat(buf,"HOME"); break;
+      case SC_END:      StrCat(buf,"END"); break;
+      case SC_INSERT:   StrCat(buf,"INSERT"); break;
+      case SC_DELETE:   StrCat(buf,"DELETE"); break;
+      case SC_F1:       StrCat(buf,"F1"); break;
+      case SC_F2:       StrCat(buf,"F2"); break;
+      case SC_F3:       StrCat(buf,"F3"); break;
+      case SC_F4:       StrCat(buf,"F4"); break;
+      case SC_F5:       StrCat(buf,"F5"); break;
+      case SC_F6:       StrCat(buf,"F6"); break;
+      case SC_F7:       StrCat(buf,"F7"); break;
+      case SC_F8:       StrCat(buf,"F8"); break;
+      case SC_F9:       StrCat(buf,"F9"); break;
+      case SC_F10:      StrCat(buf,"F10"); break;
+      case SC_F11:      StrCat(buf,"F11"); break;
+      case SC_F12:      StrCat(buf,"F12"); break;
+      case SC_GUI:      StrCat(buf,"WINDOWS"); break;
+      case SC_PRTSCRN1: StrCat(buf,"PRTSCRN1"); break;
+      case SC_PRTSCRN2: StrCat(buf,"PRTSCRN2"); break;
+    }
+  }
+  return StrNew(buf);
+}
+
+U0 KbdPktRead()
+{
+  U1 j;
+  if (GetTimeStamp&gt;kbd_evt_time+time_stamp_freq&gt;&gt;3)
+    U1FifoFlush(kbd_fifo);
+  kbd_evt_time=GetTimeStamp;
+  LowPower(FALSE);
+  j=InU1(KEYB_PORT);
+  if (!U1FifoCnt(kbd_fifo)) {
+    U1FifoInsert(kbd_fifo,0x01);
+    U1FifoInsert(kbd_fifo,j);
+    if (j!=0xE0) {
+      while (U1FifoRem(kbd_fifo,&amp;j))
+        U1FifoInsert(kbdmouse_fifo,j);
+    }
+  } else {
+    U1FifoInsert(kbd_fifo,j);
+    while (U1FifoRem(kbd_fifo,&amp;j))
+      U1FifoInsert(kbdmouse_fifo,j);
+  }
+}
+
+interrupt U0 KbdIntHandler()
+{
+  Cld;
+  OutU1(0x20,0x20);
+  if (attempting_mouse_install) {
+    reset_kbdmouse=TRUE;
+    return;
+  }
+  KbdPktRead;
+}
+
+U0 KbdInit()
+{
+  try {
+    KbdCmdFlush;
+    KbdCmdSend(KEYB_CTRL,0xA7); //Disable Mouse
+    KbdCmdSend(KEYB_CTRL,0xAE); //Enable Keyboard
+    KbdCmdSend(KEYB_PORT,0xF0);
+    KbdCmdSend(KEYB_PORT,0x02);
+    KbdSetLEDs(sys_cur_scan_code);
+  } catch {
+    KbdCmdFlush;
+    Fs-&gt;catch_except=TRUE;
+  }
+  SetIDTEntry(0x21,&amp;KbdIntHandler,0);
+  OutU1(0x21,InU1(0x21)&amp;~2);
+
+  SetCtrlAltLetterRoutine('C',&amp;CtrlAltC,"Sys/Break Execution");
+  SetCtrlAltLetterRoutine('D',&amp;CtrlAltD,"Sys/Reboot");
+  SetCtrlAltLetterRoutine('E',&amp;CtrlAltE,"Sys/Spawn New User Task");
+  SetCtrlAltLetterRoutine('P',&amp;CtrlAltP,"Sys/Toggle Pause Focused Task");
+  SetCtrlAltLetterRoutine('T',&amp;CtrlAltT,"Sys/Switch Focus to Next Task");
+  SetCtrlAltLetterRoutine('X',&amp;CtrlAltX,"Sys/Kill Focused Task");
+}
+
+U0 KbdHandler()
+{
+  U8 ch,sc,sc2=0,sc3,sc_raw;
+
+  U1FifoRem(kbdmouse_fifo,&amp;sc2);
+  if (sc2==0xE0) {
+    U1FifoRem(kbdmouse_fifo,&amp;sc2);
+    BEqu(&amp;sc2,SCf_KEY_UP,sc2 &amp; 0x80);
+    Bts(&amp;sc2,SCf_E0_PREFIX);
+  } else {
+    BEqu(&amp;sc2,SCf_KEY_UP,sc2 &amp; 0x80);
+    Btr(&amp;sc2,SCf_E0_PREFIX);
+  }
+ 
+  sc=sys_cur_scan_code.u4[0]&amp;~0x1FF;
+  sc_raw=sc2;
+  if (sc &amp; SCF_NUM) {
+    if (sc3=num_lock_map[sc2.u1[0]])
+      sc2.u1[0]=sc3;
+  } else {
+    if (sc3=scan_code_map[sc2.u1[0]])
+      sc2.u1[0]=sc3;
+  }
+  if (sc2==SC_SHIFT) {
+    sc|=SCF_SHIFT;
+    goto new_key_done;
+  }
+  if (sc2==SC_SHIFT+SCF_KEY_UP) {
+    sc&amp;=~SCF_SHIFT;
+    goto new_key_done;
+  }
+
+  if (sc2==SC_CTRL) {
+    sc|=SCF_CTRL;
+    goto new_key_done;
+  }
+   if (sc2==SC_CTRL+SCF_KEY_UP) {
+    sc&amp;=~SCF_CTRL;
+    goto new_key_done;
+  }
+
+  if (sc2==SC_ALT) {
+    sc|=SCF_ALT;
+    goto new_key_done;
+  }
+  if (sc2==SC_ALT+SCF_KEY_UP) {
+    sc&amp;=~SCF_ALT;
+    goto new_key_done;
+  }
+
+  if (sc2==SC_DELETE)
+    sc|=SCF_DELETE;
+  else if (sc2==SC_DELETE+SCF_KEY_UP)
+    sc&amp;=~SCF_DELETE;
+
+  if (sc2==SC_INSERT)
+    sc|=SCF_INSERT;
+  else if (sc2==SC_INSERT+SCF_KEY_UP)
+    sc&amp;=~SCF_INSERT;
+
+  if (sc2==SC_CAPS)
+    goto new_key_done;
+  if (sc2==SC_CAPS+SCF_KEY_UP) {
+    sc^=SCF_CAPS;
+    KbdSetLEDs(sc);
+    goto new_key_done;
+  }
+
+  if (sc2==SC_NUM)
+    goto new_key_done;
+  if (sc2==SC_NUM+SCF_KEY_UP) {
+    sc^=SCF_NUM;
+    KbdSetLEDs(sc);
+    goto new_key_done;
+  }
+
+  if (sc2==SC_SCROLL)
+    goto new_key_done;
+  if (sc2==SC_SCROLL+SCF_KEY_UP) {
+    sc^=SCF_SCROLL;
+    KbdSetLEDs(sc);
+    goto new_key_done;
+  }
+
+  if (sc &amp; SCF_CTRL &amp;&amp; sc &amp; SCF_ALT) {
+    sc&amp;=~SCF_NEW_KEY;
+    sys_cur_scan_code=sc|sc2|
+                   (sc|sc_raw)&lt;&lt;32;
+    if (!(sc2 &amp; SCF_KEY_UP)) {
+      if (sc2.u1[0]==SC_DELETE)
+        ch='d';
+      else if (sc2.u1[0]==SC_ESC)
+        ch='e';
+      else if (sc2.u1[0]==SC_TAB)
+        ch='t';
+      else
+        ch=ScanCode2A(sc2.u1[0]);
+      if ('a'&lt;=ch&lt;='z') {
+        if (fp_ctrl_alt_letter_routines[ch-'a'])
+          fp_ctrl_alt_letter_routines[ch-'a'](sys_cur_scan_code);
+      }
+    }
+    return;
+  }
+
+new_key_done:
+  sc|=SCF_NEW_KEY;
+  sys_cur_scan_code=sc|sc2|
+                   (sc|sc_raw)&lt;&lt;32;
+
+  if (Btr(&amp;sys_cur_scan_code,SCf_NEW_KEY)) {
+    Btr(&amp;sys_cur_scan_code,32+SCf_NEW_KEY);
+    U8FifoInsert(scan_code_fifo,sys_cur_scan_code);
+    sys_key_cnt++;
+    if (!(sys_cur_scan_code&amp;SCF_KEY_UP)) {
+      last_down_scan_code=sys_cur_scan_code;
+      Bts(key_down_bitmap,sys_cur_scan_code.u1[0]);
+      Bts(key_down_bitmap2,sys_cur_scan_code.u1[4]);
+    } else {
+      Btr(key_down_bitmap,sys_cur_scan_code.u1[0]);
+      Btr(key_down_bitmap2,sys_cur_scan_code.u1[4]);
+    }
+  }
+}
+
+U8 KbdQueueMsgs()
+{
+  I8 p1,p2,msg_code=MSG_NULL;
+  TaskStruct *task_focus;
+  if (task_focus=sys_cur_focus_task) {
+    while (U8FifoRem(scan_code_fifo,&amp;p2)) {
+      p1=ScanCode2A(p2);
+      if (p2 &amp; SCF_KEY_UP) {
+        QueueMsg(task_focus,0,
+          MSG_KEY_UP,p1,p2,0);
+        msg_code=MSG_KEY_UP;
+      } else {
+        QueueMsg(task_focus,0,
+          MSG_KEY_DOWN,p1,p2,0);
+        msg_code=MSG_KEY_DOWN;
+      }
+    }
+  }
+  return msg_code;
+}
+
+</pre><div class="archive-note">Historical capture: 2010-01-31. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head></html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

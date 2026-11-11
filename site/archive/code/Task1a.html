@@ -1,0 +1,419 @@
+<html>
+<head><meta charset="utf-8"/>
+<style>
+</style>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+Project: OSMain
+U0 Exit()
+{
+  if (Fs==sys_cur_focus_task &amp;&amp; IsInDbg) {
+    LBts(&amp;Fs-&gt;task_flags,TASKf_KILL_AFTER_DBG);
+    DbgExit;
+  } else {
+    if (!Gs-&gt;num &amp;&amp; !IsInDbg)
+      SingleUser(OFF);
+    Fs-&gt;rflags=GetFlags;
+    Fs-&gt;rsp=GetStkPtr;
+    Fs-&gt;rbp=GetBasePtr;
+    Fs-&gt;rip=$;
+    Cli;
+    LBts(&amp;Fs-&gt;task_flags,TASKf_KILL_TASK);
+    TaskEndNow;
+  }
+}
+
+BoolI8 TaskValidate(TaskStruct *task)
+{
+  if (!(0&lt;task&lt;=MAX_I4) || task-&gt;address!=task ||
+    task-&gt;task_signature&gt;&lt;(U8)!=TASK_COMBINED_SIGNATURE_VAL)
+    return FALSE;
+  else
+    return TRUE;
+}
+
+U0 Kill(TaskStruct *task,BoolI1 wait=TRUE)
+{
+  U8 i;
+  CPUStruct *c;
+  BoolI1 found,old_preempt=Preempt(OFF);
+  if (TaskValidate(task)) {
+    if (task==sys_winmgr_task)
+      found=TRUE;
+    else
+      found=FALSE;
+    for (i=0;i&lt;mp_cnt;i++) {
+      c=&amp;cpu_structs[i];
+      if (task==c-&gt;seth_task)
+        found=TRUE;
+    }
+    if (!found) {
+      LBts(&amp;task-&gt;task_flags,TASKf_KILL_TASK);
+      if (wait) {
+        do {
+          TaskNext;
+          if (!Bt(&amp;task-&gt;task_flags,TASKf_KILL_TASK))
+            break;
+        } while (TaskValidate(task));
+      }
+    }
+  }
+  Preempt(old_preempt);
+}
+
+asm {_INIT_TASK:}
+U8 TaskInit(TaskStruct *task,U8 stk)
+{ //Returns Fs of task
+  U1 *b;
+
+  task-&gt;code_heap-&gt;next_mem_blk=
+    task-&gt;code_heap-&gt;last_mem_blk=
+    &amp;task-&gt;code_heap-&gt;next_mem_blk;
+  if (task-&gt;code_heap!=task-&gt;data_heap)
+    task-&gt;data_heap-&gt;next_mem_blk=
+      task-&gt;data_heap-&gt;last_mem_blk=
+      &amp;task-&gt;data_heap-&gt;next_mem_blk;
+
+  task-&gt;address=
+    task-&gt;next_task=
+    task-&gt;last_task=
+    task-&gt;next_input_filter_task=
+    task-&gt;last_input_filter_task=
+    task;
+
+  task-&gt;next_key_dev=
+    task-&gt;last_key_dev=
+    &amp;task-&gt;next_key_dev;
+
+  task-&gt;rflags=SYS_NORMAL_RFLAGS;
+
+  task-&gt;next_child_task=
+    task-&gt;last_child_task=
+    (&amp;task-&gt;next_child_task)&gt;&lt;(U1 *)-offset(TaskStruct.next_sibling_task);
+
+  task-&gt;next_servant_cmd=
+    task-&gt;last_servant_cmd=
+    &amp;task-&gt;next_servant_cmd;
+
+  task-&gt;next_master_cmd=
+    task-&gt;last_master_cmd=
+    &amp;task-&gt;next_master_cmd;
+
+
+  task-&gt;next_lex=
+    task-&gt;last_lex=
+    &amp;task-&gt;next_lex;
+
+  task-&gt;next_ltf=
+    task-&gt;last_ltf=
+    (&amp;task-&gt;next_ltf)&gt;&lt;(U1 *)-offset(Ltf.next_ltf);
+
+  task-&gt;next_except=
+    task-&gt;last_except=
+    &amp;task-&gt;next_except;
+
+  task-&gt;next_ctrl=
+    task-&gt;last_ctrl=
+    &amp;task-&gt;next_ctrl;
+
+  task-&gt;next_ode=
+    task-&gt;last_ode=
+    &amp;task-&gt;next_ode;
+
+  task-&gt;fpu_mmx=MAllocAligned(sizeof(FPUState),0x10,task);
+  MemCpy(task-&gt;fpu_mmx,&amp;sys_init_fpu_mmx,sizeof(FPUState));
+
+  if (task==SYS_ADAM_TASK) {
+// Delayed until heap expanded.See Expand Heap
+//    task-&gt;hash_table=HashTableNew(ADAM_HASH_SIZE,task);
+  } else {
+    if (!Gs-&gt;num)
+      task-&gt;hash_table=HashTableNew(STD_HASH_SIZE,task);
+    else
+      task-&gt;hash_table=HashTableNew(MP_STD_HASH_SIZE,task);
+  }
+
+  if (!stk) {
+    if (!Gs-&gt;num)
+      stk=DEFAULT_STACK;
+    else
+      stk=MP_DEFAULT_STACK;
+  }
+  b=task-&gt;stack_base=MAlloc(stk,task);
+  task-&gt;stack_size=MSize(b);
+  task-&gt;rsp=b+task-&gt;stack_size;
+
+  task-&gt;answers_displayed=1;  //from 0-8
+  task-&gt;text_attr=0xF1;
+  task-&gt;border_attr=WHITE&lt;&lt;4+LTBLUE;
+  task-&gt;win_right=text_cols-2;
+  task-&gt;win_left=1;
+  task-&gt;win_top=1;
+  task-&gt;win_bottom=text_rows-2;
+  return task;
+}
+
+TaskStruct *Spawn(U0 (*fp_start_add)(U0 *data),U0 *data=NULL,
+            U1 *task_name=NULL,
+            TaskStruct *parent=NULL, //NULL means adam
+            U1 *acct=NULL,
+            U8 stk=0, //0=default
+            U8 flags=SPAWNF_ADD_TO_QUEUE)
+{
+//We alloc from code heap so address will be short
+//Could be allocated off of data heap
+  TaskStruct *task=CAlloc(sizeof(TaskStruct),Gs-&gt;seth_task-&gt;code_heap);
+  task-&gt;task_signature=TASK_SIGNATURE_VAL;
+  if (!task_name) task_name="Unnamed Task";
+  if (!parent) parent=Gs-&gt;seth_task;
+  task-&gt;parent_task=parent;
+  task-&gt;gs=parent-&gt;gs;
+  if (Gs-&gt;code_bp)
+    task-&gt;data_heap=task-&gt;code_heap=TaskHeapCtrlInit(task,Gs-&gt;code_bp,Gs-&gt;seth_task-&gt;data_heap);
+  if (Gs-&gt;data_bp)
+    task-&gt;data_heap=TaskHeapCtrlInit(task,Gs-&gt;data_bp,Gs-&gt;seth_task-&gt;data_heap);
+  TaskInit(task,stk);
+  task-&gt;rip=fp_start_add;
+  task-&gt;rsp&gt;&lt;(U1 *)-=8;
+  *task-&gt;rsp=data;
+  task-&gt;rsp&gt;&lt;(U1 *)-=8;
+  *task-&gt;rsp=&amp;Exit;
+  task-&gt;hash_table-&gt;next=parent-&gt;hash_table;
+  MemCpy(task-&gt;task_title,task_name,TASK_TITLE_LEN+1);
+  MemCpy(task-&gt;task_name,task_name,TASK_NAME_LEN+1);
+  if (acct)
+    task-&gt;acct=AcctFind(acct);
+  else
+    task-&gt;acct=task-&gt;parent_task-&gt;acct;
+  PushFD;
+  Cli;
+  if (flags&amp;SPAWNF_ADD_TO_QUEUE) {
+    TaskChildAdd(task);
+    TaskQueueAdd(task);
+  }
+  PopFD;
+  return task;
+}
+
+U0 ServantTaskCont()
+{
+  FlushMsgs;
+  while (TRUE) {
+    if (ServantCmdsHandler)
+      if (!Bt(&amp;Fs-&gt;task_flags,TASKf_LOCK_TITLE))
+        MemCpy(Fs-&gt;task_title,Fs-&gt;task_name,TASK_NAME_LEN+1);
+    FlushMsgs;
+    LBts(&amp;Fs-&gt;task_flags,TASKf_IDLE);
+    LBts(&amp;Fs-&gt;task_flags,TASKf_AWAITING_MSG);
+    TaskNext;
+  }
+}
+
+U0 TaskDerivedValuesUpdate(TaskStruct *task=NULL)
+{
+  if (!task) task=Fs;
+  PushFD;
+  Cli; //TODO Multiprocessor safe
+  WinDerivedValuesUpdate(task);
+  if (fp_update_ctrls)
+    fp_update_ctrls(task);
+  PopFD;
+}
+
+U0 TaskLocalInit()
+{
+  if (LBts(&amp;Fs-&gt;task_flags,TASKf_LOCAL_INITIALIZED))
+    return;
+  TaskDerivedValuesUpdate;
+  LBts(&amp;Fs-&gt;display_flags,DISPLAYf_HAS_CLOSE_WIN);
+  Fs-&gt;text_attr=WHITE&lt;&lt;4+BLUE;
+  Fs-&gt;border_attr=WHITE&lt;&lt;4+LTBLUE;
+  Fs-&gt;win_top=13;
+  Cd("HOME");
+  CallExtNum(EXT_WIN_TO_TOP,Fs);
+}
+
+U0 UserTaskInit()
+{
+  LBts(&amp;Fs-&gt;task_flags,TASKf_LOCAL_USER);
+  TaskLocalInit;
+}
+
+U0 UserCmdLine()
+{
+  UserTaskInit;
+  Fs-&gt;user_num=++num_spawned_users;
+  ExeFile("UserStartUp.CPZ");
+  if (!LBts(&amp;Fs-&gt;display_flags,DISPLAYf_SHOW))
+    Dbg;
+  UserTaskCont;
+}
+
+U0 ServantUserCmdLine()
+{
+  LBts(&amp;Fs-&gt;task_flags,TASKf_SERVANT_USER);
+  UserTaskInit;
+  ExeFile("ServantStartUp.CPZ");
+  ServantTaskCont;
+}
+
+TaskStruct *SpawnUser(U1 *st=NULL)
+{
+  TaskStruct *task=Spawn(&amp;UserCmdLine);
+  TaskWaitIdle(task);
+  if (st)
+    XTalk(task,st);
+  return task;
+}
+
+U0 TaskPause(TaskStruct *task,BoolI1 state)
+{
+  TaskStruct *task1;
+  BoolI1 old_preempt=Preempt(OFF);
+  if (TaskValidate(task)) {
+    if (LBEqu(&amp;task-&gt;task_flags,TASKf_PAUSED,state)) {
+      if (!state)
+        task-&gt;pause_total+=t-task-&gt;pause_start;
+    } else {
+      if (state)
+        task-&gt;pause_start=t;
+    }
+    task1=task-&gt;next_child_task;
+    while (task1!=&amp;task-&gt;next_child_task) {
+      if (!TaskValidate(task1))
+        break;
+      TaskPause(task1,state);
+      task1=task1-&gt;next_sibling_task;
+    }
+  }
+  Preempt(old_preempt);
+}
+
+U0 TaskFinishOff(TaskStruct *task)
+{ //We delay freeing in case lingering
+  //references are made to task's.
+  FreeMemBlkList(task-&gt;code_heap);
+  Free(task-&gt;code_heap);
+  if (task-&gt;data_heap!=task-&gt;code_heap) {
+    FreeMemBlkList(task-&gt;data_heap);
+    Free(task-&gt;data_heap);
+  }
+  Free(task);
+}
+
+asm {_TASK_END:}
+U8 TaskEnd()
+{ //called with irq's off
+  TaskStruct *tempt,*tempt1;
+  TaskCmdStruct *tempc,*tempc1,*tempc2;
+  if (Fs==sys_task_being_screen_updated) {
+    LBts(&amp;Fs-&gt;task_flags,TASKf_KILL_TASK);
+    return Fs-&gt;next_task;
+  }
+  if (Fs-&gt;task_end_cb) {
+    Fs-&gt;wake_time=0;
+    LBtr(&amp;Fs-&gt;task_flags,TASKf_KILL_TASK);
+    LBtr(&amp;Fs-&gt;task_flags,TASKf_AWAITING_MSG);
+    LBtr(&amp;Fs-&gt;task_flags,TASKf_SUSPENDED);
+    Fs-&gt;rip=Fs-&gt;task_end_cb;
+    Fs-&gt;task_end_cb=NULL;
+    return Fs;
+  }
+  if (Fs-&gt;parent_task) {
+    if (Fs-&gt;parent_task-&gt;popup_task==Fs) {
+      Fs-&gt;parent_task-&gt;popup_task=NULL;
+      Kill(Fs-&gt;parent_task,FALSE);
+      return Fs-&gt;parent_task;
+    }
+    if (Fs-&gt;parent_task-&gt;dbg_task==Fs)
+      Fs-&gt;parent_task-&gt;dbg_task=NULL;
+  }
+
+  PartitionsRelease;
+  BlkDevsRelease;
+  tempt1=(&amp;Fs-&gt;next_child_task)&gt;&lt;(U1 *)-offset(TaskStruct.next_sibling_task);
+  tempt=tempt1-&gt;next_sibling_task;
+  if (tempt!=tempt1) {
+    do {
+      LBts(&amp;tempt-&gt;task_flags,TASKf_KILL_TASK);
+      tempt=tempt-&gt;next_sibling_task;
+    } while (tempt!=tempt1);
+    return Fs-&gt;next_task;
+  }
+  while (LBts(&amp;Fs-&gt;locked_flags,TASKLf_TASK_LOCK))
+    Pause;
+  tempc1=&amp;Fs-&gt;next_servant_cmd;
+  tempc=tempc1-&gt;next;
+  while (tempc!=tempc1) {
+    tempc2=tempc-&gt;next;
+    Free(tempc-&gt;data);
+    Free(tempc);
+    tempc=tempc2;
+  }
+
+  tempc1=&amp;Fs-&gt;next_master_cmd;
+  tempc=tempc1-&gt;next;
+  while (tempc!=tempc1) {
+    tempc2=tempc-&gt;next;
+    Free(tempc-&gt;data);
+    Free(tempc);
+    tempc=tempc2;
+  }
+
+  if (IsRaw)
+    LBts(&amp;sys_semas[SYS_SEMA_FLUSH_VGA_IMAGE],0);
+
+  if (sys_cur_focus_task==Fs) {
+    if (!Gs-&gt;num)
+      SingleUser(OFF);
+    sys_cur_focus_task=NULL;
+    win_inhibit=0;
+  }
+
+
+//Remque
+  Fs-&gt;task_signature&gt;&lt;(U8)=0;
+
+  tempt =Fs-&gt;next_input_filter_task;
+  tempt1=Fs-&gt;last_input_filter_task;
+  tempt1-&gt;next_input_filter_task=tempt;
+  tempt -&gt;last_input_filter_task=tempt1;
+
+  tempt =Fs-&gt;next_sibling_task;
+  tempt1=Fs-&gt;last_sibling_task;
+  tempt1-&gt;next_sibling_task=tempt;
+  tempt -&gt;last_sibling_task=tempt1;
+
+  tempt =Fs-&gt;next_task;
+  tempt1=Fs-&gt;last_task;
+  tempt1-&gt;next_task=tempt;
+  tempt -&gt;last_task=tempt1;
+
+  LBtr(&amp;Fs-&gt;locked_flags,TASKLf_TASK_LOCK);
+
+  if (sys_winmgr_task) {
+    Fs-&gt;next_task=Gs-&gt;dying_task_list;
+    Gs-&gt;dying_task_list=Fs;
+  } else
+    TaskFinishOff(Fs); //dangerous (stack in use)
+  return tempt;
+}
+
+U0 TaskFinishOffDying()
+{ //We delay freeing in case lingering
+  //references are made to task's.
+  BoolI1 old_preempt=Preempt(OFF);
+  TaskStruct *task1,*task2;
+  if (task1=Gs-&gt;dying_task_list) {
+    do {
+      task2=task1-&gt;next_task;
+      TaskFinishOff(task1);
+      task1=task2;
+    } while (task1);
+    Gs-&gt;dying_task_list=NULL;
+  }
+  Preempt(old_preempt);
+}
+</pre><div class="archive-note">Historical capture: 2010-01-29. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head></html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

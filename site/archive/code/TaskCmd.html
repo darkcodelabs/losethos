@@ -1,0 +1,416 @@
+<html>
+<head><meta charset="utf-8"/>
+<style>
+</style>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+Project: OSMain
+
+TaskCmdStruct *TaskRequestQueue(TaskStruct *servant,TaskStruct *master,
+                     U1 *data,U8 flags)
+{
+  TaskCmdStruct *result;
+  if (!data || !TaskValidate(servant) ||
+      master &amp;&amp; !TaskValidate(master) ||
+      servant-&gt;popup_task &amp;&amp; !Bt(&amp;servant-&gt;task_flags,TASKf_FILTER_INPUT))
+    return NULL;
+  result=AMAlloc(sizeof(TaskCmdStruct));
+  result-&gt;master_task=master;
+  result-&gt;cmd_code=TASKCT_EXECUTE_STR;
+  result-&gt;flags=flags;
+  result-&gt;data=AStrNew(data);
+  result-&gt;result=NULL;
+
+  PushFD;
+  Cli;
+  while (LBts(&amp;servant-&gt;locked_flags,TASKLf_TASK_LOCK))
+    Pause;
+  if (!TaskValidate(servant)) {
+    PopFD;
+    Free(result-&gt;data);
+    Free(result);
+    return NULL;
+  } else {
+    LBtr(&amp;servant-&gt;task_flags,TASKf_IDLE);
+    LBtr(&amp;servant-&gt;task_flags,TASKf_AWAITING_MSG);
+    InsQue(result,servant-&gt;last_servant_cmd);
+    LBtr(&amp;servant-&gt;locked_flags,TASKLf_TASK_LOCK);
+    if (Bt(&amp;flags,TASKCf_WAKE_MASTER) &amp;&amp;
+      TaskValidate(master)) {
+      LBts(&amp;master-&gt;task_flags,TASKf_SUSPENDED);
+      TaskNext;
+    }
+  }
+  PopFD;
+  return result;
+}
+
+TaskCmdStruct *TextInputQueue(TaskStruct *servant,TaskStruct *master,
+                     U1 *data,U8 flags)
+{
+  BoolI1 old_preempt=Preempt(OFF);
+  TaskCmdStruct *result;
+  TaskStruct *task;
+  if (!data || !TaskValidate(servant) ||
+      master &amp;&amp; !TaskValidate(master) ||
+      servant-&gt;popup_task &amp;&amp; !Bt(&amp;servant-&gt;task_flags,TASKf_FILTER_INPUT)) {
+    Preempt(old_preempt);
+    return NULL;
+  }
+  result=AMAlloc(sizeof(TaskCmdStruct));
+  result-&gt;master_task=master; //in case somebody cares
+  result-&gt;cmd_code=TASKCT_TEXT_INPUT;
+  result-&gt;flags=flags;
+  result-&gt;data=AStrNew(data);
+  result-&gt;result=NULL;
+
+  PushFD;
+  if (flags&amp;1&lt;&lt;TASKCf_HIGHEST_PRIORITY ||
+      servant-&gt;next_input_filter_task==servant) {
+    task=Spawn(&amp;InputFilterTask,NULL,
+        "Input Filter",servant);
+    Cli;
+    task-&gt;next_input_filter_task=servant-&gt;next_input_filter_task;
+    task-&gt;last_input_filter_task=servant;
+    servant-&gt;next_input_filter_task=task;
+    task-&gt;next_input_filter_task-&gt;last_input_filter_task=task;
+  } else
+    task=servant-&gt;next_input_filter_task;
+  Cli;
+  while (LBts(&amp;task-&gt;locked_flags,TASKLf_TASK_LOCK))
+    Pause;
+  if (!TaskValidate(task)) {
+    Free(result-&gt;data);
+    Free(result);
+    result=NULL;
+  } else {
+    LBtr(&amp;task-&gt;task_flags,TASKf_IDLE);
+    LBtr(&amp;task-&gt;task_flags,TASKf_AWAITING_MSG);
+    InsQue(result,task-&gt;last_servant_cmd);
+    LBtr(&amp;task-&gt;locked_flags,TASKLf_TASK_LOCK);
+  }
+  PopFD;
+  Preempt(old_preempt);
+  return result;
+}
+
+TaskCmdStruct *QueueMsg(TaskStruct *_servant,TaskStruct *master,
+                     I8 msg_code,I8 p1,I8 p2,U8 flags)
+{
+  TaskCmdStruct *tempc1,*tempc;
+  TaskStruct *servant=_servant;
+  if (!TaskValidate(servant) ||
+      master &amp;&amp; !TaskValidate(master)||
+      servant-&gt;popup_task &amp;&amp; !Bt(&amp;servant-&gt;task_flags,TASKf_FILTER_INPUT))
+    return NULL;
+  tempc=AMAlloc(sizeof(TaskCmdStruct));
+  tempc-&gt;master_task=master;
+  tempc-&gt;cmd_code=TASKCT_MSG;
+  tempc-&gt;msg_code=AbsI8(msg_code); //negative means do a down and up
+  tempc-&gt;p1=p1;
+  tempc-&gt;p2=p2;
+  tempc-&gt;flags=flags;
+  tempc-&gt;data=NULL;
+  tempc-&gt;result=NULL;
+  PushFD;
+  if (Bt(&amp;sys_semas[SYS_SEMA_RECORD_MACRO],0) &amp;&amp;
+      servant!=macro_util_task &amp;&amp;
+      msg_code==MSG_KEY_DOWN) {
+    tempc1=AMAllocIdentical(tempc);
+    Cli;
+    InsQue(tempc1,sys_macro_queue.last);
+  }
+  Cli;
+  while (Bt(&amp;servant-&gt;task_flags,TASKf_FILTER_INPUT) &amp;&amp;
+      !Bt(&amp;flags,TASKCf_DONT_FILTER))
+    servant=servant-&gt;next_input_filter_task;
+  while (LBts(&amp;servant-&gt;locked_flags,TASKLf_TASK_LOCK))
+    Pause;
+  if (!TaskValidate(servant)) {
+    Free(tempc);
+    tempc=NULL;
+  } else {
+    LBtr(&amp;servant-&gt;task_flags,TASKf_IDLE);
+    LBtr(&amp;servant-&gt;task_flags,TASKf_AWAITING_MSG);
+    InsQue(tempc,servant-&gt;last_servant_cmd);
+    LBtr(&amp;servant-&gt;locked_flags,TASKLf_TASK_LOCK);
+  }
+  PopFD;
+  if (msg_code&lt;0) //Down-Up
+    QueueMsg(_servant,master,-msg_code+1,p1,p2,flags);
+  return tempc;
+}
+
+BoolI8 GetRequestResult(TaskCmdStruct *rqst=NULL,U8 *result=NULL)
+{
+  TaskCmdStruct *tempc,*tempc1;
+  PushFD;
+  Cli;
+  while (LBts(&amp;Fs-&gt;locked_flags,TASKLf_TASK_LOCK))
+    Pause;
+  tempc1=&amp;Fs-&gt;next_master_cmd;
+  tempc=tempc1-&gt;next;
+  while (tempc!=tempc1) {
+    if (!rqst || rqst==tempc) {
+      RemQue(tempc);
+      LBtr(&amp;Fs-&gt;locked_flags,TASKLf_TASK_LOCK);
+      PopFD;
+      if (result)
+        *result=tempc-&gt;result;
+      Free(tempc-&gt;data);
+      Free(tempc);
+      return TRUE;
+    }
+    tempc=tempc-&gt;next;
+  }
+  LBtr(&amp;Fs-&gt;locked_flags,TASKLf_TASK_LOCK);
+  PopFD;
+  return FALSE;
+}
+
+U0 TaskWaitIdle(TaskStruct *task)
+{
+  TaskStruct *task1;
+  TaskCmdStruct *tempc;
+  if (TaskValidate(task)) {
+    PushFD;
+    Cli;
+    while (TRUE) {
+      task1=task-&gt;last_input_filter_task;
+      tempc=&amp;task1-&gt;next_servant_cmd;
+      if (TaskValidate(task1) &amp;&amp; tempc==*tempc &amp;&amp;
+          Bt(&amp;task1-&gt;task_flags,TASKf_IDLE))
+        break;
+      TaskNext;
+    }
+    PopFD;
+  }
+}
+
+U0 PostMsg(TaskStruct *task,I8 msg_code,I8 p1,I8 p2,U8 flags=0)
+{
+  if (Bt(&amp;task-&gt;task_flags,TASKf_INPUT_FILTER_TASK))
+    QueueMsg(task-&gt;last_input_filter_task,NULL,msg_code,p1,p2,
+        flags| 1&lt;&lt;TASKCf_DONT_FILTER);
+  else
+    QueueMsg(task,NULL,msg_code,p1,p2,flags);
+}
+
+U0 SendMsg(TaskStruct *task,I8 msg_code,I8 p1,I8 p2,U8 flags=0)
+{
+  PostMsg(task,msg_code,p1,p2,flags);
+  TaskWaitIdle(task);
+}
+
+U0 Msg(I8 msg_code,I8 p1,I8 p2,U8 flags=0)
+{
+  PostMsg(Fs,msg_code,p1,p2,flags);
+}
+
+U8 ServantCmdsHandler(TaskStruct *task=NULL)
+{
+  U8 cnt=0,old_flags=GetFlags;
+  TaskCmdStruct *tempc,*tempc1;
+  TaskStruct *master;
+  if (!task) task=Fs;
+start_over:
+  Cli;
+  while (LBts(&amp;task-&gt;locked_flags,TASKLf_TASK_LOCK))
+    Pause;
+  tempc1=&amp;task-&gt;next_servant_cmd;
+  while (tempc!=tempc1) {
+    tempc=tempc1-&gt;next;
+    if (tempc-&gt;cmd_code==TASKCT_EXECUTE_STR ||
+    tempc-&gt;cmd_code==TASKCT_EXECUTE_FILE) {
+      cnt++;
+      RemQue(tempc);
+      LBtr(&amp;task-&gt;locked_flags,TASKLf_TASK_LOCK);
+      SetFlags(old_flags);
+      try {
+        if (tempc-&gt;cmd_code==TASKCT_EXECUTE_STR)
+          tempc-&gt;result=ExePutS(tempc-&gt;data,sys_temp_filename);
+        else
+          tempc-&gt;result=ExeFile(tempc-&gt;data);
+      } catch
+        Fs-&gt;catch_except=TRUE;
+      if (master=tempc-&gt;master_task) {
+        if (!Bt(&amp;tempc-&gt;flags,TASKCf_EXIT_ON_COMPLETE)) {
+          Cli;
+          while (LBts(&amp;master-&gt;locked_flags,TASKLf_TASK_LOCK))
+            Pause;
+          InsQue(tempc,master-&gt;last_master_cmd);
+          LBtr(&amp;master-&gt;locked_flags,TASKLf_TASK_LOCK);
+          SetFlags(old_flags);
+        }
+        if (Bt(&amp;tempc-&gt;flags,TASKCf_FOCUS_MASTER) &amp;&amp;
+        Bt(&amp;master-&gt;task_flags,TASKf_LOCAL_USER))
+          sys_cur_focus_task=master;
+        if (Bt(&amp;tempc-&gt;flags,TASKCf_WAKE_MASTER))
+          LBtr(&amp;master-&gt;task_flags,TASKf_SUSPENDED);
+        if (!Bt(&amp;tempc-&gt;flags,TASKCf_EXIT_ON_COMPLETE))
+          goto start_over;
+        else {
+          Free(tempc-&gt;data);
+          Free(tempc);
+          Exit;
+        }
+      } else {
+        if (!Bt(&amp;tempc-&gt;flags,TASKCf_EXIT_ON_COMPLETE)) {
+          Free(tempc-&gt;data);
+          Free(tempc);
+          goto start_over;
+        } else {
+          Free(tempc-&gt;data);
+          Free(tempc);
+          Exit;
+        }
+      }
+    } else
+      break;
+  }
+  LBtr(&amp;task-&gt;locked_flags,TASKLf_TASK_LOCK);
+  SetFlags(old_flags);
+  return cnt;
+}
+
+I8 Adam(U1 *fmt,...)
+//Sends text to the adam task which gets
+//compiled and run.
+{
+  U1 *buf=SPrintFJoin(NULL,fmt,argc,argv);
+  U8 result;
+  BoolI1 old_preempt=Preempt(OFF);
+  TaskCmdStruct *tempc;
+  if (!Bt(&amp;sys_run_level,RLf_ADAM_SERVER))
+    Dbg("Adam Not Serving Yet");
+  TaskWaitIdle(adam_task);
+  tempc=TaskRequestQueue(adam_task,Fs,buf,1&lt;&lt;TASKCf_WAKE_MASTER);
+  Preempt(old_preempt);
+  GetRequestResult(tempc,&amp;result);
+  Free(buf);
+  return result;
+}
+
+U0 AdamLog(U1 *fmt,...)
+//Sends text to the adam task which gets
+//displayed.
+{
+  U1 *buf=SPrintFJoin(NULL,fmt,argc,argv);
+  if (Fs!=adam_task) {
+    if (!IsSingleUser)
+      Adam("PutS(\"%Q\");",buf);
+  } else
+    PutS(buf);
+  Free(buf);
+}
+
+U0 AdamErr(U1 *fmt,...)
+//Sends text to the adam task which gets
+//displayed as red and blinking.
+{
+  U1 *buf=SPrintFJoin(NULL,fmt,argc,argv),
+     *buf1=MSPrintF("%S%s",
+       "ST_ERR",buf);
+  if (Fs!=adam_task) {
+    if (!IsSingleUser)
+      Adam("PutS(\"%Q\");",buf1);
+  }else
+    PutS(buf1);
+  Free(buf1);
+  Free(buf);
+}
+
+U0 XTalk(TaskStruct *task,U1 *fmt,...)
+//Sends text to another task's input
+//buffer.
+{
+  U1 *buf=SPrintFJoin(NULL,fmt,argc,argv),
+     *buf1=MSPrintF("PutS(\"%Q\");",buf);
+  TextInputQueue(task,0,buf1,0);
+  Free(buf1);
+  Free(buf);
+}
+
+U0 XTalkWithWait(TaskStruct *task,U1 *fmt,...)
+{
+  U1 *buf=SPrintFJoin(NULL,fmt,argc,argv),
+     *buf1=MSPrintF("PutS(\"%Q\");",buf);
+  TextInputQueue(task,0,buf1,0);
+  Free(buf1);
+  Free(buf);
+  TaskWaitIdle(task);
+}
+
+U0 Auto(U1 *fmt,...)
+//Sends text to one's own input buffer
+{
+  U1 *buf=SPrintFJoin(NULL,fmt,argc,argv),
+     *buf1=MSPrintF("PutS(\"%Q\");",buf);
+  if (Bt(&amp;Fs-&gt;task_flags,TASKf_INPUT_FILTER_TASK))
+    ExePutS(buf1);
+  else
+    TextInputQueue(Fs,0,buf1,1&lt;&lt;TASKCf_HIGHEST_PRIORITY);
+  Free(buf1);
+  Free(buf);
+}
+
+I8 ServantUser(U1 *fmt,...)
+//Spawns a visible task and sends text
+//which gets compiled and run.
+{
+  U1 *buf=SPrintFJoin(NULL,fmt,argc,argv);
+  U8 result=0;
+  TaskCmdStruct *tempc;
+  TaskStruct *task=Spawn(&amp;ServantUserCmdLine,NULL,"Servant",Fs);
+  Fs-&gt;popup_task=task;
+  tempc=TaskRequestQueue(task,Fs,buf,1&lt;&lt;TASKCf_WAKE_MASTER|1&lt;&lt;TASKCf_FOCUS_MASTER);
+  GetRequestResult(tempc,&amp;result);
+  Fs-&gt;popup_task=NULL;
+  Kill(task,FALSE);
+  Free(buf);
+  return result;
+}
+
+U0 AutoStr(U1 *fmt,...)
+//Sends text in the nature of an AutoFile to one's
+//own input buffer.
+{
+  U1 *buf=SPrintFJoin(NULL,fmt,argc,argv);
+  if (Bt(&amp;Fs-&gt;task_flags,TASKf_INPUT_FILTER_TASK))
+    ExePutS(buf);
+  else
+    TextInputQueue(Fs,0,buf,1&lt;&lt;TASKCf_HIGHEST_PRIORITY);
+  Free(buf);
+}
+
+U0 AutoFile(U1 *filename)
+{
+  U1 *name2=DefaultExtension(filename,"AUZ");
+  if (Bt(&amp;Fs-&gt;task_flags,TASKf_INPUT_FILTER_TASK))
+    ExeFile(name2);
+  else
+    AutoStr("%F",name2);
+  Free(name2);
+}
+
+
+//This sends text of an AutoFile nature to a
+//task's input buffer.
+U0 XTalkStr(TaskStruct *task,U1 *fmt,...)
+{
+  U1 *buf=SPrintFJoin(NULL,fmt,argc,argv);
+  TextInputQueue(task,0,buf,0);
+  Free(buf);
+}
+
+U0 XTalkStrWithWait(TaskStruct *task,U1 *fmt,...)
+{
+  U1 *buf=SPrintFJoin(NULL,fmt,argc,argv);
+  TextInputQueue(task,0,buf,0);
+  Free(buf);
+  TaskWaitIdle(task);
+}
+
+</pre><div class="archive-note">Historical capture: 2010-01-31. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head></html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

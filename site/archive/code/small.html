@@ -1,0 +1,136 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V7.08" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cF5">                               <a href="/archive/doc/TrivialSolutions.html">Trivial Solutions</a>
+                    <a href="/archive/index.html">The LoseThos 64-bit PC Operating System</a>
+File:/LT/Apps/MusicOrgan/Examples/small.CPZ
+This, and all LoseThos files, are public domain.  Do whatever you like.
+God is watching; God is just; God is never out-done in generosity.  He talks!
+
+LoseThos code compiles with the 64-bit LoseThos compiler/assembler I wrote.
+Boot the LoseThos CD and you can compile it.  Not in Kansas anymore!
+
+<a href="/archive/code/FixedPoint.html">Click here for preliminary compiler information you need.</a>
+
+</span><a name="l1"></a><span class="cF2">//9 has graphics</span><span class="cF0">
+<a name="l2"></a>
+<a name="l3"></a>
+<a name="l4"></a></span><span class="cF3">&lt;1&gt;</span><span class="cF2">/* Graphics Not Rendered in HTML */</span><span class="cF0">
+<a name="l5"></a>
+<a name="l6"></a>
+<a name="l7"></a>
+<a name="l8"></a>
+<a name="l9"></a>
+<a name="l10"></a></span><span class="cF3">&lt;2&gt;</span><span class="cF2">/* Graphics Not Rendered in HTML */</span><span class="cF0">
+<a name="l11"></a>
+<a name="l12"></a>
+<a name="l13"></a>
+<a name="l14"></a>
+<a name="l15"></a>
+<a name="l16"></a>
+<a name="l17"></a></span><span class="cF3">&lt;3&gt;</span><span class="cF2">/* Graphics Not Rendered in HTML */</span><span class="cF0">
+<a name="l18"></a>
+<a name="l19"></a>
+<a name="l20"></a>
+<a name="l21"></a>
+<a name="l22"></a>
+<a name="l23"></a></span><span class="cF3">&lt;4&gt;</span><span class="cF2">/* Graphics Not Rendered in HTML */</span><span class="cF0">
+<a name="l24"></a>
+<a name="l25"></a>
+<a name="l26"></a>
+<a name="l27"></a>
+<a name="l28"></a>
+<a name="l29"></a>
+<a name="l30"></a></span><span class="cF3">&lt;5&gt;</span><span class="cF2">/* Graphics Not Rendered in HTML */</span><span class="cF0">
+<a name="l31"></a>
+<a name="l32"></a>
+<a name="l33"></a>
+<a name="l34"></a>
+<a name="l35"></a>
+<a name="l36"></a>
+<a name="l37"></a>
+<a name="l38"></a>
+<a name="l39"></a>
+<a name="l40"></a>
+<a name="l41"></a></span><span class="cF3">&lt;6&gt;</span><span class="cF2">/* Graphics Not Rendered in HTML */</span><span class="cF0">
+<a name="l42"></a>
+<a name="l43"></a>
+<a name="l44"></a>
+<a name="l45"></a>
+<a name="l46"></a>#</span><span class="cF1">define</span><span class="cF0"> MAN_FRAMES 8
+<a name="l47"></a>
+<a name="l48"></a></span><span class="cF1">U8</span><span class="cF0"> *man_imgs[MAN_FRAMES]=
+<a name="l49"></a>{
+<a name="l50"></a></span><span class="cF3">&lt;1&gt;</span><span class="cF0">,</span><span class="cF3">&lt;2&gt;</span><span class="cF0">,</span><span class="cF3">&lt;3&gt;</span><span class="cF0">,</span><span class="cF3">&lt;4&gt;</span><span class="cF0">,
+<a name="l51"></a></span><span class="cF3">&lt;5&gt;</span><span class="cF0">,</span><span class="cF3">&lt;4&gt;</span><span class="cF0">,</span><span class="cF3">&lt;3&gt;</span><span class="cF0">,</span><span class="cF3">&lt;1&gt;</span><span class="cF0">
+<a name="l52"></a>};
+<a name="l53"></a>
+<a name="l54"></a></span><span class="cF1">F64</span><span class="cF0"> t0=tJ;
+<a name="l55"></a>
+<a name="l56"></a></span><span class="cF1">U0</span><span class="cF0"> DrawIt(TaskStruct *task,GrDC *dc)
+<a name="l57"></a>{
+<a name="l58"></a>  </span><span class="cF1">U8</span><span class="cF0"> *inter;
+<a name="l59"></a>  </span><span class="cF1">F64</span><span class="cF0"> tt=4.0*tJ,dt=(tJ-t0)*music_tempo;
+<a name="l60"></a>  inter=GrSpriteInterpolate(man_imgs[tt%MAN_FRAMES],man_imgs[</span><span class="cF7">(</span><span class="cF0">tt+1</span><span class="cF7">)</span><span class="cF0">%MAN_FRAMES],tt%1.0);
+<a name="l61"></a>  GrSpritePlot3(dc,180,40,0,inter);
+<a name="l62"></a>  Free(inter);
+<a name="l63"></a>  </span><span class="cF1">if</span><span class="cF0"> (dt&gt;24.0)
+<a name="l64"></a>    GrSpritePlot3(dc,task-&gt;win_pixel_width-12.0*</span><span class="cF7">(</span><span class="cF0">dt-24.0</span><span class="cF7">)</span><span class="cF0">,40,0,</span><span class="cF3">&lt;6&gt;</span><span class="cF0">);
+<a name="l65"></a>}
+<a name="l66"></a>
+<a name="l67"></a></span><span class="cF1">U0</span><span class="cF0"> Song()
+<a name="l68"></a>{
+<a name="l69"></a>  SettingsPush; </span><span class="cF2">//See </span><a href="/archive/code/TaskSettings.html#l3"><span class="cF4">SettingsPush</span></a><span class="cF0">
+<a name="l70"></a>  Fs-&gt;draw_it=&amp;DrawIt;
+<a name="l71"></a>  Fs-&gt;task_end_cb=&amp;SndTaskEndCB;
+<a name="l72"></a>
+<a name="l73"></a>  music_tempo=2.5;
+<a name="l74"></a>  </span><span class="cF1">try</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l75"></a>    </span><span class="cF1">while</span><span class="cF0"> (!ScanKey) {
+<a name="l76"></a>      t0=tJ;
+<a name="l77"></a>      LtfClear;
+<a name="l78"></a>      Play(</span><span class="cF6">"qR3sDEDE2eGR3etGGAqEetDGBsA2G3A2GqR"</span><span class="cF0">,
+<a name="l79"></a>          </span><span class="cF6">" \0What \0 \0seem \0 \0large, \0 \0for \0 \0 \0God \0is \0quite \0small.\r\n\0 \0 \0 \0 \0 \0"</span><span class="cF0">);
+<a name="l80"></a>      Play(</span><span class="cF6">"R3sDEDE2eGR3etGGAqEetDGBsA2G3A2GqR"</span><span class="cF0">,
+<a name="l81"></a>          </span><span class="cF6">" \0Hea\0ven\0ly \0 \0host \0 \0waits \0 \0 \0 \0at \0His \0call.\r\n\0 \0 \0 \0 \0 \0"</span><span class="cF0">);
+<a name="l82"></a>      Play(</span><span class="cF6">"3EsFCFCeG2G3qDCetBCG2sG3C2G3CqG"</span><span class="cF0">,
+<a name="l83"></a>          </span><span class="cF6">"So, \0do \0 \0what's \0 \0in \0your \0pow\0er.\r\n\0 \0 \0 \0 \0 \0 \0 \0 \0"</span><span class="cF0">);
+<a name="l84"></a>      Play(</span><span class="cF6">"EsFCFCeG2G3qDCetBCG2sG3C2G3CqG"</span><span class="cF0">,
+<a name="l85"></a>          </span><span class="cF6">" \0Then, \0 \0call \0 \0in \0your \0ho\0ur.\r\n\0 \0 \0 \0 \0 \0 \0 \0 \0"</span><span class="cF0">);
+<a name="l86"></a>    }
+<a name="l87"></a>  </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">catch</span><span class="cF0">
+<a name="l88"></a>    CatchAll;
+<a name="l89"></a>  SettingsPop;
+<a name="l90"></a>}
+<a name="l91"></a>
+<a name="l92"></a>Song;
+</span></pre><div class="archive-note">Historical capture: 2011-11-26. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

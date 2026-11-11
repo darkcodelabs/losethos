@@ -1,0 +1,109 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>Install</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V8.00" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<a name="l1"></a><span class="cF0">                              </span><span class="cF5">Installing LoseThos</span><span class="cF0">
+<a name="l2"></a>
+<a name="l3"></a>Burn a CD with software that supports ISO files.  Then, boot it.  It's a live 
+<a name="l4"></a>CD, so you can look around with or without installing.
+<a name="l5"></a>
+<a name="l6"></a>Dual booting with another operating system is the best way to use LoseThos.  
+<a name="l7"></a>You'll need a partition for LoseThos.  Windows often comes with a restore disk 
+<a name="l8"></a>that does not allow repartitioning.  I recommend connecting a spare additional 
+<a name="l9"></a>hard drive and using the </span><span class="cF2">BIOS</span><span class="cF0"> to select which drive to boot.
+<a name="l10"></a>
+<a name="l11"></a>The CD-ROM "Install" will automate much of this.
+<a name="l12"></a>
+<a name="l13"></a>See </span><a href="https://web.archive.org/web/20120228155533/http://www.losethos.com/LTHtml/Doc/Boot.html"><span class="cF4">Boot.TXZ</span></a><span class="cF0"> for an overview of booting.  See </span><a href="/archive/LTHtml/Doc/Requirements.html"><span class="cF4">Requirements</span></a><span class="cF0"> for supported 
+<a name="l14"></a>hardware.  See </span><a href="https://web.archive.org/web/20120228155533/http://www.losethos.com/LTHtml/Doc/Upgrade.html"><span class="cF4">Upgrading</span></a><span class="cF0"> if you are upgrading.
+<a name="l15"></a>
+<a name="l16"></a>Two LoseThos partitions are highly recommended, so you can boot to a back-up and 
+<a name="l17"></a>fix the primary when you work on it.  Odds are, you only need a couple gigabytes 
+<a name="l18"></a>for your LoseThos partitions.
+<a name="l19"></a>
+<a name="l20"></a>1)
+<a name="l21"></a>  </span><a href="https://web.archive.org/web/20120228155533/http://www.losethos.com/LTHtml/OSMain/Dsk/DskAddDev.html#l198"><span class="cF4">Mount</span></a><span class="cF0">() use if the drive is partitioned.
+<a name="l22"></a>    This command mounts a drive making it accessible.  For simplicity, select </span><span class="cF2">'C
+<a name="l23"></a>    '</span><span class="cF0"> as the base drive letter for your hard drive.  The first partition will be </span><span class="cF2">
+<a name="l24"></a>    'C'</span><span class="cF0">, second, </span><span class="cF2">'D'</span><span class="cF0">, etc.  LoseThos needs 3 numbers to utilize a hard drive -- 
+<a name="l25"></a>    base0, base1, and unit.  When you enter a hexadecimal number, do it like in </span><span class="cF2">
+<a name="l26"></a>    C</span><span class="cF0"> with a </span><span class="cF2">0x</span><span class="cF0"> prefix.  If the probe was successful, you can just enter the 
+<a name="l27"></a>    number in the probe box instead of base0.
+<a name="l28"></a>  
+<a name="l29"></a>  </span><a href="https://web.archive.org/web/20120228155533/http://www.losethos.com/LTHtml/Adam/Dsk3a.html#l86"><span class="cF4">PrtDsk</span></a><span class="cF0">(</span><span class="cF2">'C'</span><span class="cF0">) use if drive is not partitioned
+<a name="l30"></a>  
+<a name="l31"></a>    This will perform a special </span><a href="https://web.archive.org/web/20120228155533/http://www.losethos.com/LTHtml/OSMain/Dsk/DskAddDev.html#l198"><span class="cF4">Mount</span></a><span class="cF0">() automatically.
+<a name="l32"></a>    
+<a name="l33"></a>    WARNING:  This command erases everything on a hard drive.  It repartitions a 
+<a name="l34"></a>    whole drive and formats the partitions.  This command should be skipped if 
+<a name="l35"></a>    you already have your hard drive partitioned.
+<a name="l36"></a>    
+<a name="l37"></a>    
+<a name="l38"></a>    WARNING:  This command doesn't play well with other operating systems.  
+<a name="l39"></a>    You'll need to do a </span><a href="/archive/LTHtml/Adam/Boot/InsBoot.html#l299"><span class="cF4">MasterBootZero</span></a><span class="cF0">() to restore your drive to a state where 
+<a name="l40"></a>    other operating systems can partition it.
+<a name="l41"></a>  
+<a name="l42"></a>2) </span><a href="/archive/LTHtml/OSMain/Dsk/Dsk1c.html#l155"><span class="cF4">Fmt</span></a><span class="cF0">(</span><span class="cF2">'D'</span><span class="cF0">,</span><span class="cF2">TRUE,FALSE,PT_FAT32</span><span class="cF0">)
+<a name="l43"></a>  This command formats a partition with </span><span class="cF2">FAT32</span><span class="cF0"> or the LoseThos native file system 
+<a name="l44"></a>  type.  Use the drive letter of the partition in place of </span><span class="cF2">'D'</span><span class="cF0">.
+<a name="l45"></a>  
+<a name="l46"></a>  WARNING:  If you are upgrading, be sure not to lose the file, </span><span class="cF2">/0000Boot/OldMBR
+<a name="l47"></a>  .BIC</span><span class="cF0">.
+<a name="l48"></a>  
+<a name="l49"></a>3) </span><a href="/archive/LTHtml/Adam/Dsk2a.html#l109"><span class="cF4">CopyTree</span></a><span class="cF0">(</span><span class="cF2">"T:/"</span><span class="cF0">,</span><span class="cF2">"D:/"</span><span class="cF0">)
+<a name="l50"></a>  This command is used to copy files onto a hard drive partition from the 
+<a name="l51"></a>  CD-ROM.  Use the drive letter of the partition in place of </span><span class="cF2">'D'</span><span class="cF0">.
+<a name="l52"></a>  
+<a name="l53"></a>4) </span><a href="/archive/LTHtml/Adam/Boot/InsBoot.html#l168"><span class="cF4">InstallBoot</span></a><span class="cF0">(</span><span class="cF2">'D'</span><span class="cF0">)
+<a name="l54"></a>  This command recompiles the source code on a partition and writes to the parti
+<a name="l55"></a>  tion's boot record.  You'll need to reenter the </span><a href="https://web.archive.org/web/20120228155533/http://www.losethos.com/LTHtml/OSMain/Dsk/DskAddDev.html#l198"><span class="cF4">Mount</span></a><span class="cF0"> information so it can be 
+<a name="l56"></a>  stored in the kernel.
+<a name="l57"></a>  
+<a name="l58"></a>5) </span><a href="/archive/LTHtml/Adam/Boot/InsBoot.html#l325"><span class="cF4">InstallMasterBoot</span></a><span class="cF0">(</span><span class="cF2">'D'</span><span class="cF0">)
+<a name="l59"></a>  
+<a name="l60"></a>  The </span><a href="/archive/LTHtml/Adam/Boot/InsBoot.html#l325"><span class="cF4">InstallMasterBoot</span></a><span class="cF0">() command places a boot loader on a drive to boot 
+<a name="l61"></a>  partitions.  It saves the old master boot record to </span><span class="cF2">/0000Boot/OldMBR.BIC</span><span class="cF0"> and 
+<a name="l62"></a>  replaces it.  When you boot, you will have the option of booting the old 
+<a name="l63"></a>  master boot record.  This command can be skipped if you already have a boot 
+<a name="l64"></a>  loader.  Be sure not to lose the copy of the old boot record, like if you 
+<a name="l65"></a>  reformat the partition.
+<a name="l66"></a>  
+<a name="l67"></a>  Delete </span><span class="cF2">/0000Boot/OldMBR.BIC</span><span class="cF0"> if you want to get a fresh copy of a mbr, like if 
+<a name="l68"></a>  installing from your own custom CD containing it's own </span><span class="cF2">/0000Boot/OldMBR.BIC</span><span class="cF0"> 
+<a name="l69"></a>  onto a system with a non-LoseThos boot loader.
+<a name="l70"></a>  
+<a name="l71"></a>  If you have anti-virus software, it might object to having a different master 
+<a name="l72"></a>  boot record.
+<a name="l73"></a>
+<a name="l74"></a>
+<a name="l75"></a></span><span class="cF8">
+<a name="l76"></a>* "Windows" is a trademark of MicroSoft Corp.
+</span></pre><div class="archive-note">Historical capture: 2012-02-28. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

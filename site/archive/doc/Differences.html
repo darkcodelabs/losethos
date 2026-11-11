@@ -1,0 +1,297 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V7.07" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<a name="l1"></a><span class="cF0">                             </span><span class="cF5">Departures from C/C++:</span><span class="cF0">
+<a name="l2"></a>
+<a name="l3"></a>* See </span><a href="https://web.archive.org/web/20111026203546/http://www.losethos.com/doc/ImportExports.html#l1"><span class="cF4">Scoping and Linkages</span></a><span class="cF0"> for details on </span><span class="cF2">extern</span><span class="cF0">, </span><span class="cF2">import</span><span class="cF0">, </span><span class="cF2">LTextern</span><span class="cF0">, </span><span class="cF2">LTimport</span><span class="cF0">, 
+<a name="l4"></a>etc.
+<a name="l5"></a>
+<a name="l6"></a>* See </span><a href="https://web.archive.org/web/20111026203546/http://www.losethos.com/doc/Directives.html#l1"><span class="cF4">::/LT/Doc/Directives.TXZ</span></a><span class="cF0">.
+<a name="l7"></a>
+<a name="l8"></a>* See the demo</span><span class="cF4">::/LT/Demo/OldSchool/Demo1/Compatibility1.SPP</span><span class="cF0">, 
+<a name="l9"></a></span><span class="cF4">::/LT/Demo/OldSchool/Demo2/Compatibility2.SPP</span><span class="cF0"> and 
+<a name="l10"></a></span><a href="/archive/code/EagleDive.html#l422"><span class="cF4">::/LT/Demo/GameStarters/EagleDive.CPZ</span></a><span class="cF0"> if you want to operate conventionally (old 
+<a name="l11"></a>school).
+<a name="l12"></a>
+<a name="l13"></a>* Built-in types include </span><span class="cF2">I0,I8,I16,I32,I64</span><span class="cF0"> for signed 0-8 byte ints and </span><span class="cF2">U0,U8,U1
+<a name="l14"></a>6,U32,U64</span><span class="cF0"> for unsigned 0-8 byte ints and </span><span class="cF2">F64</span><span class="cF0"> for 8 byte floats.
+<a name="l15"></a>
+<a name="l16"></a></span><span class="cF2">        U0      void
+<a name="l17"></a>        I8      char
+<a name="l18"></a>        U8      unsigned char
+<a name="l19"></a>        I16     short
+<a name="l20"></a>        U16     unsigned short
+<a name="l21"></a>        I32     int
+<a name="l22"></a>        U32     unsigned int
+<a name="l23"></a>        I64     long (64-bit)
+<a name="l24"></a>        U64     unsigned long (64-bit)
+<a name="l25"></a>        F64     double</span><span class="cF0">
+<a name="l26"></a>
+<a name="l27"></a>* Function with no, or just default args can be called without parenthesis. 
+<a name="l28"></a>
+<a name="l29"></a>* Default args don't have to be on the end.  This code is valid:
+<a name="l30"></a>  </span><span class="cF2">U0 Test(I64 i=4,I64 j,I64 k=5)
+<a name="l31"></a>  {
+<a name="l32"></a>    PrintF("%X %X %X\r\n",i,j,k);
+<a name="l33"></a>  }
+<a name="l34"></a>  
+<a name="l35"></a>  Test(,3);</span><span class="cF0">
+<a name="l36"></a>
+<a name="l37"></a>* When dealing with function addres, precede the name with "</span><span class="cF2">&amp;</span><span class="cF0">".
+<a name="l38"></a>
+<a name="l39"></a>* There is no </span><span class="cF2">main()</span><span class="cF0"> function.  Any code outside of functions gets executed on 
+<a name="l40"></a>start-up, in order.
+<a name="l41"></a>
+<a name="l42"></a>* Var arg cnts (</span><span class="cF2">...</span><span class="cF0">) are accessed with </span><span class="cF2">argc</span><span class="cF0"> and </span><span class="cF2">argv[]</span><span class="cF0"> which are predefined 
+<a name="l43"></a>invisible local var in any function with "</span><span class="cF2">...</span><span class="cF0">" as args.
+<a name="l44"></a>
+<a name="l45"></a>* Allows "</span><span class="cF2">5&lt;i&lt;j+1&lt;20</span><span class="cF0">" instead of "</span><span class="cF2">5&lt;i &amp;&amp; i&lt;j+1 &amp;&amp; j+1&lt;20</span><span class="cF0">".
+<a name="l46"></a>
+<a name="l47"></a>* </span><span class="cF2">switch</span><span class="cF0"> statements always use a jump table.  Don't use them with cases with 
+<a name="l48"></a>really big, sparse ranges.
+<a name="l49"></a>
+<a name="l50"></a>* Allows ranges like "</span><span class="cF2">case 4...7:</span><span class="cF0">" in </span><span class="cF2">switch</span><span class="cF0"> statements. 
+<a name="l51"></a>
+<a name="l52"></a>* </span><span class="cF2">nobound_switch</span><span class="cF0"> can be used if you know a switch statement will not exceed the 
+<a name="l53"></a>lowest or highest case values.  It's a little faster because it doesn't check.
+<a name="l54"></a>
+<a name="l55"></a>* </span><span class="cF2">noreg</span><span class="cF0"> or </span><span class="cF2">reg</span><span class="cF0"> can be placed before a function local var name.  You can, 
+<a name="l56"></a>optionally, specify a register after the </span><span class="cF2">reg</span><span class="cF0"> keyword.
+<a name="l57"></a>
+<a name="l58"></a>* </span><span class="cF2">interrupt</span><span class="cF0">, </span><span class="cF2">public</span><span class="cF0">, </span><span class="cF2">argpop</span><span class="cF0"> or </span><span class="cF2">noargpop</span><span class="cF0"> are function flags.
+<a name="l59"></a>
+<a name="l60"></a>* A </span><span class="cF2">nounusedwarn</span><span class="cF0"> statement will suppress an unused var warning.
+<a name="l61"></a>
+<a name="l62"></a>* You can have multiple member vars of a class named "</span><span class="cF2">pad</span><span class="cF0">" or "</span><span class="cF2">reserved</span><span class="cF0">", and it 
+<a name="l63"></a>won't issue warnings. 
+<a name="l64"></a>
+<a name="l65"></a>* Type casting is done with </span><span class="cF2">&gt;&lt;(classname)</span><span class="cF0"> and is postfix.  To typecast int or 
+<a name="l66"></a>F64, use </span><a href="https://web.archive.org/web/20111026203546/http://www.losethos.com/code/Adam1b.html#l217"><span class="cF4">ToI64</span></a><span class="cF0">(), </span><a href="https://web.archive.org/web/20111026203546/http://www.losethos.com/code/Adam1b.html#l219"><span class="cF4">ToBool</span></a><span class="cF0">() or </span><a href="https://web.archive.org/web/20111026203546/http://www.losethos.com/code/Adam1b.html#l218"><span class="cF4">ToF64</span></a><span class="cF0">(). (LoseThos follows normal C float&lt;--&gt;int 
+<a name="l67"></a>conversion, but sometimes you want to override.  These functions are better than 
+<a name="l68"></a>multiplying by "1.0" to convert to float.) 
+<a name="l69"></a>
+<a name="l70"></a>* The "</span><span class="cF2">`</span><span class="cF0">" operator raises a base to a power.
+<a name="l71"></a>
+<a name="l72"></a>* A single quote can encompass multiple characters.  </span><span class="cF2">'ABC'</span><span class="cF0"> is equal to </span><span class="cF2">0x434241</span><span class="cF0">.
+<a name="l73"></a>
+<a name="l74"></a>* </span><span class="cF8"></span><span class="cF0">LoseThos </span><a href="https://web.archive.org/web/20111026203546/http://www.losethos.com/code/CmpInit.html#l689"><span class="cF4">operator precedence</span></a><span class="cF0">
+<a name="l75"></a>  </span><span class="cF2">`</span><span class="cF0">,</span><span class="cF2">&gt;&gt;</span><span class="cF0">,</span><span class="cF2">&lt;&lt;</span><span class="cF0">
+<a name="l76"></a>  </span><span class="cF2">*</span><span class="cF0">,</span><span class="cF2">/</span><span class="cF0">,</span><span class="cF2">%</span><span class="cF0">
+<a name="l77"></a>  </span><span class="cF2">&amp;</span><span class="cF0">
+<a name="l78"></a>  </span><span class="cF2">^</span><span class="cF0">
+<a name="l79"></a>  </span><span class="cF2">|</span><span class="cF0">
+<a name="l80"></a>  </span><span class="cF2">+</span><span class="cF0">,</span><span class="cF2">-</span><span class="cF0">
+<a name="l81"></a>  </span><span class="cF2">&lt;</span><span class="cF0">,</span><span class="cF2">&gt;</span><span class="cF0">,</span><span class="cF2">&lt;=</span><span class="cF0">,</span><span class="cF2">&gt;=</span><span class="cF0">
+<a name="l82"></a>  </span><span class="cF2">==</span><span class="cF0">,</span><span class="cF2">!=</span><span class="cF0">
+<a name="l83"></a>  </span><span class="cF2">&amp;&amp;</span><span class="cF0">
+<a name="l84"></a>  </span><span class="cF2">^^</span><span class="cF0">
+<a name="l85"></a>  </span><span class="cF2">||</span><span class="cF0">
+<a name="l86"></a>  </span><span class="cF2">:</span><span class="cF0">,</span><span class="cF2">?</span><span class="cF0">
+<a name="l87"></a>  </span><span class="cF2">=</span><span class="cF0">,</span><span class="cF2">&lt;&lt;=</span><span class="cF0">,</span><span class="cF2">&gt;&gt;=</span><span class="cF0">,</span><span class="cF2">*=</span><span class="cF0">,</span><span class="cF2">/=</span><span class="cF0">,</span><span class="cF2">&amp;=</span><span class="cF0">,</span><span class="cF2">|=</span><span class="cF0">,</span><span class="cF2">^=</span><span class="cF0">,</span><span class="cF2">+=</span><span class="cF0">,</span><span class="cF2">-=</span><span class="cF0">
+<a name="l88"></a>
+<a name="l89"></a>* Use </span><a href="https://web.archive.org/web/20111026203546/http://www.losethos.com/code/Directives.html#l8"><span class="cF4">OptOn</span></a><span class="cF0">(</span><a href="/archive/code/Adam1a.html#l1397"><span class="cF4">OPTf_STD_C</span></a><span class="cF0">) to use C precedence.
+<a name="l90"></a>
+<a name="l91"></a>* You can use </span><a href="https://web.archive.org/web/20111026203546/http://www.losethos.com/code/Directives.html#l8"><span class="cF4">OptOn</span></a><span class="cF0">(</span><a href="/archive/code/Adam1a.html#l1388"><span class="cF4">OPTf_PAREN_WARN</span></a><span class="cF0">) to find unnecessary parentheses in code.
+<a name="l92"></a>
+<a name="l93"></a>* With the </span><span class="cF2">#exe{}</span><span class="cF0"> feature in your src code, you can place programs that insert 
+<a name="l94"></a>text into the stream of code being compiled.  See </span><a href="/archive/code/OSMain.html#l43"><span class="cF4">#exe {}</span></a><span class="cF0"> for an example where 
+<a name="l95"></a>the date/time and compile-time prompting for cfguration data is placed into a 
+<a name="l96"></a>program.  The </span><a href="https://web.archive.org/web/20111026203546/http://www.losethos.com/code/CmpMain.html#l15"><span class="cF4">StreamPrintF</span></a><span class="cF0">() and </span><a href="https://web.archive.org/web/20111026203546/http://www.losethos.com/code/CmpMain.html#l2"><span class="cF4">StreamPutS</span></a><span class="cF0">() place text into a src program 
+<a name="l97"></a>stream following the conclusion of the </span><span class="cF2">#exe{}</span><span class="cF0"> blk.
+<a name="l98"></a>
+<a name="l99"></a>* No </span><span class="cF2">#define</span><span class="cF0"> functions exist (I'm not a fan)
+<a name="l100"></a>
+<a name="l101"></a>* No type-checking
+<a name="l102"></a>
+<a name="l103"></a>* Can't use </span><span class="cF2">&lt;&gt;</span><span class="cF0"> with </span><span class="cF2">#include</span><span class="cF0">, use </span><span class="cF2">""</span><span class="cF0">.
+<a name="l104"></a>
+<a name="l105"></a>* "</span><span class="cF2">$</span><span class="cF0">" is an escape character.  Two dollar signs signify an ordinary $.  See 
+<a name="l106"></a></span><a href="https://web.archive.org/web/20111026203546/http://www.losethos.com/doc/Dollar.html#l1"><span class="cF4">::/LT/Doc/Dollar.TXZ</span></a><span class="cF0">.  In </span><span class="cF2">asm</span><span class="cF0"> or </span><span class="cF2">C+</span><span class="cF0"> code, it also refers to the instruction's 
+<a name="l107"></a>addr. 
+<a name="l108"></a>
+<a name="l109"></a>* </span><span class="cF2">union</span><span class="cF0"> is more like a class, so you don't referrence it with a </span><span class="cF2">union</span><span class="cF0"> label 
+<a name="l110"></a>after you define it.  Some common unions are declared in </span><a href="/archive/code/Adam1a.html#l12"><span class="cF4">Adam1a.HPZ</span></a><span class="cF0"> for 1,2,4 
+<a name="l111"></a>and 8 byte objects.  If you place a type in front of a union declaration, that 
+<a name="l112"></a>is the type when used by itself.  See </span><a href="https://web.archive.org/web/20111026203546/http://www.losethos.com/code/SubIntAccess.html#l1"><span class="cF4">::/LT/Demo/SubIntAccess.CPZ</span></a><span class="cF0">. 
+<a name="l113"></a>
+<a name="l114"></a>* </span><span class="cF2">class</span><span class="cF0"> member vars can have meta data. </span><span class="cF2">fmtstr</span><span class="cF0"> and </span><span class="cF2">fmtdata</span><span class="cF0"> are two meta data 
+<a name="l115"></a>types now used.  All compiler structures are saved and you can access the 
+<a name="l116"></a>compiler's info about classes and vars.  See </span><span class="cF4">::/LT/Demo/ClassMeta.CPZ</span><span class="cF0"> and  
+<a name="l117"></a></span><a href="https://web.archive.org/web/20111026203546/http://www.losethos.com/code/LtfPopUp.html#l308"><span class="cF4">LtfFormDo</span></a><span class="cF0">().
+<a name="l118"></a>
+<a name="l119"></a>* See </span><span class="cF4">::/LT/Demo/Exceptions.CPZ</span><span class="cF0">.  </span><span class="cF2">try{} catch{}</span><span class="cF0"> and </span><span class="cF2">throw</span><span class="cF0"> are different from 
+<a name="l120"></a>C++. </span><span class="cF2">throw</span><span class="cF0"> is a function with var ("</span><span class="cF2">...</span><span class="cF0">") args.  The values passed in </span><span class="cF2">throw()</span><span class="cF0"> 
+<a name="l121"></a>can be accessed from within a </span><span class="cF2">catch{}</span><span class="cF0"> using the </span><span class="cF2">Fs-&gt;except_argc</span><span class="cF0"> and </span><span class="cF2">Fs-&gt;except_a
+<a name="l122"></a>rgv[]</span><span class="cF0"> vars.  Within a </span><span class="cF2">catch {}</span><span class="cF0"> blk, set the var </span><span class="cF2">Fs-&gt;catch_except</span><span class="cF0"> to </span><span class="cF2">TRUE</span><span class="cF0"> if you 
+<a name="l123"></a>want to terminate the search for a handler.  By convention, the first arg of </span><span class="cF2">exc
+<a name="l124"></a>ept_argv[]</span><span class="cF0"> specifies the exception type num.  A list of assigned exception types 
+<a name="l125"></a>can be found at </span><a href="/archive/code/Adam1a.html#l2706"><span class="cF4">EXCEPT_LOCAL</span></a><span class="cF0">.  For a handler that will catch all excepts, you 
+<a name="l126"></a>can use </span><a href="https://web.archive.org/web/20111026203546/http://www.losethos.com/code/OSMain2.html#l15"><span class="cF4">CatchAll</span></a><span class="cF0">().
+<a name="l127"></a>
+<a name="l128"></a>* A function is available similar to </span><span class="cF2">sizeof</span><span class="cF0"> which provides the offset of a 
+<a name="l129"></a>member of a class.  It's called </span><span class="cF2">offset</span><span class="cF0">.  You place the class name and member 
+<a name="l130"></a>inside as in </span><span class="cF2">offset(classname.membername)</span><span class="cF0">.  It has nothing to do with 16-bit 
+<a name="l131"></a>code.  Both </span><span class="cF2">sizeof</span><span class="cF0"> and </span><span class="cF2">offset</span><span class="cF0"> only accept one level of member vars.  That is, 
+<a name="l132"></a>you can't do </span><span class="cF2">sizeof(classname.membername.submembername)</span><span class="cF0">.
+<a name="l133"></a>
+<a name="l134"></a>* There is no </span><span class="cF2">continue</span><span class="cF0"> statement.  Use </span><span class="cF2">goto</span><span class="cF0">.
+<a name="l135"></a>
+<a name="l136"></a>* No bit field support, but there are bit access </span><span class="cF4">library routines</span><span class="cF0">.
+<a name="l137"></a>
+<a name="l138"></a>* </span><span class="cF2">lock{}</span><span class="cF0"> can be used to apply asm </span><span class="cF2">LOCK</span><span class="cF0"> prefixes to code for safe multicore 
+<a name="l139"></a>read-modify-write accesses.  The code bracked with have </span><span class="cF2">LOCK</span><span class="cF0"> asm prefix's 
+<a name="l140"></a>applied to relevant instructions within.  It's a little shoddy.  See 
+<a name="l141"></a></span><span class="cF4">::/LT/Demo/MultiCore/Lock.CPZ</span><span class="cF0">.
+<a name="l142"></a>
+<a name="l143"></a>* There is a function called </span><a href="/archive/code/Memory.html#l920"><span class="cF4">MSize</span></a><span class="cF0">() which gives the size of an object allocated 
+<a name="l144"></a>off the heap.  For larger size allocations, the system rounds-up to a power of 
+<a name="l145"></a>two, so </span><span class="cF2">MSize()</span><span class="cF0"> lets you know the real size and you can take full advantage of 
+<a name="l146"></a>it.
+<a name="l147"></a>
+<a name="l148"></a>* You can </span><a href="/archive/code/Memory.html#l919"><span class="cF4">Free</span></a><span class="cF0">() a </span><span class="cF2">NULL</span><span class="cF0"> ptr.  Useful variants of </span><a href="/archive/code/Memory.html#l925"><span class="cF4">MAlloc</span></a><span class="cF0">() can be found </span><a href="/archive/code/Memory.html#l932"><span class="cF4">Here</span></a><span class="cF0">.  
+<a name="l149"></a>Each task has a heap and you can </span><span class="cF2">MAlloc</span><span class="cF0"> and </span><span class="cF2">Free</span><span class="cF0"> off of other task's heaps, or 
+<a name="l150"></a>make an independent heap with </span><a href="/archive/code/Memory.html#l1079"><span class="cF4">IndependentHeapCtrlInit</span></a><span class="cF0">().
+<a name="l151"></a>
+<a name="l152"></a>* The stk does not grow because virtual mem is not used.  I recommend allocating 
+<a name="l153"></a>large local vars from the heap.  You can change </span><a href="/archive/code/Adam1a.html#l2804"><span class="cF4">DFT_STK</span></a><span class="cF0"> and recompile </span><span class="cF2">OSMain</span><span class="cF0"> or 
+<a name="l154"></a>request more when doing a </span><a href="/archive/code/Task1a.html#l230"><span class="cF4">Spawn</span></a><span class="cF0">().  You can use </span><a href="/archive/code/Task1a.html#l67"><span class="cF4">CallStkGrow</span></a><span class="cF0">(), but it's odd.  
+<a name="l155"></a>See </span><span class="cF4">::/LT/Demo/StkGrow.CPZ</span><span class="cF0">. 
+<a name="l156"></a>
+<a name="l157"></a>* Only one base class is allowed.
+<a name="l158"></a>
+<a name="l159"></a>* All values are extended to 64-bit when accessed.  Intermediate calculations 
+<a name="l160"></a>are done with 64-bit values.
+<a name="l161"></a>
+<a name="l162"></a>  The follow examples should be inserted in a function, so that register 
+<a name="l163"></a>  variables are used.  (Global vars are never register.)
+<a name="l164"></a>  
+<a name="l165"></a>  </span><span class="cF2">I16 i;
+<a name="l166"></a>  I32 j;
+<a name="l167"></a>  j=i=0x12345678; //Resulting i is 0x5678 but j is 0x12345678
+<a name="l168"></a>  
+<a name="l169"></a>  I64 i=0x8000000000000000;
+<a name="l170"></a>  PrintF("%X\r\n",i&gt;&gt;1);  //Result is 0xC000000000000000 as expected
+<a name="l171"></a>  
+<a name="l172"></a>  U64 u=0x8000000000000000;
+<a name="l173"></a>  PrintF("%X\r\n",u&gt;&gt;1);  //Result is 0x4000000000000000 as expected
+<a name="l174"></a>  
+<a name="l175"></a>  I32 i=0x80000000;       //constant is loaded into a 64-bit register var.
+<a name="l176"></a>  PrintF("%X\r\n",i&gt;&gt;1);  //Result is 0x40000000
+<a name="l177"></a>  
+<a name="l178"></a>  I32 i=-0x80000000;
+<a name="l179"></a>  PrintF("%X\r\n",i&gt;&gt;1);  //Result is 0xC0000000 as expected
+<a name="l180"></a>  
+<a name="l181"></a></span><span class="cF0">
+<a name="l182"></a>                                 </span><span class="cF5">PrintF Family</span><span class="cF0">
+<a name="l183"></a>
+<a name="l184"></a></span><a href="https://web.archive.org/web/20111026203546/http://www.losethos.com/code/Str1a.html#l1130"><span class="cF4">MSPrintF</span></a><span class="cF0">() is like </span><a href="https://web.archive.org/web/20111026203546/http://www.losethos.com/code/Str1a.html#l1108"><span class="cF4">SPrintF</span></a><span class="cF0">() but it returns a </span><a href="/archive/code/Memory.html#l925"><span class="cF4">MAlloc</span></a><span class="cF0">ated str.  It is vary handy 
+<a name="l185"></a>because you don't have to worry about overflow.
+<a name="l186"></a>
+<a name="l187"></a></span><a href="/archive/code/Display.html#l272"><span class="cF4">PutS</span></a><span class="cF0">() doesn't print a new line.
+<a name="l188"></a>
+<a name="l189"></a></span><a href="/archive/code/TaskCmd.html#l353"><span class="cF4">Auto</span></a><span class="cF0">(U8 *fmtstr,...) sends text to the current task's input buffer.
+<a name="l190"></a></span><a href="/archive/code/TaskCmd.html#l383"><span class="cF4">AutoStr</span></a><span class="cF0">(U8 *fmtstr,...) sends text of an </span><a href="https://web.archive.org/web/20111026203546/http://www.losethos.com/doc/Glossary.html#l13"><span class="cF4">AutoFile</span></a><span class="cF0"> to the keyboard stream of the 
+<a name="l191"></a>current TASK but can also do mouse cmds.
+<a name="l192"></a>
+<a name="l193"></a></span><a href="/archive/code/TaskCmd.html#l332"><span class="cF4">XTalk</span></a><span class="cF0">(TaskStruct *task,U8 *fmtstr,...) and text to another task's input buffer.
+<a name="l194"></a></span><a href="/archive/code/TaskCmd.html#l408"><span class="cF4">XTalkStr</span></a><span class="cF0">(TaskStruct *task,U8 *fmtstr,...) sends text of an </span><a href="https://web.archive.org/web/20111026203546/http://www.losethos.com/doc/Glossary.html#l13"><span class="cF4">AutoFile</span></a><span class="cF0"> to the 
+<a name="l195"></a>keyboard stream of another TASK but can also do mouse cmds.
+<a name="l196"></a>
+<a name="l197"></a>
+<a name="l198"></a></span><a href="https://web.archive.org/web/20111026203546/http://www.losethos.com/code/LtfPlain.html#l844"><span class="cF4">LtfPutS</span></a><span class="cF0">(Ltf *l,U8 *src) and </span><a href="https://web.archive.org/web/20111026203546/http://www.losethos.com/code/LtfPlain.html#l1000"><span class="cF4">LtfPrintF</span></a><span class="cF0">(Ltf *l,U8 *fmtstr,...) send text to a 
+<a name="l199"></a>linked text file.  You can buffer to a Ltf and save it, providing the 
+<a name="l200"></a>functionality of </span><span class="cF2">fprintf</span><span class="cF0">.  See </span><span class="cF4">::/LT/Demo/Dsk/FPrintF.CPZ</span><span class="cF0">.
+<a name="l201"></a>
+<a name="l202"></a></span><a href="/archive/code/TaskCmd.html#l285"><span class="cF4">Adam</span></a><span class="cF0">(U8 *fmtstr,...) send text to the adam task to be compiled and run.
+<a name="l203"></a></span><a href="/archive/code/TaskCmd.html#l303"><span class="cF4">AdamLog</span></a><span class="cF0">(U8 *fmtstr,...) and </span><a href="/archive/code/TaskCmd.html#l316"><span class="cF4">AdamErr</span></a><span class="cF0">(U8 *fmtstr,...) send text to the adam task 
+<a name="l204"></a>to be displayed.
+<a name="l205"></a>
+<a name="l206"></a></span><a href="https://web.archive.org/web/20111026203546/http://www.losethos.com/code/CmpMain.html#l15"><span class="cF4">StreamPrintF</span></a><span class="cF0">(U8 *fmtstr,...) and </span><a href="https://web.archive.org/web/20111026203546/http://www.losethos.com/code/CmpMain.html#l2"><span class="cF4">StreamPutS</span></a><span class="cF0">(U8 *src) send text to the stream of 
+<a name="l207"></a>code being compiled and must reside in a </span><span class="cF2">#exe{}</span><span class="cF0"> blk.
+<a name="l208"></a>
+<a name="l209"></a></span><a href="/archive/code/GrBitMap.html#l1104"><span class="cF4">GrPrintF</span></a><span class="cF0">(GrBitMap *base,I64 x,I64 y,U8 *fmtstr,...) and </span><a href="/archive/code/GrBitMap.html#l1054"><span class="cF4">GrPutS</span></a><span class="cF0">(GrBitMap 
+<a name="l210"></a>*base,I64 x,I64 y,U8 *src) plots text in graphics mode.  </span><a href="/archive/code/GrBitMap.html#l1111"><span class="cF4">GrVPrintF</span></a><span class="cF0">() and 
+<a name="l211"></a></span><a href="/archive/code/GrBitMap.html#l1078"><span class="cF4">GrVPutS</span></a><span class="cF0">() will print vertically.
+<a name="l212"></a>
+<a name="l213"></a></span><a href="https://web.archive.org/web/20111026203546/http://www.losethos.com/code/CmpMain.html#l559"><span class="cF4">ExePrintF</span></a><span class="cF0">(U8 *fmtstr,...) and </span><a href="https://web.archive.org/web/20111026203546/http://www.losethos.com/code/CmpMain.html#l527"><span class="cF4">ExePutS</span></a><span class="cF0">(U8 *src) compile and execute a string.  
+<a name="l214"></a>Note: It returns the result of the last executed expression.
+<a name="l215"></a>
+<a name="l216"></a>Note: If no </span><span class="cF2">PutS</span><span class="cF0"> variant is available, you can use </span><span class="cF2">PrintF("%s",src)</span><span class="cF0">.
+<a name="l217"></a>
+<a name="l218"></a>
+<a name="l219"></a></span><span class="cF8"></span><span class="cF0">The </span><a href="https://web.archive.org/web/20111026203546/http://www.losethos.com/code/Str1a.html#l1122"><span class="cF4">PrintF</span></a><span class="cF0">() family supports extended format codes.  See </span><a href="/archive/code/SPrintF2.html#l490"><span class="cF4">SPrintFJoin2</span></a><span class="cF0">().
+<a name="l220"></a>  </span><span class="cF2">%</span><span class="cF0">[</span><span class="cF2">-</span><span class="cF0">][</span><span class="cF2">0</span><span class="cF0">][</span><span class="cF5">width</span><span class="cF0">][</span><span class="cF2">.</span><span class="cF5">decimals</span><span class="cF0">][</span><span class="cF5">flags</span><span class="cF0">][</span><span class="cF2">h</span><span class="cF5">sub_fmt</span><span class="cF0">][</span><span class="cF5">main_fmt</span><span class="cF0">]
+<a name="l221"></a>  
+<a name="l222"></a>  </span><span class="cF5">flags:</span><span class="cF0">
+<a name="l223"></a>    * </span><span class="cF2">'t'</span><span class="cF0"> is a flag which will truncate to field width.
+<a name="l224"></a>    * </span><span class="cF2">','</span><span class="cF0"> is a flag which will add commas every three digits in a </span><span class="cF2">%d</span><span class="cF0">, </span><span class="cF2">%f</span><span class="cF0">,</span><span class="cF2"> %g</span><span class="cF0">,</span><span class="cF2"> %e</span><span class="cF0"> 
+<a name="l225"></a>    and </span><span class="cF2">%n</span><span class="cF0"> entries.
+<a name="l226"></a>    * </span><span class="cF2">'$'</span><span class="cF0"> is a flag which affects the </span><span class="cF2">%Q</span><span class="cF0"> entry, converting </span><span class="cF2">'$'</span><span class="cF0"> to </span><span class="cF2">"\044"</span><span class="cF0">.
+<a name="l227"></a>    * </span><span class="cF2">'k'</span><span class="cF0"> is a flag which forces 1000 instead of 1024 on integer with </span><span class="cF5">sub_fmts</span><span class="cF0">.
+<a name="l228"></a>  
+<a name="l229"></a>  </span><span class="cF5">sub_fmt:</span><span class="cF0">
+<a name="l230"></a>    On date or time entries, the sub_format specifies the format.  See 
+<a name="l231"></a>    </span><span class="cF4">::/LT/Demo/DateTime.CPZ</span><span class="cF0">.
+<a name="l232"></a>    
+<a name="l233"></a>    </span><span class="cF8"></span><span class="cF0">On </span><span class="cF2">"%n"</span><span class="cF0">, </span><span class="cF2">"%d"</span><span class="cF0"> or </span><span class="cF2">"%u"</span><span class="cF0">, the sub_fmt causes thousands mode.
+<a name="l234"></a>      </span><span class="cF2">"%h?n"</span><span class="cF0"> will pick a var exponent multiples of three unit, while </span><span class="cF2">"%h-3n"</span><span class="cF0">, 
+<a name="l235"></a>    for example, will display milli units or </span><span class="cF2">"%h6n"</span><span class="cF0"> will display mega units.  
+<a name="l236"></a>    The </span><span class="cF2">'k'</span><span class="cF0"> flag is always on for </span><span class="cF2">"%n"</span><span class="cF0">.  See </span><span class="cF4">::/LT/Demo/PrintF.CPZ</span><span class="cF0">.
+<a name="l237"></a>  
+<a name="l238"></a>  *  </span><span class="cF2">"%n"</span><span class="cF0"> will print a floating point in engineering notation, exponents being 
+<a name="l239"></a>  multiples of three.  If it has a </span><span class="cF5">sub_fmt</span><span class="cF0"> code, it will display scientific 
+<a name="l240"></a>  units letters.
+<a name="l241"></a>  
+<a name="l242"></a>  * </span><span class="cF2">"%S"</span><span class="cF0"> will print a Define entry.
+<a name="l243"></a>  
+<a name="l244"></a>  * </span><span class="cF2">"%C"</span><span class="cF0"> will print a ToUpper character.
+<a name="l245"></a>  
+<a name="l246"></a>  * </span><span class="cF2">"%F"</span><span class="cF0"> will print a text file.
+<a name="l247"></a>  
+<a name="l248"></a>  * </span><span class="cF2">"%P"</span><span class="cF0"> will display a PSECT expression which is good for ptrs or addres.
+<a name="l249"></a>  
+<a name="l250"></a>  * </span><span class="cF2">"%T"</span><span class="cF0"> and </span><span class="cF2">"%D"</span><span class="cF0"> will display a date or time and the format is selected with a 
+<a name="l251"></a>  subcode, entered after a "</span><span class="cF2">h</span><span class="cF0">".  Example: "</span><span class="cF2">%20h1D</span><span class="cF0">" uses date format code "1". 
+<a name="l252"></a>  See </span><span class="cF4">::/LT/Demo/DateTime.CPZ</span><span class="cF0">, </span><a href="/archive/code/SPrintF2.html#l134"><span class="cF4">MSPrintFDate</span></a><span class="cF0">() and </span><a href="/archive/code/SPrintF2.html#l44"><span class="cF4">MSPrintFTime</span></a><span class="cF0">() for subcodes.
+<a name="l253"></a>  
+<a name="l254"></a>  * </span><span class="cF2">"%z"</span><span class="cF0"> will display a subentry of an enumerated list of text entries. It calls 
+<a name="l255"></a>  </span><a href="https://web.archive.org/web/20111026203546/http://www.losethos.com/code/Str1a.html#l387"><span class="cF4">ListEntryPoint</span></a><span class="cF0">().  Pass entry_num first, list second.
+<a name="l256"></a>  
+<a name="l257"></a>  * </span><span class="cF2">"%Z"</span><span class="cF0"> will display a Define subentry.  Pass entry_num first, list_systext 
+<a name="l258"></a>  second.
+<a name="l259"></a>  
+<a name="l260"></a>  * </span><span class="cF2">"%Q"</span><span class="cF0"> will convert "\" to "\\" and quote to backslash quote. (For use in 
+<a name="l261"></a>  creating strs in strs.)
+<a name="l262"></a>  
+<a name="l263"></a>  * </span><span class="cF2">"%q"</span><span class="cF0"> will reverse a </span><span class="cF2">"%Q"</span><span class="cF0">.
+<a name="l264"></a>
+</span></pre><div class="archive-note">Historical capture: 2011-10-26. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

@@ -1,0 +1,125 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="description"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="keywords"/>
+<meta content="LoseThos V6.18" name="generator"/>
+<style type="text/css">
+.cBLACK{color:rgb(0,0,0);}
+.cBLUE{color:rgb(0,0,168);}
+.cGREEN{color:rgb(0,168,0);}
+.cCYAN{color:rgb(0,168,168);}
+.cRED{color:rgb(168,0,0);}
+.cPURPLE{color:rgb(168,0,168);}
+.cBROWN{color:rgb(168,84,0);}
+.cLTGRAY{color:rgb(168,168,168);}
+.cDKGRAY{color:rgb(84,84,84);}
+.cLTBLUE{color:rgb(84,84,252);}
+.cLTGREEN{color:rgb(84,252,84);}
+.cLTCYAN{color:rgb(84,252,252);}
+.cLTRED{color:rgb(252,84,84);}
+.cLTPURPLE{color:rgb(252,84,252);}
+.cYELLOW{color:rgb(252,252,84);}
+.cWHITE{color:rgb(252,252,252);}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<a name="l1"></a><span class="cBLACK">                                     </span><span class="cPURPLE">Wisdom</span><span class="cBLACK">
+<a name="l2"></a>
+<a name="l3"></a>* Writing your own code is more fun then modifying someone else's.  I've decided 
+<a name="l4"></a>I enjoy programming most when I know what I'm doing.  Sadly, I've heard that 90% 
+<a name="l5"></a>of programmers work on maintaining code.  One good thing about looking at other 
+<a name="l6"></a>people's code, though, is you learn what to and what NOT to do.  
+<a name="l7"></a>
+<a name="l8"></a>* Use a profiler.  </span><span class="cRED">Profiler</span><span class="cBLACK">  Don't make noncritical code optimized.  Such 
+<a name="l9"></a>optimizations are ugly, complicated and bulky.  They create a maintenance 
+<a name="l10"></a>burden.  Stay agile.  Obviously, develop good habits for all code, though.
+<a name="l11"></a>
+<a name="l12"></a>* When I was inexperienced, I remember coming across different code indentation 
+<a name="l13"></a>and formatting schemes.  I couldn't read, being too distracted.  Over the years, 
+<a name="l14"></a>I've become less bothered by variations.  I'm not alone.  I remember one young 
+<a name="l15"></a>coworker who reformatted a program I had written when he was asked to work on 
+<a name="l16"></a>it.  Then, he asked me for help!  Code can become your baby.  Caring is probably 
+<a name="l17"></a>good.  In later years, I remember working on ugly code... I just wanted out of 
+<a name="l18"></a>there.
+<a name="l19"></a>
+<a name="l20"></a>* Misspellings almost never make things unreadable, but they definitely 
+<a name="l21"></a>distract.  There was an interesting study where people were presented with a 
+<a name="l22"></a>paragraph containing completely misspelled words except for the first and last 
+<a name="l23"></a>letters.  It was still readable!  Generally speaking, people use spelling as an 
+<a name="l24"></a>IQ test and you'll lose your reader's attention.  The same is true in oration.  
+<a name="l25"></a>It's silly, but the distractions presented are a serious problem.  If a 
+<a name="l26"></a>politician bumbles a word, the audience won't hear the next 30 seconds because 
+<a name="l27"></a>they're flustered.  Another reason for standard forms is to make things machine 
+<a name="l28"></a>readable.
+<a name="l29"></a>
+<a name="l30"></a>* Off topic, I took a control system's course and our book used different 
+<a name="l31"></a>letters for matrices than I was used to.  I couldn't adapt.  That sounds silly, 
+<a name="l32"></a>but imagine </span><span class="cGREEN">d=g(u)</span><span class="cBLACK"> instead </span><span class="cGREEN">y=f(x)</span><span class="cBLACK"> everywhere.  I realize I'm guilty of changing 
+<a name="l33"></a>things with LoseThos, but had I followed standards, LoseThos would be nothing 
+<a name="l34"></a>but an inferior imitation of Linux.  Instead, it's and improvement.  You can't 
+<a name="l35"></a>tell me the standard library routines, </span><span class="cGREEN">getchar, scanf, gets</span><span class="cBLACK"> are good the way 
+<a name="l36"></a>they are.  </span><span class="cGREEN">getchar()</span><span class="cBLACK"> requires a carriage return.  </span><span class="cGREEN">scanf()</span><span class="cBLACK"> is bizarre.  </span><span class="cGREEN">gets()</span><span class="cBLACK"> 
+<a name="l37"></a>has length problems.
+<a name="l38"></a> 
+<a name="l39"></a>* When working on other people's code, people tend to be defensive.  They use 
+<a name="l40"></a>caution when uncertain.  This adds unnecessary code.  This is just a fact of 
+<a name="l41"></a>life.
+<a name="l42"></a>
+<a name="l43"></a>* Documentation which is out-of-date is worse than no documentation.  I tried to 
+<a name="l44"></a>keep documentation right by code in LoseThos.
+<a name="l45"></a>
+<a name="l46"></a>* There is potential for huge added functionality by enhancing low level 
+<a name="l47"></a>routines.  Imagine modifying a date range prompting routine like </span><a href="/archive/code/SPrintF2.html#l1126"><span class="cRED">A2LTDate</span></a><span class="cBLACK">(), 
+<a name="l48"></a>file choosing dialog, or </span><a href="https://web.archive.org/web/20101116122626/http://www.losethos.com/code/Str1a.html#l973"><span class="cRED">A2I</span></a><span class="cBLACK">() or </span><a href="/archive/code/SPrintF2.html#l333"><span class="cRED">PrintF</span></a><span class="cBLACK">().  Imagine modifying the compiler's 
+<a name="l49"></a>preprocessor, </span><a href="/archive/code/Lex.html#l765"><span class="cRED">Lex</span></a><span class="cBLACK">(), making new </span><span class="cGREEN">#cmd</span><span class="cBLACK"> operations.
+<a name="l50"></a>
+<a name="l51"></a>* Often, you're faced with not being able to fully implement a feature.  
+<a name="l52"></a>Professional companies choose not to include a feature if it can't work 100%.  
+<a name="l53"></a>Half-baked features tends to frustrate users.
+<a name="l54"></a> 
+<a name="l55"></a>* Not all features are good to use.  I've seen cases where people use macro 
+<a name="l56"></a>functions (</span><span class="cGREEN">#define</span><span class="cBLACK">) to make C code look like C++ code.  This is one more layer 
+<a name="l57"></a>you have to look-up to understand.  An advantage of nonvertical coding is 
+<a name="l58"></a>readability.  Reducing redundancy is good, but it is possible to get carried 
+<a name="l59"></a>away with nonstandard library routines.
+<a name="l60"></a>
+<a name="l61"></a>* One mentor discouraged using abbreviations.  One advantage of nonabreviated 
+<a name="l62"></a>labels is there's no uncertainty on how to spell them.  Typing is never what 
+<a name="l63"></a>slows you down, except maybe at the cmd line.  Uncertainty is what slows you 
+<a name="l64"></a>down.  Forgive me if I've used obscure abbreviations.
+<a name="l65"></a>
+<a name="l66"></a>* One mentor always put "temp" on the beginning of local vars -- "</span><span class="cGREEN">tempd</span><span class="cBLACK">" instead 
+<a name="l67"></a>of just "</span><span class="cGREEN">d</span><span class="cBLACK">".  The reason is probably for text finds and replaces.  I've somewhat 
+<a name="l68"></a>eliminated this need with the "whole label" search feature.
+<a name="l69"></a>
+<a name="l70"></a>* </span><span class="cRED">Grep</span><span class="cBLACK">() is my best friend.  I use a wrapper function </span><span class="cRED">F</span><span class="cBLACK">().
+<a name="l71"></a>
+<a name="l72"></a>* It's easier to write a cmd line interface than a GUI one.  If you are working 
+<a name="l73"></a>on something for personal use, why not?
+<a name="l74"></a>
+<a name="l75"></a>* On a modern home computer, the only things which take significant memory are 
+<a name="l76"></a>disk cache, graphics and sound data.  Code related items do not.  If you have 
+<a name="l77"></a>10-20 bytes of machine code for each line of C/C++ code, a million lines of src 
+<a name="l78"></a>code takes 20 Meg.  If you have a million lines of code and store an 8-byte 
+<a name="l79"></a>value telling where each line is located, that's 8 Meg.  I have 12 Gig of RAM! 
+<a name="l80"></a>That would be 0.07%.  The compiler-generated debug structures that LoseThos uses 
+<a name="l81"></a>do not use significant resources.
+<a name="l82"></a>
+<a name="l83"></a>* A home computer doesn't need a big disk cache.  How often do you listen to the 
+<a name="l84"></a>same multimedia item more than once?  If you have a database server, you need 
+<a name="l85"></a>disk cache.
+<a name="l86"></a>
+<a name="l87"></a>* Run toward bugs not away.  Robust code is good in the field, but bad for 
+<a name="l88"></a>testing--better to have things fail.</span><span class="cDKGRAY">
+<a name="l89"></a>
+<a name="l90"></a>
+<a name="l91"></a>* "Windows" is a trademark of MicroSoft Corp.
+<a name="l92"></a>* "Linux" is probably a trademark owned by Linus Torvalds.
+</span></pre><div class="archive-note">Historical capture: 2010-11-16. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

@@ -1,0 +1,4 @@
+<resources>
+    <color name="brand">#0000aa</color>
+    <string name="asset_statements" translatable="false">[{\"relation\":[\"delegate_permission/common.handle_all_urls\"],\"target\":{\"namespace\":\"web\",\"site\":\"https://losethos.org\"}}]</string>
+</resources>

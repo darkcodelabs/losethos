@@ -1,0 +1,482 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="description"/>
+<meta content="64-Bit, Operating System, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="keywords"/>
+<meta content="LoseThos V6.04" name="generator"/>
+<style type="text/css">
+.cBLACK{color:rgb(0,0,0);}
+.cBLUE{color:rgb(0,0,168);}
+.cGREEN{color:rgb(0,168,0);}
+.cCYAN{color:rgb(0,168,168);}
+.cRED{color:rgb(168,0,0);}
+.cPURPLE{color:rgb(168,0,168);}
+.cBROWN{color:rgb(168,84,0);}
+.cLTGRAY{color:rgb(168,168,168);}
+.cDKGRAY{color:rgb(84,84,84);}
+.cLTBLUE{color:rgb(84,84,252);}
+.cLTGREEN{color:rgb(84,252,84);}
+.cLTCYAN{color:rgb(84,252,252);}
+.cLTRED{color:rgb(252,84,84);}
+.cLTPURPLE{color:rgb(252,84,252);}
+.cYELLOW{color:rgb(252,252,84);}
+.cWHITE{color:rgb(252,252,252);}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cBLACK">----01/25/09 17:04:56----
+* V5.00 Released
+* Added </span><a href="/archive/code/Misc1a.html"><span class="cRED">Pow10I8</span></a><span class="cBLACK">().
+* Fixed power operator </span><span class="cGREEN">`</span><span class="cBLACK"> for negative bases.
+* Made power operator </span><span class="cGREEN">`</span><span class="cBLACK"> higher precedence than unary minus.
+* </span><span class="cRED">R</span><span class="cBLACK">("IDE","ATA");
+*</span><span class="cRED"> WARNING: renamed grbase and made just one persistent layer.</span><span class="cBLACK">
+  * </span><span class="cRED">R</span><span class="cBLACK">("Gs-&gt;grbase","gr_persistent_base");
+  * </span><span class="cRED">R</span><span class="cBLACK">("grbase","gr_refreshed_base");
+* WARNING: Renamed </span><span class="cRED">AdamK</span><span class="cBLACK"> to </span><span class="cRED">Adam1</span><span class="cBLACK">.
+* Added FlowChart </span><a href="/archive/doc/Boot.html"><span class="cRED">::/LT/Doc/Boot.TXZ</span></a><span class="cBLACK">.
+* Added </span><span class="cRED">pci_busses</span><span class="cBLACK">.
+* Fixed compiler bug relating to typecast values pushed for calls.
+* Added </span><a href="/archive/code/DiskATA.html"><span class="cRED">ATAGetDeviceId</span></a><span class="cBLACK"> -- changed disk code.
+* Overhauled keyboard mouse low level routines.
+
+----01/21/09 10:01:45----
+* OverHauled </span><a href="/archive/code/FlightSim.html"><span class="cRED">::/LT/Demo/GameStarters/FlightSim.CPZ</span></a><span class="cBLACK"> for 8 cores.  Got rid of 
+second version.
+* WARNING: Config promts for </span><a href="/archive/code/InsBoot.html"><span class="cRED">InstallBoot</span></a><span class="cBLACK">() are changed.
+* Added </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/QSort.html"><span class="cRED">QSortU8</span></a><span class="cBLACK">().
+* Replaced </span><span class="cRED">GetTimeStamp</span><span class="cBLACK"> with </span><span class="cRED">HPET</span><span class="cBLACK"> and added autocalibration to </span><span class="cRED">time_stamp_freq</span><span class="cBLACK">.  
+WARNING: if you have code which divided by </span><span class="cRED">time_stamp_freq</span><span class="cBLACK">, you might want to 
+switch to </span><a href="/archive/code/Misc1a.html"><span class="cRED">tNP</span></a><span class="cBLACK">, </span><span class="cRED">HPET</span><span class="cBLACK"> or </span><span class="cRED">time_stamp_freq_initial</span><span class="cBLACK">.
+* Fixed </span><a href="/archive/code/MultiProc.html"><span class="cRED">MPInt</span></a><span class="cBLACK">() and </span><span class="cRED">::/LT/Demo/MultiCore/Interrupts.CPZ</span><span class="cBLACK">.
+* Added </span><span class="cRED">::/LT/Demo/MultiCore/Primes.CPZ</span><span class="cBLACK">.
+
+----01/18/09 04:29:21----
+* Got Core i7 working.
+* Mouse continues after failed install attempt.  On my system, it still works 
+with a failed install.  Some BIOS's init mouse, I guess.
+* Made kbd/mouse code reset itself if confused.
+* Fixed bugs relating to data heaps.  Now, you can access up to 128 Gig of RAM.
+* Fixed floating point initialization bug.  Some BIOS's would not work.
+* Task Swapping now preserves MMX registers.
+* Made CD-ROM boot sector more robust -- will work on more hardware.
+
+----01/13/09 10:38:14----
+* Made task swapping 2% faster.
+* Changed wallpaper and </span><span class="cRED">::/LT/Demo/Graphics/CPUPlot.CPZ</span><span class="cBLACK"> for 8 processors.
+* Worked on </span><span class="cRED">::/LT/Apps/Wilderness/Wilderness.CPZ</span><span class="cBLACK">.
+* A 2*2 Meg code heap is now created for other CPU's.
+* Now, kills compiler prefetch task when last request completed.
+* Added </span><span class="cRED">HPET</span><span class="cBLACK">() and </span><span class="cRED">HPET_freq</span><span class="cBLACK">, </span><span class="cRED">HPET_kHz_freq</span><span class="cBLACK">.
+
+----01/08/09 04:54:25----
+* V4.22 Released
+* Added </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/DeviceInfo.html"><span class="cRED">PCIRep</span></a><span class="cBLACK">().
+* Overhauled kbd/mouse.
+* Made </span><span class="cGREEN">ENTER</span><span class="cBLACK"> activate menu in </span><a href="/archive/code/Organ.html"><span class="cRED">::/LT/Apps/MusicOrgan/Organ.CPZ</span></a><span class="cBLACK">. 
+* Made Boot-Loaders handle larger size drives, &gt;130 Gig.
+
+----01/02/09 04:01:45----
+* Improved assembler's listing feature.
+* Got rid of </span><span class="cRED">mp_heap</span><span class="cBLACK">.
+* Fixed date bug.
+* Added </span><span class="cRED">::/LT/Demo/MultiCore/LoadTest.CPZ</span><span class="cBLACK">.
+* Worked on </span><a href="/archive/code/FlightSim.html"><span class="cRED">::/LT/Demo/GameStarters/FlightSim.CPZ</span></a><span class="cBLACK">.
+* Overhauled MultiCore code.
+* Added </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/DeviceInfo.html"><span class="cRED">MemBIOSRep</span></a><span class="cBLACK">().
+
+----12/25/08 02:12:14----
+* Worked on assembler
+* Made </span><a href="/archive/code/MultiProc.html"><span class="cRED">MPStart</span></a><span class="cBLACK">() free old heap.
+* Overhauled keyboard/mouse code.
+
+----12/22/08 02:45:51----
+* V4.21 Released
+* Changed locks to </span><a href="/archive/code/Adam1a.html"><span class="cRED">Sema</span></a><span class="cBLACK">'s.
+* Moved </span><a href="/archive/code/MultiProc.html"><span class="cRED">MPStart</span></a><span class="cBLACK">() call into the kernel.
+* Added Prefetching to compiler.  Use </span><span class="cGREEN">#prefetch ""</span><span class="cBLACK">.
+* Increased default MultiCore heaps from 2Meg to 64Meg.
+* Overhauled MultiCore code, lots of changes.
+* Made </span><span class="cRED">CLFlush</span><span class="cBLACK">() inline function.
+
+----12/18/08 12:49:51----
+* Fixed bug in memory detection.
+* Warning: </span><a href="/archive/code/InsBoot.html"><span class="cRED">InstallBoot</span></a><span class="cBLACK">() prompts are different.
+* Added </span><a href="/archive/code/Squirt.html"><span class="cRED">::/LT/Demo/GameStarters/Squirt.CPZ</span></a><span class="cBLACK">.
+* Added </span><span class="cRED">Pause</span><span class="cBLACK">() in-line function.
+* Warning: Added new arg to </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/LtfPopUp.html"><span class="cRED">PopUpFile</span></a><span class="cBLACK">() and </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/LtfPopUp.html"><span class="cRED">AdamFile</span></a><span class="cBLACK">().
+* Added </span><span class="cRED">::/LT/Demo/SuggestSpelling.CPZ</span><span class="cBLACK">.
+
+----12/10/08 00:44:37----
+* Added </span><span class="cRED">::/LT/Demo/Ltf/Data.CPZ</span><span class="cBLACK">
+* Added </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/Dbg2a.html"><span class="cRED">ClassRepD</span></a><span class="cBLACK">() display editable.
+* Fixed bugs in </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/Str1a.html"><span class="cRED">SPrintF</span></a><span class="cBLACK">() family.
+* Added </span><a href="/archive/code/Adam1a.html"><span class="cRED">Ltf</span></a><span class="cBLACK"> flag </span><span class="cGREEN">+UD</span><span class="cBLACK"> update data for </span><span class="cGREEN">$DA,...$  </span><span class="cBLACK"> widgets.
+* Added </span><a href="/archive/code/Adam1a.html"><span class="cRED">Ltf</span></a><span class="cBLACK"> flags </span><span class="cGREEN">+U1 +U2 +U4 +U8</span><span class="cBLACK"> for </span><span class="cGREEN">$DA,...$  </span><span class="cBLACK"> widgets.
+
+----12/04/08 20:39:04----
+* Worked on </span><a href="/archive/code/Organ.html"><span class="cRED">::/LT/Apps/MusicOrgan/Organ.CPZ</span></a><span class="cBLACK">.
+* Fixed critical compiler bug -- a terrible bug on initializing certain register 
+variables with certain constants.  Shocking it hasn't appeared sooner!
+* Added </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/GrComposites.html"><span class="cRED">GrLineRect4</span></a><span class="cBLACK">() and</span><span class="cRED"> EXT_DRAW_INPUT_PTR</span><span class="cBLACK">.
+
+----12/02/08 22:15:22----
+* V4.20 Released
+* </span><span class="cRED">R</span><span class="cBLACK">("Octive","Octave");  
+* Worked on </span><a href="/archive/code/Organ.html"><span class="cRED">::/LT/Apps/MusicOrgan/Organ.CPZ</span></a><span class="cBLACK">.
+
+----11/26/08 05:27:10----
+* Added </span><span class="cRED">PushFD</span><span class="cBLACK">() and </span><span class="cRED">PopFD</span><span class="cBLACK">().
+* Optimized </span><span class="cRED">LimitI8</span><span class="cBLACK">(), </span><span class="cRED">LimitU8</span><span class="cBLACK">, </span><span class="cRED">MaxI8</span><span class="cBLACK">(), </span><span class="cRED">MinI8</span><span class="cBLACK">(), </span><span class="cRED">MaxU8</span><span class="cBLACK">() and </span><span class="cRED">MinU8</span><span class="cBLACK">().
+* Added </span><span class="cGREEN">CMOVxx</span><span class="cBLACK"> asm opcodes to assembler.
+* Added </span><a href="/archive/code/LtfBible.html"><span class="cRED">PutBibleVerse</span></a><span class="cBLACK">().
+* Added </span><span class="cRED">::/LT/Apps/Wilderness/Battle.CPZ</span><span class="cBLACK">.  It's funny.
+
+----11/17/08 23:48:37----
+* Added </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/GrElemPlot.html"><span class="cRED">GrElemsPlot2</span></a><span class="cBLACK">().
+* Added golden calf to </span><span class="cRED">::/LT/Demo/Graphics/Camp.CPZ</span><span class="cBLACK">.
+* Fixed bug in Maze demo.
+* Made </span><span class="cGREEN">F2</span><span class="cBLACK"> macro consolidate keys into </span><a href="/archive/code/Display.html"><span class="cRED">PutS</span></a><span class="cBLACK">() instead of all </span><a href="/archive/code/TaskCmd.html"><span class="cRED">Msg</span></a><span class="cBLACK">() commands.
+* Added </span><span class="cRED">::/LT/Apps/Wilderness/Map.CPZ</span><span class="cBLACK">.
+* Expanded list of filename characters to make it more compatible with FAT32.
+
+----11/11/08 01:41:30----
+* Added Open/Save to Span game.
+* Added </span><span class="cRED">::/LT/Demo/Ltf/Quirk1.CPZ</span><span class="cBLACK">.
+
+----11/10/08 18:14:14----
+* V4.19 Released
+* Added </span><span class="cRED">::/LT/Apps/Span/SpanMain.CPZ</span><span class="cBLACK">.
+* Made so mouse over ctrls do not generate msgs.  Added </span><span class="cRED">inside_ctrl()</span><span class="cBLACK"> to </span><a href="/archive/code/Adam1a.html"><span class="cRED">Ctrl</span></a><span class="cBLACK">s.  
+Made so click routine have U0 return.
+* Added </span><span class="cRED">::/LT/Demo/GameStarters/MassSpring.CPZ</span><span class="cBLACK">.
+
+----11/06/08 20:33:19----
+* Compiler now allows initialization of multidimensional variables.
+* Added </span><span class="cRED">::/LT/Opt/BinRep.APZ</span><span class="cBLACK">.
+* Fixed compiler bug relating to multidimensional arrays as function local 
+variables.
+* Got rid of margins on </span><a href="/archive/code/Adam1a.html"><span class="cRED">GrBitMap</span></a><span class="cBLACK">s.</span><span class="cRED">
+  !!!Warning!!!</span><span class="cBLACK"> Saved </span><span class="cGREEN">.LGZ</span><span class="cBLACK"> files are no longer valid.  Sorry, create them again. 
+   It would be easy to convert them -- just remove margins in the file header 
+  portions.
+* Added </span><span class="cRED">::/LT/Doc/Lectures/PageTableEntries2.CPZ</span><span class="cBLACK">.
+* Added </span><span class="cRED">::/LT/Demo/Disk/Raw.CPZ</span><span class="cBLACK">.
+* Improved </span><a href="/archive/code/X-Caliber.html"><span class="cRED">::/LT/Apps/X-Caliber/X-Caliber.CPZ</span></a><span class="cBLACK"> and 
+</span><span class="cRED">::/LT/Demo/GameStarters/MissileDefense.CPZ</span><span class="cBLACK">.
+
+----10/30/08 03:49:56----
+* V4.18 Released
+* Added </span><a href="/archive/code/TaskSettings.html"><span class="cRED">SettingsPush</span></a><span class="cBLACK">() and </span><a href="/archive/code/TaskSettings.html"><span class="cRED">SettingsPop</span></a><span class="cBLACK">().
+* Adjusted </span><a href="/archive/code/Adam1a.html"><span class="cRED">LTFF_MIN_SIZE</span></a><span class="cBLACK"> (shrink wrap) windows to fit better.  This affects 
+PopUp windows.
+
+----10/28/08 20:38:17----
+* Added </span><span class="cGREEN">asm{}</span><span class="cBLACK"> blocks inside functions.
+* Added </span><span class="cRED">::/LT/Demo/MultiCore/Lock.CPZ</span><span class="cBLACK">.
+* Added </span><span class="cGREEN">lock{}</span><span class="cBLACK"> to compiler for multicore code.
+
+----10/25/08 20:36:02----
+* Added </span><span class="cRED">::/LT/Demo/PhoneNumWords.CPZ</span><span class="cBLACK">.
+* Fixed bug in PutChar when dbl buffering Ltf's.
+* Added </span><span class="cRED">::/LT/Apps/Wilderness/Wilderness.CPZ</span><span class="cBLACK">.
+* Changed CTRL-R wizard.
+* Changed random number generator.
+* Added compiler directive: </span><span class="cRED">IncludeDepth</span><span class="cBLACK">().
+* Created </span><span class="cRED">::/LT/Demo/MultiCore/Clouds.CPZ</span><span class="cBLACK">.
+
+----10/21/08 11:11:53----
+* V4.17 Released
+* Fixed compiler bug relating to global F8 variables in comparisons.
+* Changed </span><span class="cRED">ip_inhibit_win_operations</span><span class="cBLACK"> to </span><span class="cRED">win_inhibit</span><span class="cBLACK">.
+* Added default parameters compiler feature for code like:
+  </span><span class="cGREEN">U0 Test(I8 i=4,I8 j,I8 k=5)
+  {
+  }
+
+  Test(,3);</span><span class="cBLACK">
+ 
+* Added </span><span class="cRED">sys_key_cnt</span><span class="cBLACK">.
+* Overhauled WarGame: </span><span class="cRED">::/LT/Demo/GameStarters/WarGame.CPZ</span><span class="cBLACK">.
+* Overhauled MusicOrgan.
+* Added "DOWN_UP" messages: </span><a href="/archive/code/Adam1a.html"><span class="cRED">MSG_KEY_DOWN_UP</span></a><span class="cBLACK">, etc.
+* Added pull-down menu's.  See </span><span class="cRED">::/LT/Demo/PullDownMenu.CPZ</span><span class="cBLACK">.
+* Made </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/Str1a.html"><span class="cRED">CrLf</span></a><span class="cBLACK">() handle multiple instances and added </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/Str1a.html"><span class="cRED">Spaces</span></a><span class="cBLACK">().
+* Added </span><span class="cGREEN">/Linux/LTZ</span><span class="cBLACK"> for uncompressing from Linux.
+* Removed </span><span class="cRED">picwords</span><span class="cBLACK">.  They sucked.
+* Improved </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/PSect.html"><span class="cRED">PSectFind</span></a><span class="cBLACK">().
+
+----10/17/08 05:31:04----
+* Modified tour.
+* Added Terminal Window Button to </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/WallPaper.html"><span class="cRED">::/LT/Adam/WallPaper.APZ</span></a><span class="cBLACK">.
+* Changed IDTTAB initialization.
+* Added </span><span class="cRED">Cld</span><span class="cBLACK">() and </span><span class="cRED">Std</span><span class="cBLACK">().
+* Moved </span><span class="cGREEN">CTRL_ALT_ESC</span><span class="cBLACK"> from out of kernel.
+* Converted </span><span class="cRED">EXT_IRQxx</span><span class="cBLACK"> externs to </span><span class="cGREEN">interrupt</span><span class="cBLACK"> routines with </span><a href="/archive/code/Interrupts.html"><span class="cRED">SetIDTEntry</span></a><span class="cBLACK">().
+* Added </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/doc/Grub.html"><span class="cRED">::/LT/Doc/Grub.TXZ</span></a><span class="cBLACK">.
+* Added </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/DiskAddDev.html"><span class="cRED">DriveEnable</span></a><span class="cBLACK">().
+* Fixed-up boot code.
+* Added </span><span class="cRED">::/LT/Demo/GameStarters/Rocket.CPZ</span><span class="cBLACK">.
+* Fixed compiler bug on large constant bit numbers in </span><span class="cRED">Bt</span><span class="cBLACK">(), </span><span class="cRED">LBts</span><span class="cBLACK">(), </span><span class="cRED">LBtr</span><span class="cBLACK">() and 
+</span><span class="cRED">LBtc</span><span class="cBLACK">().
+
+----10/14/08 00:06:23----
+* V4.16 Released
+* Modified </span><a href="/archive/code/GrPrimatives.html"><span class="cRED">GrFloodFill3</span></a><span class="cBLACK">() to recognize depth buffers.
+* Fixed scrolling bug in </span><span class="cRED">MusicOrgan</span><span class="cBLACK">.
+* Added </span><a href="/archive/code/satisfaction.html"><span class="cRED">::/LT/Apps/MusicOrgan/Examples/satisfaction.CPZ</span></a><span class="cBLACK">.
+* Added </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/LtfRecalc.html"><span class="cRED">LtfCursor</span></a><span class="cBLACK">.
+* Moved code around.
+* Got rid of </span><span class="cRED">BMT_COLOR4_U1</span><span class="cBLACK">.
+* Got rid of </span><span class="cRED">ROP_OR</span><span class="cBLACK"> and </span><span class="cRED">ROP_CLEAR_BITS</span><span class="cBLACK">.
+* </span><span class="cRED">R</span><span class="cBLACK">("GrLine2","GrLine3b");
+* </span><span class="cRED">R</span><span class="cBLACK">("GrPlot2","GrPlot3b");
+* </span><span class="cRED">R</span><span class="cBLACK">("ResetHomeDir","HomeDirReset");
+* </span><span class="cRED">R</span><span class="cBLACK">("ResetProgressBars","ProgressBarsReset");
+* </span><span class="cRED">R</span><span class="cBLACK">("GrResetDepthBuffer","GrDepthBufReset");
+* </span><span class="cRED">R</span><span class="cBLACK">("GrSpeedLine2","GrSpeedLine3");
+* </span><span class="cRED">R</span><span class="cBLACK">("MusicResetSettings","MusicSettingsReset");
+* Changed WordStat Init </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/WsMain.html"><span class="cRED">WsInit</span></a><span class="cBLACK">()
+* Added </span><span class="cGREEN">#define</span><span class="cBLACK"> line extensions with '\' to compiler.
+* Enabled depth_buf in </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/GrElemPlot.html"><span class="cRED">GrElemsPlot</span></a><span class="cBLACK"> and </span><a href="/archive/code/GrPrimatives.html"><span class="cRED">GrBlot3</span></a><span class="cBLACK">.
+* Added </span><span class="cRED">::/LT/Demo/Graphics/Camp.CPZ</span><span class="cBLACK">.
+* Added </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/doc/Options.html"><span class="cRED">::/LT/Doc/Options.TXZ</span></a><span class="cBLACK">.
+
+----10/08/08 12:46:08----
+* WARNING: Added prompts for code/data block pools to config.
+* </span><span class="cRED">R</span><span class="cBLACK">("DelSysHashEntry","HashRemDel");
+* </span><span class="cRED">R</span><span class="cBLACK">("NewLTDirEntry","LTDirEntryNew");
+* </span><span class="cRED">R</span><span class="cBLACK">("TaskInitHeapCtrl","TaskheapCtrlInity");
+* </span><span class="cRED">R</span><span class="cBLACK">("InitIndependentHeapCtrl","IndependentHeapCtrlInit");
+* </span><span class="cRED">R</span><span class="cBLACK">("InitSysAuxLtf","SysAuxLtfInit");
+* </span><span class="cRED">R</span><span class="cBLACK">("InitLocalTask","TaskLocalInit");
+* </span><span class="cRED">R</span><span class="cBLACK">("InitUserTask","UserTaskInit");
+* </span><span class="cRED">R</span><span class="cBLACK">("InitBlkPool","BlkPoolInit");
+* Modifed </span><a href="/archive/code/LtfMain.html"><span class="cRED">PmtI8</span></a><span class="cBLACK">() and </span><a href="/archive/code/LtfMain.html"><span class="cRED">PmtF8</span></a><span class="cBLACK">() to accept expressions.
+* Added </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/CmpMain.html"><span class="cRED">ExePutS3</span></a><span class="cBLACK">(), </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/CmpMain.html"><span class="cRED">ExePrintF3</span></a><span class="cBLACK">() and </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/CmpMain.html"><span class="cRED">ExeFile3</span></a><span class="cBLACK">().
+* Modified </span><span class="cRED">ToI8</span><span class="cBLACK">() and </span><span class="cRED">ToF8</span><span class="cBLACK">() so they do nothing if no conversion is required.  
+Adjusted optimization of compiler on constants to get this to work.
+* Added ability to allocate global variables from the heap in static modules 
+using </span><a href="/archive/code/Adam1a.html"><span class="cRED">OPTf_GLBLS_ON_DATA_HEAP</span></a><span class="cBLACK">.
+* Changed rounding in </span><a href="/archive/code/GrMath.html"><span class="cRED">Circle</span></a><span class="cBLACK">() and </span><a href="/archive/code/GrMath.html"><span class="cRED">Ellipse</span></a><span class="cBLACK">().
+
+----10/06/08 07:02:36----
+* Added </span><span class="cRED">::/LT/Demo/Ltf/CallBack2.CPZ</span><span class="cBLACK">
+* Modified </span><span class="cRED">::/LT/Demo/Spy.CPZ</span><span class="cBLACK"> to use the new dbl-buffer stuff.
+* Added </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/LtfRecalc.html"><span class="cRED">LtfUpdateTaskLtfs</span></a><span class="cBLACK">().
+* Added </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/LtfNew.html"><span class="cRED">LtfStartDblBuf</span></a><span class="cBLACK">(), </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/LtfNew.html"><span class="cRED">LtfSwapDblBuf</span></a><span class="cBLACK">() and </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/LtfNew.html"><span class="cRED">LtfEndDblBuf</span></a><span class="cBLACK">().
+* Converted </span><span class="cRED">Fs-&gt;cur_ltf</span><span class="cBLACK"> and </span><span class="cRED">Fs-&gt;aux_ltf</span><span class="cBLACK"> to </span><span class="cRED">Fs-&gt;last_ltf</span><span class="cBLACK"> and </span><span class="cRED">Fs-&gt;next_ltf</span><span class="cBLACK">.  They 
+are now a queue.
+* Added </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/LtfNew.html"><span class="cRED">LtfCur</span></a><span class="cBLACK">(), </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/LtfNew.html"><span class="cRED">LtfAux</span></a><span class="cBLACK">(), </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/LtfNew.html"><span class="cRED">LtfInsQue</span></a><span class="cBLACK">(), </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/LtfNew.html"><span class="cRED">LtfInsQueRev</span></a><span class="cBLACK">() and </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/LtfNew.html"><span class="cRED">LtfRemQue</span></a><span class="cBLACK">().
+
+----10/03/08 01:43:57----
+* Improved dithered flood-fill.
+* Added </span><span class="cRED">::/LT/Demo/GameStarters/MissileDefense.CPZ</span><span class="cBLACK">.
+* Added </span><span class="cRED">InvlPg</span><span class="cBLACK">().
+* Added </span><span class="cRED">::/LT/Doc/Lectures/PageTableEntries1.CPZ</span><span class="cBLACK">.
+
+----09/29/08 20:53:14----
+* V4.15 Released
+* Improved multicore fault handling.
+* Improved fault handling.
+* Added </span><span class="cRED">Fs-&gt;fault_err_code</span><span class="cBLACK">.
+* Got rid of </span><span class="cRED">Fs-&gt;F8_answers[]</span><span class="cBLACK">
+* Trimmed size of </span><span class="cRED">Fs-&gt;answers_types[]</span><span class="cBLACK"> and renamed to </span><span class="cRED">Fs-&gt;answer_types</span><span class="cBLACK">.
+* Glbl vars no longer initialize to zero.
+* Added </span><a href="/archive/code/Adam1a.html"><span class="cRED">OPTf_GLBLS_ON_DATA_HEAP</span></a><span class="cBLACK">.
+* Made </span><span class="cRED">GrElem</span><span class="cBLACK"> </span><span class="cGREEN">CTRL-R</span><span class="cBLACK"> editor allow extents to be used for conversion to bitmaps.
+* Added MusicOrgan application.
+* Added </span><a href="/archive/code/Adam1a.html"><span class="cRED">Ltf</span></a><span class="cBLACK">.user_put_key, </span><a href="/archive/code/Adam1a.html"><span class="cRED">Ltf</span></a><span class="cBLACK">.user_put_s, and </span><a href="/archive/code/Adam1a.html"><span class="cRED">Ltf</span></a><span class="cBLACK">.user_put_data.
+* Abbreviated "Remove","Rem".
+* Added </span><a href="/archive/code/Display.html"><span class="cRED">TaskKeyDevAdd</span></a><span class="cBLACK">() for per task key handlers.
+
+----09/23/08 03:50:40----
+* </span><span class="cRED">R</span><span class="cBLACK">("LtfPutSExt","LtfPutS");
+* </span><span class="cRED">R</span><span class="cBLACK">("LtfPutKeyExt","LtfPutKey");
+* Made assembler automatically leave-off REX on "XOR RAX,RAX", etc.
+* Fixed hex-edit widgit page-down/page-up editor bug.
+* Made assembler automatically leave-off REX on PUSH and POP for R0-R7.
+* Added F4 filename chooser tour.
+
+----09/20/08 20:16:54----
+* V4.14 Released
+* Made </span><a href="/archive/code/Dbg1a.html"><span class="cRED">DbgNum</span></a><span class="cBLACK">(), etc. work in input filter (AutoFile) tasks.
+* Added more tours.
+* Fixed dictionary bug.
+* Added </span><span class="cRED">::/LT/Demo/WordSearch.CPZ</span><span class="cBLACK">.
+
+----09/18/08 12:43:13----
+* Added </span><span class="cRED">ImportHashTable</span><span class="cBLACK">() </span><span class="cRED">::/LT/OSMain/StaticAdam.HPZ</span><span class="cBLACK"> and 
+</span><span class="cRED">::/LT/Demo/OldSchool/Demo2/Compatibility2.SPP</span><span class="cBLACK">. 
+* Abbreviated "Source" as "Src".
+* Changed behavior of </span><a href="/archive/code/Memory.html"><span class="cRED">MAllocIdentical</span></a><span class="cBLACK">() so that it returns </span><span class="cGREEN">NULL</span><span class="cBLACK"> if passed </span><span class="cGREEN">NULL</span><span class="cBLACK">.
+* Added </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/doc/SysPgmGuide.html"><span class="cRED">::/LT/Doc/SysPgmGuide.TXZ</span></a><span class="cBLACK">.
+* Fixed compiler mem leak relating to typedefs.
+* Added </span><a href="/archive/code/Memory.html"><span class="cRED">LinkedListCopy</span></a><span class="cBLACK">().
+* Shifted compiler options routines from </span><span class="cGREEN">OSMain</span><span class="cBLACK"> to </span><span class="cGREEN">OSMain2</span><span class="cBLACK">. 
+
+----09/13/08 22:08:50----
+* Improved editor traversal of hex edit widgets.
+* Added </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/LtfPopUp.html"><span class="cRED">PopUp1</span></a><span class="cBLACK">() and </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/LtfPopUp.html"><span class="cRED">PopUp2</span></a><span class="cBLACK">().
+* Adjusted </span><a href="/archive/code/Adam1a.html"><span class="cRED">Ltf</span></a><span class="cBLACK"> center x and center y calculations by one.
+* Improved fault info
+* Added </span><a href="/archive/code/Dbg1a.html"><span class="cRED">Da</span></a><span class="cBLACK">()
+* Got rid of </span><span class="cRED">InitDisplay</span><span class="cBLACK">() -- made it a part of </span><a href="/archive/code/Task1a.html"><span class="cRED">Spawn</span></a><span class="cBLACK">().
+
+----09/10/08 07:19:33----
+* Added more depth buffer support to graphics routines and tweaked it.
+* Added </span><span class="cRED">::/LT/Demo/Graphics/WallPaperCtrl.APZ</span><span class="cBLACK"> and modified window manager to 
+accommodate window manager (wall-paper) controls.
+* Added </span><span class="cRED">::/LT/Demo/GameStarters/Pac.CPZ</span><span class="cBLACK">.
+* Fixed minor int&lt;--&gt;F8 compiler conversion bug.
+* Added </span><a href="/archive/code/GrMath.html"><span class="cRED">GrSetRotMat</span></a><span class="cBLACK">().
+* Added </span><span class="cRED">::/LT/Demo/Graphics/Life.CPZ</span><span class="cBLACK">.
+* Made </span><span class="cRED">DT?</span><span class="cBLACK"> standard filename extension for data files (WordStat).
+* Changed how </span><span class="cRED">disk_reads</span><span class="cBLACK">, </span><span class="cRED">disk_writes</span><span class="cBLACK"> are updated.
+* Put hash table size back -- not worth it.
+
+----08/27/08 03:40:27----
+* V4.13 Released
+* Added </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/Hash2a.html"><span class="cRED">HashDepthRep</span></a><span class="cBLACK">() and increased adam task hash table size.
+* Reworked asm hash table routines
+* Added </span><a href="/archive/code/Adam1a.html"><span class="cRED">OPTf_REPLACE_SYMS</span></a><span class="cBLACK"> and </span><a href="/archive/code/Hash1a.html"><span class="cRED">HashReplace</span></a><span class="cBLACK">(), </span><a href="/archive/code/Hash1a.html"><span class="cRED">HashRemDel</span></a><span class="cBLACK">().
+* </span><span class="cRED">!!!WARNING!!!</span><span class="cBLACK"> Renamed stuff.
+  </span><span class="cRED">R</span><span class="cBLACK">("ExePrintF","StreamPrintF");
+  </span><span class="cRED">R</span><span class="cBLACK">("ExePutS","StreamPutS");
+  </span><span class="cRED">R</span><span class="cBLACK">("ExecuteStr","ExePutS");
+  </span><span class="cRED">R</span><span class="cBLACK">("ExecuteFile","ExeFile");
+* Added </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/CmpMain.html"><span class="cRED">ExePrintF</span></a><span class="cBLACK">().
+
+----08/21/08 22:54:52----
+* Added </span><span class="cRED">Noise</span><span class="cBLACK">().
+* Added compiler size optimizations.
+* removed compiler </span><span class="cGREEN">continue</span><span class="cBLACK"> statement from language.
+* Added </span><span class="cRED">AInsQue</span><span class="cBLACK">(), </span><span class="cRED">AInsQueRev</span><span class="cBLACK">() and </span><span class="cRED">ARemQue</span><span class="cBLACK">().
+* Added </span><span class="cRED">::/LT/Doc/Lectures/ScreenMemory.CPZ</span><span class="cBLACK">.
+
+----08/16/08 16:26:31----
+* V4.12 Released
+* Added </span><span class="cRED">::/LT/Demo/Disk/UnusedSpaceRep.CPZ</span><span class="cBLACK">.
+* Added </span><span class="cRED">::/LT/Demo/Ltf/Menu.CPZ</span><span class="cBLACK">.
+* Added transforming of Boxes in </span><span class="cRED">GrElem</span><span class="cBLACK">.
+* Added </span><a href="/archive/code/Adam1a.html"><span class="cRED">LTFLF_DONT_DRAW</span></a><span class="cBLACK"> and modified </span><span class="cRED">GrElem</span><span class="cBLACK"> edit code.
+* Added </span><span class="cRED">::/LT/Demo/KeyBitMap.CPZ</span><span class="cBLACK">.
+* Added </span><span class="cRED">key_down_bitmap</span><span class="cBLACK"> and </span><span class="cRED">key_down_bitmap2</span><span class="cBLACK">.
+* Added </span><a href="/archive/code/FPS.html"><span class="cRED">::/LT/Demo/GameStarters/FPS.CPZ</span></a><span class="cBLACK">.
+* Added </span><a href="/archive/code/Misc1a.html"><span class="cRED">Rand</span></a><span class="cBLACK">().
+* Worked on </span><a href="/archive/code/Tanks.html"><span class="cRED">::/LT/Apps/Tanks/Tanks.CPZ</span></a><span class="cBLACK">.
+* Added dithered coloring with pen_width&gt;1.
+* </span><span class="cRED">R</span><span class="cBLACK">("ResetMusicSettings","MusicSettingsReset");
+
+----07/25/08 16:04:13----
+* V4.11 Released
+* Added </span><span class="cRED">LimitU8</span><span class="cBLACK">(), </span><span class="cRED">MinI8</span><span class="cBLACK">(), </span><span class="cRED">MaxI8</span><span class="cBLACK">(), </span><span class="cRED">MinU8</span><span class="cBLACK">(), </span><span class="cRED">MaxU8</span><span class="cBLACK">(), </span><a href="/archive/code/Misc1a.html"><span class="cRED">Min</span></a><span class="cBLACK">() and </span><a href="/archive/code/Misc1a.html"><span class="cRED">Max</span></a><span class="cBLACK">().
+* Added </span><a href="/archive/code/FlightSim.html"><span class="cRED">::/LT/Demo/GameStarters/FlightSim.CPZ</span></a><span class="cBLACK">.
+* Added </span><a href="/archive/code/Adam1a.html"><span class="cRED">GrBitMap</span></a><span class="cBLACK">.transform() so you can define your own transformation.
+* Altered </span><a href="/archive/code/FlightSim.html"><span class="cRED">::/LT/Demo/GameStarters/FlightSim.CPZ</span></a><span class="cBLACK"> to use user defined  
+transformation feature.
+
+----07/22/08 21:39:35----
+* Added dither color to </span><span class="cRED">GrElem</span><span class="cBLACK">s.
+* Added </span><span class="cRED">::/LT/Demo/Graphics/RotateTank.CPZ</span><span class="cBLACK">.
+* Added </span><span class="cRED">::/LT/Demo/Graphics/3DPolygon.CPZ</span><span class="cBLACK">
+* Working on </span><a href="/archive/code/GrPrimatives.html"><span class="cRED">GrFillPolygon3</span></a><span class="cBLACK">().
+* Added </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/GrNew.html"><span class="cRED">GrAllocDepthBuf</span></a><span class="cBLACK">() and </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/GrNew.html"><span class="cRED">GrDepthBufReset</span></a><span class="cBLACK">().
+* Added built-in compiler functions, </span><span class="cRED">SwapU1</span><span class="cBLACK">()... </span><span class="cRED">SwapU8</span><span class="cBLACK">().
+* Added </span><a href="/archive/code/Adam1a.html"><span class="cRED">ROPF_DITHER</span></a><span class="cBLACK">.
+
+----07/17/08 16:43:46----
+* V4.10 Released
+* Added </span><span class="cRED">::/LT/Demo/AutoFile/Demo5.AUZ</span><span class="cBLACK">.
+* Compressed Dictionary
+* Added </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/Snd.html"><span class="cRED">SndTaskEndCB</span></a><span class="cBLACK">().
+* Fixed bug in end-task code.
+* Added </span><span class="cGREEN">/LT/Demo/AcctExample</span><span class="cBLACK">.
+* Added </span><a href="/archive/code/Adam1a.html"><span class="cRED">SU_SCALE_INDENT</span></a><span class="cBLACK">.
+* Made </span><a href="/archive/code/Tanks.html"><span class="cRED">::/LT/Apps/Tanks/Tanks.CPZ</span></a><span class="cBLACK"> multicore.
+
+----07/07/08 15:23:20----
+* V4.09 Released
+* </span><span class="cRED">R</span><span class="cBLACK">("CRT","Display")
+* Added </span><span class="cGREEN">CTRL-R</span><span class="cBLACK"> Transform for BitMaps.
+* Added </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/LtfPopUp.html"><span class="cRED">PopUpRangeI8</span></a><span class="cBLACK">(), </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/LtfPopUp.html"><span class="cRED">PopUpRangeF8</span></a><span class="cBLACK">(), </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/LtfPopUp.html"><span class="cRED">PopUpRangeF8Log</span></a><span class="cBLACK">(), and </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/LtfPopUp.html"><span class="cRED">PopUpRangeF8Exp</span></a><span class="cBLACK">()
+.
+* Added </span><a href="/archive/code/Tanks.html"><span class="cRED">::/LT/Apps/Tanks/Tanks.CPZ</span></a><span class="cBLACK">.
+* </span><span class="cRED">R</span><span class="cBLACK">("attribute","attr")
+* Fixed compiler bug on F8&lt;--&gt;int conversions.
+* Removed </span><span class="cRED">System()</span><span class="cBLACK"> task type -- it wasn't used.
+
+----06/29/08 15:51:10----
+* V4.08 Released
+* Optimized compiler BoolI1's.  Change all your BoolU4's to BoolI1's.
+* WARNING: The checkbox widget now fills a BoolI1 instead of BoolU4.
+* </span><span class="cRED">R</span><span class="cBLACK">("BoolU8","BoolI8")
+* </span><span class="cRED">R</span><span class="cBLACK">("BoolU4","BoolI4")
+* </span><span class="cRED">R</span><span class="cBLACK">("BoolU2","BoolI2")
+* </span><span class="cRED">R</span><span class="cBLACK">("BoolU1","BoolI1")
+
+----06/26/08 21:48:15----
+* Improved accuracy of idle calculations.
+* Modified </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/LtfRecalc.html"><span class="cRED">LtfRecalc</span></a><span class="cBLACK">() behavior with </span><a href="/archive/code/Adam1a.html"><span class="cRED">LTFF_MIN_SIZE</span></a><span class="cBLACK"> to reduce flicker.
+* Added </span><span class="cRED">MemRep</span><span class="cBLACK">().
+* Added </span><span class="cRED">::/LT/Demo/Define.CPZ</span><span class="cBLACK">.
+* Added </span><span class="cRED">::/LT/Demo/Ltf/UnusedDefine.CPZ</span><span class="cBLACK">.
+
+----06/20/08 15:25:57----
+* V4.07 Released
+* Abbreviated stuff.
+* Added </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/Spinning.html"><span class="cRED">::/LT/Doc/Lectures/Spinning.CPZ</span></a><span class="cBLACK">.
+* Fixed multicore bugs
+* Removed FWAIT from compiler's floating calculations.
+* Added </span><span class="cRED">::/LT/Demo/GameStarters/BirdLand.CPZ</span><span class="cBLACK">.
+
+----06/12/08 08:32:14----
+* V4.06 Released
+* Reorganized demos
+* Added </span><span class="cRED">::/LT/Demo/Graphics/Golf.CPZ</span><span class="cBLACK">.
+* Added </span><span class="cRED">::/LT/Demo/Graphics/Logo.CPZ</span><span class="cBLACK">.
+* Changed "Cain" to "Seth".
+* Added </span><span class="cGREEN">#include_text</span><span class="cBLACK"> which is a 6% faster on text-only code.
+* Added </span><span class="cRED">::/LT/Demo/Graphics/PixelCollision.CPZ</span><span class="cBLACK">.
+* Disabled multicore by default on install.
+* WARNING: Altered </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/LtfPopUp.html"><span class="cRED">LtfDo</span></a><span class="cBLACK">(), </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/LtfPopUp.html"><span class="cRED">LtfFormDo</span></a><span class="cBLACK">() and </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/LtfPopUp.html"><span class="cRED">LtfMenuDo</span></a><span class="cBLACK">() to take flags. See 
+</span><a href="/archive/code/Adam1a.html"><span class="cRED">do_flags</span></a><span class="cBLACK">.
+
+----06/06/08 10:45:21----
+* Added </span><a href="/archive/code/Adam1a.html"><span class="cRED">_CFG_HEAP_DBG</span></a><span class="cBLACK">
+* </span><span class="cRED">R</span><span class="cBLACK">("TreeSize","TreeSizeRep");
+* </span><span class="cRED">R</span><span class="cBLACK">("LineCnt","LineCntRep");
+* Made </span><a href="/archive/code/Disk1b.html"><span class="cRED">FilesFind</span></a><span class="cBLACK">() report FAT32 directory size.
+* Added </span><a href="/archive/code/Disk2a.html"><span class="cRED">UnusedDriveSpace</span></a><span class="cBLACK">().
+* Added </span><a href="/archive/code/Disk2a.html"><span class="cRED">TreeSize</span></a><span class="cBLACK">()
+* Fixed </span><span class="cRED">ScanChar</span><span class="cBLACK">()
+* Fixed bug in </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/LtfRecalc.html"><span class="cRED">LtfUpdateWinJoin</span></a><span class="cBLACK">() -- uninitialized variable.
+* Improved </span><span class="cRED">::/LT/Accts/Install/DoItOnce.CPZ</span><span class="cBLACK">.
+
+----06/05/08 03:01:45----
+* V4.05 Released
+* Got rid of </span><span class="cGREEN">.MUZ</span><span class="cBLACK"> and </span><span class="cGREEN">.GLZ</span><span class="cBLACK"> file types.  Now, they're just </span><span class="cGREEN">.TXZ</span><span class="cBLACK">.  Got rid of 
+glossary.
+* </span><span class="cRED">R</span><span class="cBLACK">("DriveIsWritable","IsDriveWritable");
+* Changed registry from binary to text and made infrastructure.  See 
+</span><span class="cRED">::/LT/Demo/RegistryDemo.CPZ</span><span class="cBLACK">.
+
+----05/24/08 09:28:48----
+* V4.04 Released
+* Added </span><span class="cRED">::/LT/Apps/WordBox/WordBox.CPZ</span><span class="cBLACK">.
+* Added </span><a href="/archive/code/Adam1a.html"><span class="cRED">MSG_RESIZE</span></a><span class="cBLACK">, </span><a href="/archive/code/Adam1a.html"><span class="cRED">MSG_MOVE</span></a><span class="cBLACK">, and </span><a href="/archive/code/Adam1a.html"><span class="cRED">MSG_FOCUS</span></a><span class="cBLACK">.
+* Fixed dictionary word look-up.
+* Sorted </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/Training.html"><span class="cRED">KeyMap</span></a><span class="cBLACK">().
+* Optimized static compiled import functions and glbl variables.
+* Reduced code size for immediate values.
+* Fixed bugs in compiler relating to intializing glbl vars in static modules 
+which fixed a bug in </span><a href="https://web.archive.org/web/20100322220614/http://www.losethos.com/code/Str1a.html"><span class="cRED">SPrintF</span></a><span class="cBLACK">().
+* Added </span><a href="/archive/code/Disk2a.html"><span class="cRED">TreeSize</span></a><span class="cBLACK">().
+
+</span></pre><div class="archive-note">Historical capture: 2010-03-22. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

@@ -1,0 +1,319 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="description"/>
+<meta content="64-Bit, Operating System, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="keywords"/>
+<meta content="LoseThos V6.02" name="generator"/>
+<style type="text/css">
+.cBLACK{color:rgb(0,0,0);}
+.cBLUE{color:rgb(0,0,168);}
+.cGREEN{color:rgb(0,168,0);}
+.cCYAN{color:rgb(0,168,168);}
+.cRED{color:rgb(168,0,0);}
+.cPURPLE{color:rgb(168,0,168);}
+.cBROWN{color:rgb(168,84,0);}
+.cLTGRAY{color:rgb(168,168,168);}
+.cDKGRAY{color:rgb(84,84,84);}
+.cLTBLUE{color:rgb(84,84,252);}
+.cLTGREEN{color:rgb(84,252,84);}
+.cLTCYAN{color:rgb(84,252,252);}
+.cLTRED{color:rgb(252,84,84);}
+.cLTPURPLE{color:rgb(252,84,252);}
+.cYELLOW{color:rgb(252,252,84);}
+.cWHITE{color:rgb(252,252,252);}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cDKGRAY">Project: OSMain</span><span class="cBLACK">
+</span><span class="cBLUE">U0</span><span class="cBLACK"> FAllocFile(LTFile *f,</span><span class="cBLUE">U8</span><span class="cBLACK"> cnt,BoolI1 contiguous)
+{
+  LTPartition *fp=f-&gt;p;
+  LTFileAccess *fa=LTFileAccessNew(f-&gt;de.full_name);
+  f-&gt;de.cluster=AllocClusters(fp,0,</span><span class="cLTGRAY">(</span><span class="cBLACK">cnt+fp-&gt;spc-1</span><span class="cLTGRAY">)</span><span class="cBLACK">/fp-&gt;spc,contiguous);
+  f-&gt;de.size=cnt&lt;&lt;BLK_SIZE_BITS;
+  f-&gt;de.expanded_size=f-&gt;de.size;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (fa) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    LTDirEntryNew(fa-&gt;p,Fs-&gt;cur_dir,&amp;f-&gt;de,TRUE);
+    LTFileAccessDel(fa);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  f-&gt;flags&amp;=~LTF_NEW_FILE;
+}
+
+</span><span class="cBLUE">U8</span><span class="cBLACK"> FSize(LTFile *f)
+{
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (f)
+    </span><span class="cBLUE">return</span><span class="cBLACK"> f-&gt;de.size;
+  </span><span class="cBLUE">else</span><span class="cBLACK">
+    </span><span class="cBLUE">return</span><span class="cBLACK"> 0;
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> FSync(LTFile *f)
+{
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (f-&gt;flags &amp; LTF_BUF_DIRTY) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    WClusters(f-&gt;p,f-&gt;cluster_buf,f-&gt;cluster,1);
+    f-&gt;flags&amp;=~LTF_BUF_DIRTY;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+}
+
+
+LTFile *FOpen(</span><span class="cBLUE">U1</span><span class="cBLACK"> *filename,</span><span class="cBLUE">U1</span><span class="cBLACK"> *flags,</span><span class="cBLUE">U8</span><span class="cBLACK"> cnt=0)
+{  </span><span class="cGREEN">//allows flags "r","w","w+" and "c" (contiguous)</span><span class="cBLACK">
+  LTFile *f=ACAlloc(</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">LTFile</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+  LTFileAccess *fa;
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *full_name,*full_name2;
+  BoolI1 contiguous=Occurrences(flags,</span><span class="cBROWN">'c'</span><span class="cBLACK">);
+
+  f-&gt;cluster=INVALID_CLUSTER;
+  f-&gt;fblk_num=0;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (cnt)
+    f-&gt;max_blk=cnt-1;
+  </span><span class="cBLUE">else</span><span class="cBLACK">
+    f-&gt;max_blk=INVALID_CLUSTER;
+  f-&gt;file_cluster_num=INVALID_CLUSTER;
+  full_name2=FileNameAbs(filename);
+  full_name=AStrNew(full_name2);
+  Free(full_name2);
+  f-&gt;p=Drive2Partition(*full_name);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (f-&gt;p-&gt;type==PT_LT)
+    contiguous=TRUE;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (contiguous) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    f-&gt;flags|=LTF_CONTIGUOUS;
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (f-&gt;p-&gt;type!=PT_LT) {
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (!</span><span class="cLTGRAY">(</span><span class="cBLACK">FileAttr(filename) &amp; LT_ATTR_CONTIGUOUS</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+        throw(EXCEPT_FILE,2);
+    }
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  f-&gt;cluster_buf=ACAlloc(f-&gt;p-&gt;spc&lt;&lt;BLK_SIZE_BITS);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (Occurrences</span><span class="cLTGRAY">(</span><span class="cBLACK">flags,</span><span class="cBROWN">'w'</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    f-&gt;flags=f-&gt;flags|LTF_WRITE|LTF_NEEDS_WRITE;
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (Occurrences</span><span class="cLTGRAY">(</span><span class="cBLACK">flags,</span><span class="cBROWN">'+'</span><span class="cLTGRAY">)</span><span class="cBLACK">) {
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (FileFind</span><span class="cLTGRAY">(</span><span class="cBLACK">full_name,&amp;f-&gt;de,FALSE,TRUE</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        f-&gt;de.full_name=full_name;
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (contiguous)
+          f-&gt;max_blk=(FSize</span><span class="cLTGRAY">(</span><span class="cBLACK">f</span><span class="cLTGRAY">)</span><span class="cBLACK">+BLK_SIZE-1)&gt;&gt;BLK_SIZE_BITS-1;
+        </span><span class="cBLUE">return</span><span class="cBLACK"> f;
+      </span><span class="cLTGRAY">}</span><span class="cBLACK">
+    } </span><span class="cBLUE">else</span><span class="cBLACK">
+      Del(full_name,FALSE);
+    f-&gt;de.full_name=full_name;
+    f-&gt;flags|=LTF_NEW_FILE;
+    fa=LTFileAccessNew(full_name);
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (fa) {
+      StrCpy(f-&gt;de.name,fa-&gt;mask);
+      LTFileAccessDel(fa);
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (cnt)
+        FAllocFile(f,cnt,contiguous);
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (!contiguous || cnt)
+        </span><span class="cBLUE">return</span><span class="cBLACK"> f;
+    }
+  </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (FileFind</span><span class="cLTGRAY">(</span><span class="cBLACK">full_name,&amp;f-&gt;de,FALSE,TRUE</span><span class="cLTGRAY">)</span><span class="cBLACK">) {
+      f-&gt;de.full_name=full_name;
+      f-&gt;max_blk=(FSize</span><span class="cLTGRAY">(</span><span class="cBLACK">f</span><span class="cLTGRAY">)</span><span class="cBLACK">+BLK_SIZE-1)&gt;&gt;BLK_SIZE_BITS-1;
+      </span><span class="cBLUE">return</span><span class="cBLACK"> f;
+    }
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  Free(f-&gt;cluster_buf);
+  Free(full_name);
+  Free(f);
+  </span><span class="cBLUE">return</span><span class="cBLACK"> NULL;
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> FClose(LTFile *f)
+{
+  LTFileAccess *fa;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (f) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    FSync(f);
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (f-&gt;flags &amp; LTF_NEEDS_WRITE) {
+      fa=LTFileAccessNew(f-&gt;de.full_name);
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (fa) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (!</span><span class="cLTGRAY">(</span><span class="cBLACK">f-&gt;flags &amp; LTF_USE_OLD_DATETIME</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+          f-&gt;de.datetime=GetCurTimeLTDate;
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (f-&gt;flags &amp; LTF_NEW_FILE)
+          LTDirEntryNew(fa-&gt;p,Fs-&gt;cur_dir,&amp;f-&gt;de,TRUE);
+        </span><span class="cBLUE">else</span><span class="cBLACK">
+          LTDirEntryNew(fa-&gt;p,Fs-&gt;cur_dir,&amp;f-&gt;de,FALSE);
+        LTFileAccessDel(fa);
+      </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK">
+        throw(EXCEPT_FILE,1);
+    }
+    Free(f-&gt;cluster_buf);
+    Free(f-&gt;de.full_name);
+    Free(f);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+}
+
+</span><span class="cBLUE">U8</span><span class="cBLACK"> FSetCluster(LTFile *f,</span><span class="cBLUE">U8</span><span class="cBLACK"> c,</span><span class="cBLUE">U8</span><span class="cBLACK"> blk,BoolI1 read)
+{
+  LTPartition *p=f-&gt;p;
+  </span><span class="cBLUE">I8</span><span class="cBLACK"> i;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (f-&gt;cluster!=c) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (f-&gt;flags &amp; LTF_BUF_DIRTY) {
+      i=p-&gt;spc;
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (f-&gt;max_blk!=INVALID_CLUSTER) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        i=f-&gt;max_blk+1-f-&gt;file_cluster_num*p-&gt;spc;
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (i&gt;p-&gt;spc)
+          i=p-&gt;spc;
+      </span><span class="cLTGRAY">}</span><span class="cBLACK">
+      WClustersBlks(p,f-&gt;cluster_buf,f-&gt;cluster,i);
+      f-&gt;flags=f-&gt;flags &amp; ~LTF_BUF_DIRTY;
+    }
+    f-&gt;cluster=c;
+    f-&gt;file_cluster_num=blk/p-&gt;spc;
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (read) {
+      i=p-&gt;spc;
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (f-&gt;max_blk!=INVALID_CLUSTER) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        i=f-&gt;max_blk+1-f-&gt;file_cluster_num*p-&gt;spc;
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (i&gt;p-&gt;spc)
+          i=p-&gt;spc;
+      </span><span class="cLTGRAY">}</span><span class="cBLACK">
+      c=RClustersBlks(p,f-&gt;cluster_buf,c,i);
+    }
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  </span><span class="cBLUE">return</span><span class="cBLACK"> c;
+}
+
+BoolI8 FRBlks(LTFile *f,</span><span class="cBLUE">U1</span><span class="cBLACK"> *buf,</span><span class="cBLUE">U8</span><span class="cBLACK"> blk=LTFB_NEXT_BLK,</span><span class="cBLUE">U8</span><span class="cBLACK"> cnt=1)
+{
+  LTPartition *p=f-&gt;p;
+  </span><span class="cBLUE">U8</span><span class="cBLACK"> spc=p-&gt;spc,i,j,c=f-&gt;de.cluster;
+
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!f || !p) </span><span class="cBLUE">return</span><span class="cBLACK"> FALSE;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (blk==LTFB_NEXT_BLK)
+    blk=f-&gt;fblk_num;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (blk+cnt-1&gt;f-&gt;max_blk)
+    </span><span class="cBLUE">return</span><span class="cBLACK"> FALSE;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!cnt) </span><span class="cBLUE">return</span><span class="cBLACK"> TRUE;
+
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (f-&gt;flags &amp; LTF_CONTIGUOUS) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    RBlks(p,buf,Cluster2Blk</span><span class="cLTGRAY">(</span><span class="cBLACK">p,c</span><span class="cLTGRAY">)</span><span class="cBLACK">+blk,cnt);
+    blk+=cnt;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    i=blk/spc;
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (i&gt;=f-&gt;file_cluster_num) {
+      c=f-&gt;cluster;
+      i-=f-&gt;file_cluster_num;
+    }
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (i)
+      c=ClusterNumNext(p,c,i);
+
+    i=blk%spc;
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (i) {
+      c=FSetCluster(f,c,blk,TRUE);
+      j= cnt&lt;spc-i ? cnt:spc-i;
+      MemCpy(buf,f-&gt;cluster_buf+i&lt;&lt;BLK_SIZE_BITS,j&lt;&lt;BLK_SIZE_BITS);
+      buf+=j&lt;&lt;BLK_SIZE_BITS;
+      cnt-=j;
+      blk+=j;
+    }
+    </span><span class="cBLUE">while</span><span class="cBLACK"> (cnt&gt;=spc) {
+      c=FSetCluster(f,c,blk,TRUE);
+      MemCpy(buf,f-&gt;cluster_buf,spc&lt;&lt;BLK_SIZE_BITS);
+      buf+=spc&lt;&lt;BLK_SIZE_BITS;
+      cnt-=spc;
+      blk+=spc;
+    }
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (cnt) {
+      c=FSetCluster(f,c,blk,TRUE);
+      MemCpy(buf,f-&gt;cluster_buf,cnt&lt;&lt;BLK_SIZE_BITS);
+      buf+=cnt&lt;&lt;BLK_SIZE_BITS;
+      blk+=cnt;
+    }
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  f-&gt;fblk_num=blk;
+  </span><span class="cBLUE">return</span><span class="cBLACK"> TRUE;
+}
+
+BoolI8 FWBlks(LTFile *f,</span><span class="cBLUE">U1</span><span class="cBLACK"> *buf,</span><span class="cBLUE">U8</span><span class="cBLACK"> blk=LTFB_NEXT_BLK,</span><span class="cBLUE">U8</span><span class="cBLACK"> cnt=1)
+{
+  LTPartition *p=f-&gt;p;
+  </span><span class="cBLUE">U8</span><span class="cBLACK"> spc=p-&gt;spc,i,j,c=f-&gt;de.cluster,c1;
+
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!f || !p) </span><span class="cBLUE">return</span><span class="cBLACK"> FALSE;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (blk==LTFB_NEXT_BLK)
+    blk=f-&gt;fblk_num;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (blk+cnt-1&gt;f-&gt;max_blk)
+    </span><span class="cBLUE">return</span><span class="cBLACK"> FALSE;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!</span><span class="cLTGRAY">(</span><span class="cBLACK">f-&gt;flags &amp; LTF_WRITE</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+    </span><span class="cBLUE">return</span><span class="cBLACK"> FALSE;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!cnt) </span><span class="cBLUE">return</span><span class="cBLACK"> TRUE;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (f-&gt;flags &amp; LTF_CONTIGUOUS) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    WBlks(p,buf,Cluster2Blk</span><span class="cLTGRAY">(</span><span class="cBLACK">p,c</span><span class="cLTGRAY">)</span><span class="cBLACK">+blk,cnt);
+    blk+=cnt;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (!c) {
+      c=AllocClusters(p,0,1,FALSE);
+      f-&gt;file_cluster_num=0;
+      f-&gt;cluster=c;
+      f-&gt;de.cluster=c;
+      f-&gt;flags|=LTF_NEEDS_WRITE|LTF_NEW_FILE;
+    }
+    i=blk/spc;
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (i&gt;=f-&gt;file_cluster_num) {
+      c=f-&gt;cluster;
+      i-=f-&gt;file_cluster_num;
+    }
+    </span><span class="cBLUE">while</span><span class="cBLACK"> (i) {
+      c1=c;
+      c=ClusterNumNext(p,c1,1);
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (c==INVALID_CLUSTER) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        c=AllocClusters(p,c1,i,FALSE);
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (i&gt;1)
+          c=ClusterNumNext(p,c,i-1);
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK">
+        i--;
+    }
+
+    i=blk%spc;
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (i) {
+      FSetCluster(f,c,blk,TRUE);
+      j=cnt&lt;spc-i ? cnt:spc-i;
+      MemCpy(f-&gt;cluster_buf+BLK_SIZE*i,buf,j&lt;&lt;BLK_SIZE_BITS);
+      f-&gt;flags|=LTF_BUF_DIRTY;
+      buf+=j&lt;&lt;BLK_SIZE_BITS;
+      cnt-=j;
+      blk+=j;
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (cnt) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        c1=c;
+        c=ClusterNumNext(p,c1,1);
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (c==INVALID_CLUSTER)
+          c=AllocClusters(p,c1,1,FALSE);
+      </span><span class="cLTGRAY">}</span><span class="cBLACK">
+    }
+    </span><span class="cBLUE">while</span><span class="cBLACK"> (cnt&gt;=spc) {
+      FSetCluster(f,c,blk,FALSE);
+      MemCpy(f-&gt;cluster_buf,buf,spc&lt;&lt;BLK_SIZE_BITS);
+      f-&gt;flags|=LTF_BUF_DIRTY;
+      buf+=spc&lt;&lt;BLK_SIZE_BITS;
+      cnt-=spc;
+      blk+=spc;
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (cnt) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        c1=c;
+        c=ClusterNumNext(p,c1,1);
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (c==INVALID_CLUSTER)
+          c=AllocClusters(p,c1,1,FALSE);
+      </span><span class="cLTGRAY">}</span><span class="cBLACK">
+    }
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (cnt) {
+      FSetCluster(f,c,blk,TRUE);
+      MemCpy(f-&gt;cluster_buf,buf,cnt&lt;&lt;BLK_SIZE_BITS);
+      f-&gt;flags|=LTF_BUF_DIRTY;
+      buf+=cnt&lt;&lt;BLK_SIZE_BITS;
+      blk+=cnt;
+    }
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (f-&gt;de.size&lt;blk&lt;&lt;BLK_SIZE_BITS)
+      f-&gt;de.size=blk&lt;&lt;BLK_SIZE_BITS;
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (f-&gt;de.expanded_size&lt;blk&lt;&lt;BLK_SIZE_BITS)
+      f-&gt;de.expanded_size=blk&lt;&lt;BLK_SIZE_BITS;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  f-&gt;fblk_num=blk;
+  </span><span class="cBLUE">return</span><span class="cBLACK"> TRUE;
+}
+</span></pre><div class="archive-note">Historical capture: 2010-02-12. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

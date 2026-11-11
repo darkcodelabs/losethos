@@ -1,0 +1,115 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V7.07" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<a name="l1"></a><span class="cF0">                               </span><a href="/archive/doc/TrivialSolutions.html"><span class="cF5">Trivial Solutions</span></a><span class="cF0">
+<a name="l2"></a>                    The LoseThos 64-bit PC Operating System
+<a name="l3"></a>
+<a name="l4"></a>                       </span><a href="/emulator/losethos.iso"><span class="cF4">Download LoseThos V7.07 (5.74 Meg)</span></a><span class="cF0">
+<a name="l5"></a>                             </span><a href="/emulator/losethos.iso"><span class="cF4">Burn a CD and boot it.</span></a><span class="cF0">
+<a name="l6"></a>                                   </span><a href="/emulator/losethos.iso"><span class="cF4">It's Free!</span></a><span class="cF0">
+<a name="l7"></a>
+<a name="l8"></a>LoseThos is a 64-bit, multicored, multitasking, 100% open source, public domain, 
+<a name="l9"></a>ring-0-only, single-address-map operating system for the </span><span class="cF2">IBM PC</span><span class="cF0">.  It requires a 
+<a name="l10"></a>64-bit </span><a href="http://wiki.osdev.org/IA32_Architecture_Family"><span class="cF4">x86_64</span></a><span class="cF0"> CPU and 512+ Megs of RAM.  It does not have GPU acceleration, so I 
+<a name="l11"></a>limit it to 640x480 16 color graphics.
+<a name="l12"></a>
+<a name="l13"></a>LoseThos will run natively, either stand-alone or dual booted.  The easiest way 
+<a name="l14"></a>to dual boot is to install on a 2nd hard drive and select which to boot with the </span><span class="cF2">
+<a name="l15"></a>BIOS</span><span class="cF0">.  Use LoseThos' installer to install onto a partition.  LoseThos has an 
+<a name="l16"></a>optional master-boot-record boot-loader and can partition a drive if necessary.  
+<a name="l17"></a>YOU CAN'T COMPILE WITH OTHER COMPILERS.  Use </span><a href="/archive/code/InsBoot.html#l185"><span class="cF4">InstallBoot</span></a><span class="cF4">()</span><span class="cF0"> to make, if you like.
+<a name="l18"></a>
+<a name="l19"></a>The vision for LoseThos is a 64-bit </span><span class="cF2">Commodore 64</span><span class="cF0"> that's a thousand times faster 
+<a name="l20"></a>than the original and has a shell that is </span><span class="cF2">C/C++</span><span class="cF0"> instead of </span><span class="cF2">BASIC</span><span class="cF0">.  It's for 
+<a name="l21"></a>recreational programming.  The reason you would pick LoseThos over </span><span class="cF2">Linux</span><span class="cF0"> is that 
+<a name="l22"></a>it is only 129,050 lines of code, so you can easily tinkering.  LoseThos is a 
+<a name="l23"></a>secondary operating system you will use in additional to </span><span class="cF2">Windows</span><span class="cF0"> or </span><span class="cF2">Linux</span><span class="cF0"> 
+<a name="l24"></a>because LoseThos does not have networking.
+<a name="l25"></a>
+<a name="l26"></a>This is not a good-for-teaching-only OS.  LoseThos is naughty, ring-0-only, the 
+<a name="l27"></a>same way red-necks are naughty.  The name was inspired by the scene in the 
+<a name="l28"></a>movie, </span><a href="http://en.wikipedia.org/wiki/Platoon_(film)"><span class="cF4">Platoon</span></a><span class="cF0">, where Elias says to Chris, "S**tcan this and this...", referring 
+<a name="l29"></a>to dorky standard issue equipment.  Red-neck, freak or nerd, if you are 
+<a name="l30"></a>interested in assembly language, that's probably the best correlation with 
+<a name="l31"></a>LoseThos being right for you.  This is not an asm-only OS, however, because 
+<a name="l32"></a>that's just silly. 
+<a name="l33"></a>
+<a name="l34"></a>This is not an amateur OS for old, pathetic hardware.  I was a paid operating 
+<a name="l35"></a>system developer for Ticketmaster at age 20 in 1990 and have worked on LoseThos 
+<a name="l36"></a>full-time for 8.2 years.  Unlike </span><span class="cF2">Linux</span><span class="cF0"> which is, technically, just a kernel, 
+<a name="l37"></a>LoseThos includes a complete tool chain -- 64-bit kernel, 64-bit compiler, 
+<a name="l38"></a>assembler, editor, graphics library, document framework and tools such as grep 
+<a name="l39"></a>and merge.  It never executes code I did not write except a couple </span><span class="cF2">BIOS</span><span class="cF0"> calls 
+<a name="l40"></a>during boot.  However, it has no networking and, with no protections, will crash 
+<a name="l41"></a>on bugs or misuse.
+<a name="l42"></a>
+<a name="l43"></a>I have a B.S.E. in computer systems engineering (embedded system hardware and 
+<a name="l44"></a>software) and a M.S.E. in electrical engineering (control systems) from Arizona 
+<a name="l45"></a>State University.  Everybody knows electrical is higher in the engineering 
+<a name="l46"></a>pecking order than CS because it requires real math ;-)  I'm a rocket scientist, 
+<a name="l47"></a>though not a very good one.  Download </span><a href="https://web.archive.org/web/20111029163025/http://www.losethos.com/files/SimStrSetup.exe"><span class="cF2">SimStructure</span></a><span class="cF2"> </span><span class="cF0">(key: A18-W50-U50), an 
+<a name="l48"></a>application for </span><span class="cF2">Windows</span><span class="cF0">, if you want to play with my physics simulator.  It has 
+<a name="l49"></a>my first C compiler built into it, for use in the control systems.  It's an 
+<a name="l50"></a>interpretor, but LoseThos has a true compiler.  Hats off to the </span><span class="cF2">MATLAB</span><span class="cF0"> creators, 
+<a name="l51"></a>by the way.
+<a name="l52"></a>
+<a name="l53"></a>I have many years experience as an embedded system programmer working in 
+<a name="l54"></a>assembly language on bare metal for various architectures.  LoseThos is a lot 
+<a name="l55"></a>like an embedded OS.
+<a name="l56"></a>
+<a name="l57"></a>
+<a name="l58"></a></span><a href="/archive/doc/Welcome.html#l1"><span class="cF4">Introduction</span></a><span class="cF0">
+<a name="l59"></a></span><a href="/archive/doc/Constitution.html#l1"><span class="cF4">"Constitution"</span></a><span class="cF4">
+<a name="l60"></a></span><a href="/archive/screenshots.html"><span class="cF4">Screen Shots</span></a><span class="cF0">
+<a name="l61"></a></span><a href="/archive/videos.html"><span class="cF4">Videos</span></a><span class="cF0">
+<a name="l62"></a></span><a href="/archive/doc/Features.html#l1"><span class="cF4">Features</span></a><span class="cF0">
+<a name="l63"></a></span><a href="/archive/doc/Differences.html#l1"><span class="cF4">Differences from C/C++</span></a><span class="cF0">
+<a name="l64"></a></span><a href="/archive/doc/Strategy.html#l1"><span class="cF4">Strategic Decisions</span></a><span class="cF0">
+<a name="l65"></a></span><a href="/archive/doc/Requirements.html#l1"><span class="cF4">Requirements</span></a><span class="cF0">
+<a name="l66"></a></span><a href="/archive/doc/Install.html#l1"><span class="cF4">Installing</span></a><span class="cF0">
+<a name="l67"></a></span><a href="/archive/doc/Upgrade.html#l1"><span class="cF4">Upgrading</span></a><span class="cF0">
+<a name="l68"></a></span><a href="/archive/doc/HelpMain.html#l1"><span class="cF4">Main Help System</span></a><span class="cF0">
+<a name="l69"></a></span><a href="/archive/code.html"><span class="cF4">Source Code (Most)</span></a><span class="cF0">
+<a name="l70"></a></span><a href="/archive/linecnt.html"><span class="cF4">Complete Source File Listing</span></a><span class="cF0">
+<a name="l71"></a></span><a href="/archive/doc/Registered.html#l1"><span class="cF4">Registered Version</span></a><span class="cF0">
+<a name="l72"></a></span><a href="/archive/hymns.html"><span class="cF4">Hymns</span></a><span class="cF0">
+<a name="l73"></a></span><a href="/archive/doc/Bugs.html#l1"><span class="cF4">Bug Status</span></a><span class="cF0">
+<a name="l74"></a></span><a href="/archive/news.html"><span class="cF4">Change Log</span></a><span class="cF0">
+<a name="l75"></a></span><a href="/archive/doc/TrivialSolutions.html#l1"><span class="cF4">Contact Trivial Solutions</span></a><span class="cF0">
+<a name="l76"></a>
+<a name="l77"></a></span><span class="cF8">
+<a name="l78"></a>* "Windows" is a trademark of MicroSoft Corp.
+<a name="l79"></a>* "Platoon" is a trademark of MGM Pictures.
+<a name="l80"></a>* "Linux" is probably a trademark owned by Linus Torvalds.
+<a name="l81"></a>* "Commodore 64" was a trademark of Commodore Business Machines.
+<a name="l82"></a>* "MATLAB" is a trademark of Math Works Inc.
+</span></pre><div class="archive-note">Historical capture: 2011-10-29. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

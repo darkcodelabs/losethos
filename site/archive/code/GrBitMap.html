@@ -1,0 +1,2123 @@
+<html>
+<head><meta charset="utf-8"/>
+<style>
+</style>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+#help_index "Graphics"
+
+public BoolI8 GrPlot0(GrBitMap *base,I8 x,I8 y)
+{  //No clipping or transformation or pen width
+  U1 *dst;
+  I4 *db;
+  U8 d,c,c2,bit,not_bit,dist,
+     color=base-&gt;color,bkcolor=base-&gt;bkcolor;
+  GrBitMap *mask;
+
+  if (base-&gt;flags &amp; BMF_LOCATE_NEAREST) {
+    dist=DistI8(x,y,base-&gt;cur_x,base-&gt;cur_y);
+    if (dist&lt;=base-&gt;nearest_dist) {
+      base-&gt;nearest_grelem_num=base-&gt;cur_grelem_num;
+      base-&gt;nearest_dist=dist;
+    }
+  }
+  if (base-&gt;flags &amp; BMF_RECORD_EXTENTS) {
+    if (x&lt;base-&gt;min_x) base-&gt;min_x=x;
+    if (x&gt;base-&gt;max_x) base-&gt;max_x=x;
+    if (y&lt;base-&gt;min_y) base-&gt;min_y=y;
+    if (y&gt;base-&gt;max_y) base-&gt;max_y=y;
+  }
+  if (base-&gt;flags &amp; BMF_DONT_DRAW)
+    return TRUE;
+  d=base-&gt;width_internal*y+x;
+  if (db=base-&gt;depth_buffer) {
+    db+=d;
+    if (0&lt;=base-&gt;db_z&lt;=*db)
+      *db=base-&gt;db_z;
+    else
+      return TRUE;
+  }
+  if (color&amp;(ROP_DITHER|ROP_PROBABILITY_DITHER)) {
+    if (color&amp;ROP_PROBABILITY_DITHER) {
+      if (RandU2&lt;base-&gt;dither_probability) {
+        color.u1[7]=color.u1[3];
+        color.u4[0]=color.u4[1];
+      }
+    } else {
+      if ((x^y)&amp;1) {
+        color.u1[7]=color.u1[3];
+        color.u4[0]=color.u4[1];
+      }
+    }
+  }
+  nobound_switch (base-&gt;type) {
+    case BMT_COLOR4:
+      dst=base-&gt;body+d&gt;&gt;3;
+      d=base-&gt;plane_size;
+      bit=1&lt;&lt;(x&amp;7);
+      not_bit=~bit;
+      c=color.u1[0];
+      nobound_switch (color.u1[3]) {
+        case ROPB_EQU:
+        case ROPB_CLEAR_MASK_EQU:
+        case ROPB_CLEAR_MASK_TRANSPARENT:
+        case ROPB_TRANSPARENT:
+          if (c &amp; 1)
+            *dst|=bit;
+          else
+            *dst&amp;=not_bit;
+          dst+=d;
+          if (c &amp; 2)
+            *dst|=bit;
+          else
+            *dst&amp;=not_bit;
+          dst+=d;
+          if (c &amp; 4)
+            *dst|=bit;
+          else
+            *dst&amp;=not_bit;
+          dst+=d;
+          if (c &amp; 8)
+            *dst|=bit;
+          else
+            *dst&amp;=not_bit;
+          break;
+        case ROPB_COLLISION:
+          c2=0;
+          if (*dst&amp;bit)
+            c2+=1;
+          dst+=d;
+          if (*dst&amp;bit)
+            c2+=2;
+          dst+=d;
+          if (*dst&amp;bit)
+            c2+=4;
+          dst+=d;
+          if (*dst&amp;bit)
+            c2+=8;
+          if (c2!=bkcolor.u1[0])
+            base-&gt;collision_cnt++;
+          break;
+        case ROPB_XOR:
+          if (c &amp; 1) *dst^=bit;
+          dst+=d;
+          if (c &amp; 2) *dst^=bit;
+          dst+=d;
+          if (c &amp; 4) *dst^=bit;
+          dst+=d;
+          if (c &amp; 8) *dst^=bit;
+          break;
+      }
+      break;
+    case BMT_MONO:
+      c=color&amp;0xFFFFFF00FFFFFF;
+      nobound_switch (color.u1[3]) {
+        case ROPB_EQU:
+        case ROPB_CLEAR_MASK_EQU:
+        case ROPB_CLEAR_MASK_TRANSPARENT:
+        case ROPB_TRANSPARENT:
+          BEqu(base-&gt;body,d,c);
+          break;
+        case ROPB_COLLISION:
+          if (c) {
+            if (bkcolor&amp;0xFFFFFF00FFFFFF)
+              base-&gt;collision_cnt+=Bt(base-&gt;body,d);
+            else
+              base-&gt;collision_cnt+=!Bt(base-&gt;body,d);
+          } else {
+            if (bkcolor&amp;0xFFFFFF00FFFFFF)
+              base-&gt;collision_cnt+=!Bt(base-&gt;body,d);
+            else
+              base-&gt;collision_cnt+=Bt(base-&gt;body,d);
+          }
+          break;
+        case ROPB_XOR:
+          if (c)
+            Btc(base-&gt;body,d);
+          break;
+      }
+      break;
+  }
+  if (mask=base-&gt;mask) {
+    mask-&gt;brush=base-&gt;brush;
+    mask-&gt;color=WHITE;
+    if (base-&gt;color.u1[3]==ROPB_CLEAR_MASK_EQU)
+      mask-&gt;color=ROPB_EQU+BLACK;
+    else if (base-&gt;color.u1[3]==ROPB_CLEAR_MASK_TRANSPARENT)
+      mask-&gt;color=ROPB_TRANSPARENT+BLACK;
+    else
+      mask-&gt;color.u1[3]=base-&gt;color.u1[3];
+    mask-&gt;win_task=base-&gt;win_task;
+    if (mask-&gt;alias)
+      mask-&gt;alias-&gt;flags|=BMF_DIRTY;
+    GrPlot0(mask,x,y);
+  }
+  return TRUE;
+}
+
+public I8 GrPeek0(GrBitMap *base,I8 x,I8 y)
+{  //No clipping or transformation
+  U8 d,c,bit;
+  U1 *src;
+
+  d=base-&gt;width_internal*y+x;
+  nobound_switch (base-&gt;type) {
+    case BMT_COLOR4:
+      if (base-&gt;mask &amp;&amp; !Bt(base-&gt;mask-&gt;body,d))
+        return MAX_I4;
+      src=base-&gt;body+d&gt;&gt;3;
+      bit=1&lt;&lt;(x&amp;7);
+      d=base-&gt;plane_size;
+      c=0;
+      if (*src &amp; bit)
+        c|=1;
+      src+=d;
+      if (*src &amp; bit)
+        c|=2;
+      src+=d;
+      if (*src &amp; bit)
+        c|=4;
+      src+=d;
+      if (*src &amp; bit)
+        c|=8;
+
+      return c;
+    case BMT_MONO:
+      if (base-&gt;mask &amp;&amp; !Bt(base-&gt;mask-&gt;body,d))
+        return MAX_I4;
+      return Bt(base-&gt;body,d);
+  }
+}
+
+#help_index "Graphics;Graphics/Bitmaps"
+
+public BoolI8 GrBlot(GrBitMap *base,I8 _x,I8 _y,GrBitMap *img)
+{  //Clipping but not transformation
+  I8 x=_x,y=_y,reg i,i1,i2,i3,j,k,k1,kk,kk1,w1,h1,w2,h2,plane,plane1,reg bit_mask,reg bit_shift,p,p1,dist;
+  U1 reg *ptr;
+  U2 reg *ptr1;
+  I8 color,color2,reg color_byte,c,plane_size,plane_size1,plane_limit,plane_limit1;
+  I4 *db=base-&gt;depth_buffer;
+  GrBitMap *mask;
+
+  w1=x&lt;0 ?-x:0;
+  h1=y&lt;0 ?-y:0;
+  w2=img-&gt;width;
+  h2=img-&gt;height;
+  if (base-&gt;flags &amp; BMF_SCREEN_BITMAP) {
+    x+=base-&gt;win_task-&gt;win_pixel_left;
+    y+=base-&gt;win_task-&gt;win_pixel_top;
+  }
+  if (base-&gt;flags &amp; BMF_LOCATE_NEAREST) { //TODO:Untested
+    dist=DistI8(x+img-&gt;width&gt;&gt;1,y+img-&gt;height&gt;&gt;1,base-&gt;cur_x,base-&gt;cur_y);
+    if (dist&lt;=base-&gt;nearest_dist) {
+      base-&gt;nearest_grelem_num=base-&gt;cur_grelem_num;
+      base-&gt;nearest_dist=dist;
+    }
+  }
+  if (base-&gt;flags &amp; BMF_SCREEN_BITMAP) {
+    if (x+w1&lt;0) w1=-x;
+    if (x+w2&gt;base-&gt;win_task-&gt;win_pixel_right+1)
+      w2=base-&gt;win_task-&gt;win_pixel_right+1-x;
+
+    if (y+h1&lt;0) h1=-y;
+    if (y+h2&gt;base-&gt;win_task-&gt;win_pixel_bottom+1)
+      h2=base-&gt;win_task-&gt;win_pixel_bottom+1-y;
+  }
+  if (x+w2&gt;base-&gt;width)
+    w2=base-&gt;width-x;
+  if (y+h2&gt;base-&gt;height)
+    h2=base-&gt;height-y;
+  if (w1&lt;w2&lt;=img-&gt;width &amp;&amp; h1&lt;h2&lt;=img-&gt;height &amp;&amp;
+      (!(base-&gt;flags &amp; BMF_SCREEN_BITMAP) ||
+      base-&gt;flags&amp;BMF_ON_TOP ||
+      !IsPixelCovered(base-&gt;win_task,x+w1,y+h1) &amp;&amp;
+      !IsPixelCovered(base-&gt;win_task,x+w2,y+h2))) {
+    if (base-&gt;flags &amp; BMF_RECORD_EXTENTS) {
+      if (x+w1&lt;base-&gt;min_x) base-&gt;min_x=x+w1;
+      if (x+w2-1&gt;base-&gt;max_x) base-&gt;max_x=x+w2-1;
+      if (y+h1&lt;base-&gt;min_y) base-&gt;min_y=y+h1;
+      if (y+h2-1&gt;base-&gt;max_y) base-&gt;max_y=y+h2-1;
+    }
+    if (base-&gt;flags &amp; BMF_DONT_DRAW)
+      return TRUE;
+    base-&gt;depth_buffer=NULL;
+    color=base-&gt;color;
+    i1=-w1&amp;7;
+    if (i1&gt;w2) i1=w2;
+    i2=w2-w1-i1;
+    if (i2&lt;0)
+      i2=0;
+    else
+      i2&gt;&gt;=3;
+    i3=w2-w1-i2&lt;&lt;3-i1;
+    bit_shift=x&amp;7;
+    bit_mask=-1-255&lt;&lt;bit_shift;
+    switch (color.u1[3]) {
+      case ROPB_COLLISION:
+        plane_size=img-&gt;plane_size&lt;&lt;3;
+        plane_size1=base-&gt;plane_size&lt;&lt;3;
+        nobound_switch (base-&gt;type) {
+          case BMT_COLOR4:
+            plane_limit=plane_size*4;
+            plane_limit1=plane_size1*4;
+            break;
+          case BMT_MONO:
+            plane_limit=plane_size;
+            plane_limit1=plane_size1;
+            break;
+        }
+        color =base-&gt;bkcolor&amp;0xFFFFFF;
+        color2=img-&gt;bkcolor &amp;0xFFFFFF;
+        nobound_switch (img-&gt;type) {
+          case BMT_COLOR4:
+            k=h1*img-&gt;width_internal;
+            k1=(h1+y)*base-&gt;width_internal+x;
+            for (j=h2-h1;j;j--) {
+              for (i=w1;i&lt;w2;i++) {
+                c=0;
+                for (plane1=0,p=1;plane1&lt;plane_limit1;
+                plane1+=plane_size1,p&lt;&lt;=1)
+                  if (Bt(base-&gt;body,k1+i+plane1))
+                    c+=p;
+                if (c!=color) {
+                  c=0;
+                  for (plane=0,p=1;plane&lt;plane_limit;
+                  plane+=plane_size,p&lt;&lt;=1)
+                    if (Bt(img-&gt;body,k+i+plane))
+                      c+=p;
+                  if (c!=color2)
+                    base-&gt;collision_cnt++;
+                }
+              }
+              k+=img-&gt;width_internal;
+              k1+=base-&gt;width_internal;
+            }
+            break;
+          case BMT_MONO:
+            k=h1*img-&gt;width_internal;
+            k1=(h1+y)*base-&gt;width_internal+x;
+            for (j=h2-h1;j;j--) {
+              for (i=w1;i&lt;w2;i++) {
+                c=0;
+                for (plane1=0,p=1;plane1&lt;plane_limit1;
+                plane1+=plane_size1,p&lt;&lt;=1)
+                  if (Bt(base-&gt;body,k1+i+plane1))
+                    c+=p;
+                if (c!=color) {
+                  if (Bt(img-&gt;body,k+i)!=color2)
+                    base-&gt;collision_cnt++;
+                }
+              }
+              k+=img-&gt;width_internal;
+              k1+=base-&gt;width_internal;
+            }
+            break;
+        }
+        break;
+      case ROPB_TRANSPARENT:
+      case ROPB_CLEAR_MASK_TRANSPARENT:
+        if (img-&gt;type==BMT_COLOR4) {
+          plane_size=img-&gt;plane_size&lt;&lt;3;
+          plane_limit=plane_size*4;
+          color2=img-&gt;bkcolor &amp;0xFFFFFF;
+          k=h1*img-&gt;width_internal;
+          for (j=h1;j&lt;h2;j++) {
+            for (i=w1;i&lt;w2;i++) {
+              c=0;
+              for (plane=0,p=1;plane&lt;plane_limit;
+              plane+=plane_size,p&lt;&lt;=1)
+                if (Bt(img-&gt;body,k+i+plane))
+                  c+=p;
+              if (c!=color2) {
+                base-&gt;color=c;
+                GrPlot0(base,x+i,y+j);
+              }
+            }
+            k+=img-&gt;width_internal;
+          }
+          base-&gt;color=color;
+        } else
+          goto here1;
+        break;
+      default:
+        here1:
+      plane_size=img-&gt;plane_size&lt;&lt;3;
+        plane_size1=base-&gt;plane_size&lt;&lt;3;
+        nobound_switch (base-&gt;type) {
+          case BMT_COLOR4:
+            plane_limit=plane_size*4;
+            plane_limit1=plane_size1*4;
+            break;
+          case BMT_MONO:
+            plane_limit=plane_size;
+            plane_limit1=plane_size1;
+            break;
+        }
+        if (base-&gt;type==BMT_COLOR4 ||img-&gt;type==BMT_MONO) {
+          for (p1=0,p=1,plane=0,plane1=0;plane&lt;plane_limit;
+          plane+=plane_size,plane1+=plane_size1,p&lt;&lt;=1,p1++) {
+            if (Bt(&amp;color,p1))
+              color_byte=255;
+            else
+              color_byte=0;
+            kk=h1*img-&gt;width_internal+w1;
+            kk1=(h1+y)*base-&gt;width_internal+x+w1;
+            nobound_switch (img-&gt;type) {
+              case BMT_COLOR4:
+                nobound_switch (color.u1[3]) {
+                  case ROPB_EQU:
+                  case ROPB_CLEAR_MASK_EQU:
+                    for (j=h2-h1;j;j--) {
+                      k=kk+plane;
+                      k1=kk1+plane1;
+                      ptr=img-&gt;body;
+                      ptr1=base-&gt;body;
+                      for (i=0;i&lt;i1;i++,k1++)
+                        BEqu(ptr1,k1,Bt(ptr,k++));
+                      ptr+=k&gt;&gt;3;
+                      ptr1&gt;&lt;(U1 *)+=k1&gt;&gt;3;
+                      for (i=0;i&lt;i2;i++,ptr1&gt;&lt;(U1 *)++)
+                        *ptr1=*ptr1 &amp; bit_mask | *ptr++&lt;&lt;bit_shift;
+                      ptr=img-&gt;body;
+                      ptr1=base-&gt;body;
+                      k+=i2&lt;&lt;3;
+                      k1+=i2&lt;&lt;3;
+                      for (i=0;i&lt;i3;i++,k1++)
+                        BEqu(ptr1,k1,Bt(ptr,k++));
+                      kk+=img-&gt;width_internal;
+                      kk1+=base-&gt;width_internal;
+                    }
+                    break;
+                  case ROPB_XOR:
+                    for (j=h2-h1;j;j--) {
+                      k=kk+plane;
+                      k1=kk1+plane1;
+                      ptr=img-&gt;body;
+                      ptr1=base-&gt;body;
+                      for (i=0;i&lt;i1;i++,k1++)
+                        if (Bt(ptr,k++))
+                          Btc(ptr1,k1);
+                      ptr+=k&gt;&gt;3;
+                      ptr1&gt;&lt;(U1 *)+=k1&gt;&gt;3;
+                      for (i=0;i&lt;i2;i++,ptr1&gt;&lt;(U1 *)++)
+                        *ptr1^=*ptr++&lt;&lt;bit_shift;
+                      ptr=img-&gt;body;
+                      ptr1=base-&gt;body;
+                      k+=i2&lt;&lt;3;
+                      k1+=i2&lt;&lt;3;
+                      for (i=0;i&lt;i3;i++,k1++)
+                        if (Bt(ptr,k++))
+                          Btc(ptr1,k1);
+                      kk+=img-&gt;width_internal;
+                      kk1+=base-&gt;width_internal;
+                    }
+                    break;
+                }
+                break;
+              case BMT_MONO:
+                nobound_switch (color.u1[3]) {
+                  case ROPB_EQU:
+                  case ROPB_CLEAR_MASK_EQU:
+                    for (j=h2-h1;j;j--) {
+                      k=kk;
+                      k1=kk1+plane1;
+                      ptr=img-&gt;body;
+                      ptr1=base-&gt;body;
+                      for (i=0;i&lt;i1;i++,k1++)
+                        BEqu(ptr1,k1,color_byte&amp;&amp;Bt(ptr,k++));
+                      ptr+=k&gt;&gt;3;
+                      ptr1&gt;&lt;(U1 *)+=k1&gt;&gt;3;
+                      for (i=0;i&lt;i2;i++,ptr1&gt;&lt;(U1 *)++)
+                        *ptr1=*ptr1 &amp; bit_mask | (*ptr++ &amp; color_byte)&lt;&lt;bit_shift;
+                      ptr=img-&gt;body;
+                      ptr1=base-&gt;body;
+                      k+=i2&lt;&lt;3;
+                      k1+=i2&lt;&lt;3;
+                      for (i=0;i&lt;i3;i++,k1++)
+                        BEqu(ptr1,k1,color_byte &amp;&amp; Bt(ptr,k++));
+                      kk+=img-&gt;width_internal;
+                      kk1+=base-&gt;width_internal;
+                    }
+                    break;
+                  case ROPB_CLEAR_MASK_TRANSPARENT:
+                  case ROPB_TRANSPARENT:
+                    for (j=h2-h1;j;j--) {
+                      k=kk;
+                      k1=kk1+plane1;
+                      ptr=img-&gt;body;
+                      ptr1=base-&gt;body;
+                      if (!(img-&gt;bkcolor&amp;0xFFFFFF)) {
+                        for (i=0;i&lt;i1;i++,k1++)
+                          if (Bt(ptr,k++))
+                            BEqu(ptr1,k1,color_byte);
+                        ptr+=k&gt;&gt;3;
+                        ptr1&gt;&lt;(U1 *)+=k1&gt;&gt;3;
+                        for (i=0;i&lt;i2;i++,ptr1&gt;&lt;(U1 *)++) {
+                          bit_mask=~(*ptr&lt;&lt;bit_shift);
+                          *ptr1=*ptr1 &amp; bit_mask | (*ptr++ &amp; color_byte)&lt;&lt;bit_shift;
+                        }
+                        ptr=img-&gt;body;
+                        ptr1=base-&gt;body;
+                        k+=i2&lt;&lt;3;
+                        k1+=i2&lt;&lt;3;
+                        for (i=0;i&lt;i3;i++,k1++)
+                          if (Bt(ptr,k++))
+                            BEqu(ptr1,k1,color_byte);
+                      } else {
+                        for (i=0;i&lt;i1;i++,k1++)
+                          if (!Bt(ptr,k++))
+                            BEqu(ptr1,k1,color_byte);
+                        ptr+=k&gt;&gt;3;
+                        ptr1&gt;&lt;(U1 *)+=k1&gt;&gt;3;
+                        for (i=0;i&lt;i2;i++,ptr1&gt;&lt;(U1 *)++) {
+                          bit_mask=~((~*ptr&amp;0xFF)&lt;&lt;bit_shift);
+                          *ptr1=*ptr1 &amp; bit_mask | (~*ptr++ &amp; color_byte)&lt;&lt;bit_shift;
+                        }
+                        ptr=img-&gt;body;
+                        ptr1=base-&gt;body;
+                        k+=i2&lt;&lt;3;
+                        k1+=i2&lt;&lt;3;
+                        for (i=0;i&lt;i3;i++,k1++)
+                          if (!Bt(ptr,k++))
+                            BEqu(ptr1,k1,color_byte);
+                      }
+                      kk+=img-&gt;width_internal;
+                      kk1+=base-&gt;width_internal;
+                    }
+                    break;
+                  case ROPB_XOR:
+                    if (color_byte) {
+                      for (j=h2-h1;j;j--) {
+                        k=kk;
+                        k1=kk1+plane1;
+                        ptr=img-&gt;body;
+                        ptr1=base-&gt;body;
+                        for (i=0;i&lt;i1;i++,k1++)
+                          if (Bt(ptr,k++))
+                            Btc(ptr1,k1);
+                        ptr+=k&gt;&gt;3;
+                        ptr1&gt;&lt;(U1 *)+=k1&gt;&gt;3;
+                        for (i=0;i&lt;i2;i++,ptr1&gt;&lt;(U1 *)++)
+                          *ptr1^=*ptr++&lt;&lt;bit_shift;
+                        ptr=img-&gt;body;
+                        ptr1=base-&gt;body;
+                        k+=i2&lt;&lt;3;
+                        k1+=i2&lt;&lt;3;
+                        for (i=0;i&lt;i3;i++,k1++)
+                          if (Bt(ptr,k++))
+                            Btc(ptr1,k1);
+                        kk+=img-&gt;width_internal;
+                        kk1+=base-&gt;width_internal;
+                      }
+                      }
+                    break;
+                }
+                break;
+            }
+          }
+        } else {
+          if (img-&gt;type==BMT_COLOR4) {
+            plane_limit=plane_size*4;
+            k=h1*img-&gt;width_internal;
+            kk1=(h1+y)*base-&gt;width_internal+x;
+            for (j=h2-h1;j;j--) {
+              k1=kk1+w1;
+              for (i=w1;i&lt;w2;i++) {
+                c=0;
+                for (plane=0,p=1;plane&lt;plane_limit;
+                plane+=plane_size,p&lt;&lt;=1)
+                  if (Bt(img-&gt;body,k+i+plane))
+                    c+=p;
+                if (c!=img-&gt;bkcolor)
+                  Bts(base-&gt;body,k1);
+                k1++;
+              }
+              k+=img-&gt;width_internal;
+              kk1+=base-&gt;width_internal;
+            }
+          }
+        }
+        break;
+    }
+    base-&gt;depth_buffer=db;
+    if (mask=base-&gt;mask) {
+      if (color.u1[3]!=ROPB_COLLISION &amp;&amp;
+          (!(color.u1[3]==ROPB_TRANSPARENT ||
+          color.u1[3]==ROPB_CLEAR_MASK_TRANSPARENT) ||
+          img-&gt;type==BMT_MONO)) {
+        mask-&gt;brush=base-&gt;brush;
+        mask-&gt;color=WHITE;
+        if (base-&gt;color.u1[3]==ROPB_CLEAR_MASK_EQU)
+          mask-&gt;color=ROPB_EQU+BLACK;
+        else if (base-&gt;color.u1[3]==ROPB_CLEAR_MASK_TRANSPARENT)
+          mask-&gt;color=ROPB_TRANSPARENT+BLACK;
+        else
+          mask-&gt;color.u1[3]=base-&gt;color.u1[3];
+        mask-&gt;win_task=base-&gt;win_task;
+        if (mask-&gt;alias)
+          mask-&gt;alias-&gt;flags|=BMF_DIRTY;
+        GrBlot(mask,_x,_y,img);
+      }
+    }
+    return TRUE;
+  } else
+    return FALSE;
+}
+
+//This makes lots of assumptions.
+U0 GrBlotWithMask(GrBitMap *base,GrBitMap *img)
+{
+  U8 reg *mask_ptr,reg *m_dst,reg *m_src;
+  U8 reg j,row,reg col,plane,
+      d0=img-&gt;width_internal&gt;&gt;6;
+
+  m_src=img-&gt;body;
+  m_dst=base-&gt;body;
+  for (plane=1;plane&lt;0x10;plane&lt;&lt;=1) {
+    mask_ptr=img-&gt;mask-&gt;body;
+    for (row=0;row&lt;img-&gt;height;row++)
+      for (col=0;col&lt;d0;col++) {
+        if (j=*mask_ptr)
+          *m_dst=*m_dst&amp;~j|*m_src&amp;j;
+        m_dst++;
+        mask_ptr++;
+        m_src++;
+      }
+  }
+}
+
+public GrBitMap *GrExtractBitMap(GrBitMap *b,I8 x1,I8 y1,I8 x2,I8 y2,TaskStruct *task=NULL)
+{
+  GrBitMap *result;
+  if (x1&gt;x2) SwapU8(&amp;x1,&amp;x2);
+  if (y1&gt;y2) SwapU8(&amp;y1,&amp;y2);
+  if (b-&gt;flags &amp; BMF_SCREEN_BITMAP) {
+    x1+=b-&gt;win_task-&gt;win_pixel_left;
+    y1+=b-&gt;win_task-&gt;win_pixel_top;
+    x2+=b-&gt;win_task-&gt;win_pixel_left;
+    y2+=b-&gt;win_task-&gt;win_pixel_top;
+  }
+  result=GrNew(b-&gt;type,x2-x1+1,y2-y1+1,task);
+  result-&gt;color=1;
+  GrBlot(result,-x1,-y1,b);
+  result-&gt;color=0;
+  return result;
+}
+
+#help_index "Graphics"
+
+public BoolI8 GrPutS(GrBitMap *base,I8 _x,I8 _y,U1 *_s)
+{  //Clipping but not transformation
+  U1 *s=_s;
+  I8 x=_x,y=_y,len,ch,reg i,i1,i2,i3,j,k1,kk1,w1,h1,w2,h2,plane1,reg bit_mask,reg bit_shift,p,p1,dist,l,l1;
+  U1 reg *ptr,*font_ptr,*s1;
+  U2 reg *ptr1,*ptr2;
+  I8 color,reg color_byte,c,plane_size1,plane_limit1;
+  GrBitMap *mask;
+
+  if (!_s) return FALSE;
+  len=StrLen(s);
+
+  w1=x&lt;0 ?-x:0;
+  h1=y&lt;0 ?-y:0;
+  w2=len*FONT_WIDTH;
+  h2=FONT_HEIGHT;
+
+  if (base-&gt;flags &amp; BMF_SCREEN_BITMAP) {
+    x+=base-&gt;win_task-&gt;win_pixel_left;
+    y+=base-&gt;win_task-&gt;win_pixel_top;
+  }
+  if (base-&gt;flags &amp; BMF_LOCATE_NEAREST) { //TODO:Untested
+    dist=DistI8(x+w2&gt;&gt;1,y+h2&gt;&gt;1,base-&gt;cur_x,base-&gt;cur_y);
+    if (dist&lt;=base-&gt;nearest_dist) {
+      base-&gt;nearest_grelem_num=base-&gt;cur_grelem_num;
+      base-&gt;nearest_dist=dist;
+    }
+  }
+  if (base-&gt;flags &amp; BMF_SCREEN_BITMAP) {
+    if (x+w1&lt;0) w1=-x;
+    if (x+w2&gt;base-&gt;win_task-&gt;win_pixel_right+1)
+      w2=base-&gt;win_task-&gt;win_pixel_right+1-x;
+
+    if (y+h1&lt;0) h1=-y;
+    if (y+h2&gt;base-&gt;win_task-&gt;win_pixel_bottom+1)
+      h2=base-&gt;win_task-&gt;win_pixel_bottom+1-y;
+  }
+  if (x+w2&gt;base-&gt;width)
+    w2=base-&gt;width-x;
+  if (y+h2&gt;base-&gt;height)
+    h2=base-&gt;height-y;
+  if (w1&lt;w2&lt;=len*FONT_WIDTH &amp;&amp; h1&lt;h2&lt;=FONT_HEIGHT &amp;&amp;
+      (!(base-&gt;flags &amp; BMF_SCREEN_BITMAP) ||
+      base-&gt;flags&amp;BMF_ON_TOP ||
+      !IsPixelCovered(base-&gt;win_task,x+w1,y+h1) &amp;&amp;
+      !IsPixelCovered(base-&gt;win_task,x+w2,y+h2))) {
+    if (base-&gt;flags &amp; BMF_RECORD_EXTENTS) {
+      if (x+w1&lt;base-&gt;min_x) base-&gt;min_x=x+w1;
+      if (x+w2-1&gt;base-&gt;max_x) base-&gt;max_x=x+w2-1;
+      if (y+h1&lt;base-&gt;min_y) base-&gt;min_y=y+h1;
+      if (y+h2-1&gt;base-&gt;max_y) base-&gt;max_y=y+h2-1;
+    }
+    if (base-&gt;flags &amp; BMF_DONT_DRAW)
+      return TRUE;
+    color=base-&gt;color;
+    plane_size1=base-&gt;plane_size&lt;&lt;3;
+    nobound_switch (base-&gt;type) {
+      case BMT_COLOR4:
+        plane_limit1=plane_size1*4;
+        break;
+      case BMT_MONO:
+        plane_limit1=plane_size1;
+        break;
+    }
+    i1=-w1&amp;7;
+    if (i1&gt;w2) i1=w2;
+    i2=w2-w1-i1;
+    if (i2&lt;0)
+      i2=0;
+    else
+      i2&gt;&gt;=3;
+    i3=w2-w1-i2&lt;&lt;3-i1;
+    bit_shift=(x+w1)&amp;7;
+    bit_mask=-1-255&lt;&lt;bit_shift;
+    s+=w1/FONT_WIDTH;
+    l=w1%FONT_WIDTH;
+    if (color.u1[3]==ROPB_COLLISION) {
+      color =base-&gt;bkcolor&amp;0xFFFFFF;
+      ch=*s++;
+      font_ptr=&amp;grfont[(FONT_WIDTH*(FONT_HEIGHT*ch+h1))&gt;&gt;3];
+      for (i=w1;i&lt;w2;i++) {
+        k1=(h1+y)*base-&gt;width_internal+x;
+        ptr=font_ptr;
+        for (j=h2-h1;j;j--) {
+          c=0;
+          for (plane1=0,p=1;plane1&lt;plane_limit1;
+            plane1+=plane_size1,p&lt;&lt;=1)
+            if (Bt(base-&gt;body,k1+i+plane1))
+              c+=p;
+          if (c!=color) {
+            if (Bt(ptr,l))
+              base-&gt;collision_cnt++;
+          }
+          k1+=base-&gt;width_internal;
+          ptr++;
+        }
+        if (++l==FONT_WIDTH) {
+          ch=*s++;
+          font_ptr=&amp;grfont[(FONT_WIDTH*(FONT_HEIGHT*ch+h1))&gt;&gt;3];
+          l=0;
+        }
+      }
+      } else {
+        for (p1=0,plane1=0;plane1&lt;plane_limit1;plane1+=plane_size1,p1++) {
+          s1=s;
+          l1=l;
+          if (Bt(&amp;color,p1))
+            color_byte=255;
+          else
+            color_byte=0;
+          ptr2=base-&gt;body+plane1&gt;&gt;3;
+          kk1=(h1+y)*base-&gt;width_internal+x+w1;
+          ch=*s1++;
+          font_ptr=&amp;grfont[(FONT_WIDTH*(FONT_HEIGHT*ch+h1))&gt;&gt;3];
+          for (i=0;i&lt;i1;i++) {
+            k1=kk1;
+            ptr=font_ptr;
+            nobound_switch (color.u1[3]) {
+              case ROPB_EQU:
+              case ROPB_CLEAR_MASK_EQU:
+              case ROPB_CLEAR_MASK_TRANSPARENT:
+              case ROPB_TRANSPARENT:
+                for (j=h2-h1;j;j--) {
+                  if (Bt(ptr++,l1))
+                    BEqu(ptr2,k1,color_byte);
+                  k1+=base-&gt;width_internal;
+                }
+                break;
+              case ROPB_XOR:
+                if (color_byte)
+                  for (j=h2-h1;j;j--) {
+                    if (Bt(ptr++,l1))
+                      Btc(ptr2,k1);
+                    k1+=base-&gt;width_internal;
+                  }
+                  break;
+            }
+            if (++l1==FONT_WIDTH) {
+              ch=*s1++;
+              font_ptr=&amp;grfont[(FONT_WIDTH*(FONT_HEIGHT*ch+h1))&gt;&gt;3];
+              l1=0;
+            }
+          }
+          kk1+=i1;
+          ptr2&gt;&lt;(U1 *)+=kk1&gt;&gt;3;
+          for (i=0;i&lt;i2;i++) {
+            ptr1=ptr2;
+            ptr=font_ptr;
+            nobound_switch (color.u1[3]) {
+              case ROPB_EQU:
+              case ROPB_CLEAR_MASK_EQU:
+              case ROPB_CLEAR_MASK_TRANSPARENT:
+              case ROPB_TRANSPARENT:
+                for (j=h2-h1;j;j--) {
+                  bit_mask=~(*ptr&lt;&lt;bit_shift);
+                  *ptr1=*ptr1 &amp; bit_mask | (*ptr++ &amp; color_byte)&lt;&lt;bit_shift;
+                  ptr1&gt;&lt;(U1 *)+=base-&gt;width_internal&gt;&gt;3;
+                }
+                break;
+              case ROPB_XOR:
+                if (color_byte)
+                  for (j=h2-h1;j;j--) {
+                    *ptr1^=*ptr++&lt;&lt;bit_shift;
+                    ptr1&gt;&lt;(U1 *)+=base-&gt;width_internal&gt;&gt;3;
+                  }
+                  break;
+            }
+            ptr2&gt;&lt;(U1 *)++;
+            ch=*s1++;
+            font_ptr=&amp;grfont[(FONT_WIDTH*(FONT_HEIGHT*ch+h1))&gt;&gt;3];
+          }
+          kk1+=i2&lt;&lt;3;
+          ptr1=base-&gt;body+plane1&gt;&gt;3;
+          for (i=0;i&lt;i3;i++) {
+            ptr=font_ptr;
+            k1=kk1+i;
+            nobound_switch (color.u1[3]) {
+              case ROPB_EQU:
+              case ROPB_CLEAR_MASK_EQU:
+              case ROPB_CLEAR_MASK_TRANSPARENT:
+              case ROPB_TRANSPARENT:
+                for (j=h2-h1;j;j--) {
+                  if (Bt(ptr++,l1))
+                    BEqu(ptr1,k1,color_byte);
+                  k1+=base-&gt;width_internal;
+                }
+                break;
+              case ROPB_XOR:
+                if (color_byte)
+                  for (j=h2-h1;j;j--) {
+                    if (Bt(ptr++,l1))
+                      Btc(ptr1,k1);
+                    k1+=base-&gt;width_internal;
+                  }
+                  break;
+            }
+            if (++l1==FONT_WIDTH) {
+              ch=*s1++;
+              font_ptr=&amp;grfont[(FONT_WIDTH*(FONT_HEIGHT*ch+h1))&gt;&gt;3];
+              l1=0;
+            }
+          }
+        }
+    }
+    if (mask=base-&gt;mask) {
+      mask-&gt;brush=base-&gt;brush;
+      mask-&gt;color=WHITE;
+      if (base-&gt;color.u1[3]==ROPB_CLEAR_MASK_EQU)
+        mask-&gt;color=ROPB_EQU+BLACK;
+      else if (base-&gt;color.u1[3]==ROPB_CLEAR_MASK_TRANSPARENT)
+        mask-&gt;color=ROPB_TRANSPARENT+BLACK;
+      else
+        mask-&gt;color.u1[3]=base-&gt;color.u1[3];
+      mask-&gt;win_task=base-&gt;win_task;
+      if (mask-&gt;alias)
+        mask-&gt;alias-&gt;flags|=BMF_DIRTY;
+      GrPutS(mask,_x,_y,_s);
+    }
+    return TRUE;
+  } else
+    return FALSE;
+}
+
+public BoolI8 GrVPutS(GrBitMap *base,I8 _x,I8 _y,U1 *_s)
+{ //Vertical text
+  U1 buf[2];
+  BoolI1 result=FALSE,first=TRUE;
+  buf[1]=0;
+  while (buf[0]=*_s++) {
+    if (first) {
+      result=GrPutS(base,_x,_y,buf);
+      first=FALSE;
+    } else
+      GrPutS(base,_x,_y,buf);
+    _y+=FONT_HEIGHT;
+  }
+  return result;
+}
+
+public U0 GrPrintF(GrBitMap *base,I8 x,I8 y,U1 *fmt,...)
+{
+  U1 *buf=SPrintFJoin(NULL,fmt,argc,argv);
+  GrPutS(base,x,y,buf);
+  Free(buf);
+}
+
+public U0 GrVPrintF(GrBitMap *base,I8 x,I8 y,U1 *fmt,...)
+{ //Vertical text
+  U1 *buf=SPrintFJoin(NULL,fmt,argc,argv);
+  GrVPutS(base,x,y,buf);
+  Free(buf);
+}
+
+public BoolI8 GrRect(GrBitMap *base,I8 _x,I8 _y,I8 w,I8 h)
+{  //Clipping but not transformation
+  I8 x=_x,y=_y;
+  I8 i,i1,i2,i3,j,k1,kk1,w1,h1,w2,h2,plane1,bit_mask,bit_shift,p,p1,dist;
+  U2 *ptr1;
+  I8 color,color_byte,c,plane_size1,plane_limit1,dither_colors;
+  BoolI1 dither,probability_dither;
+  GrBitMap *mask;
+
+  w1=x&lt;0 ?-x:0;
+  h1=y&lt;0 ?-y:0;
+  w2=w;
+  h2=h;
+
+  if (base-&gt;flags &amp; BMF_SCREEN_BITMAP) {
+    x+=base-&gt;win_task-&gt;win_pixel_left;
+    y+=base-&gt;win_task-&gt;win_pixel_top;
+  }
+  if (base-&gt;flags &amp; BMF_LOCATE_NEAREST) { //TODO:Untested
+    if (base-&gt;cur_x&gt;=x &amp;&amp; base-&gt;cur_y&gt;=y &amp;&amp;
+        base-&gt;cur_x&lt;=x+w &amp;&amp; base-&gt;cur_y&lt;=y+h) {
+      base-&gt;nearest_grelem_num=base-&gt;cur_grelem_num;
+      base-&gt;nearest_dist=0;
+    } else {
+      dist=DistI8(x+w&gt;&gt;1,y+h&gt;&gt;1,base-&gt;cur_x,base-&gt;cur_y);
+      if (dist&lt;=base-&gt;nearest_dist) {
+        base-&gt;nearest_grelem_num=base-&gt;cur_grelem_num;
+        base-&gt;nearest_dist=dist;
+      }
+    }
+  }
+  if (base-&gt;flags &amp; BMF_SCREEN_BITMAP) {
+    if (x+w1&lt;0) w1=-x;
+    if (x+w2&gt;base-&gt;win_task-&gt;win_pixel_right+1)
+      w2=base-&gt;win_task-&gt;win_pixel_right+1-x;
+
+    if (y+h1&lt;0) h1=-y;
+    if (y+h2&gt;base-&gt;win_task-&gt;win_pixel_bottom+1)
+      h2=base-&gt;win_task-&gt;win_pixel_bottom+1-y;
+  }
+  if (x+w2&gt;base-&gt;width)
+    w2=base-&gt;width-x;
+  if (y+h2&gt;base-&gt;height)
+    h2=base-&gt;height-y;
+  if (w1&lt;w2&lt;=w &amp;&amp; h1&lt;h2&lt;=h &amp;&amp;
+      (!(base-&gt;flags &amp; BMF_SCREEN_BITMAP) ||
+      base-&gt;flags&amp;BMF_ON_TOP ||
+      !IsPixelCovered(base-&gt;win_task,x+w1,y+h1) &amp;&amp;
+      !IsPixelCovered(base-&gt;win_task,x+w2,y+h2))) {
+    if (base-&gt;flags &amp; BMF_RECORD_EXTENTS) {
+      if (x+w1&lt;base-&gt;min_x) base-&gt;min_x=x+w1;
+      if (x+w2-1&gt;base-&gt;max_x) base-&gt;max_x=x+w2-1;
+      if (y+h1&lt;base-&gt;min_y) base-&gt;min_y=y+h1;
+      if (y+h2-1&gt;base-&gt;max_y) base-&gt;max_y=y+h2-1;
+    }
+    if (base-&gt;flags &amp; BMF_DONT_DRAW)
+      return TRUE;
+    color=base-&gt;color;
+    if (color&amp;(ROP_DITHER|ROP_PROBABILITY_DITHER)) {
+      dither=TRUE;
+      if (color&amp;ROP_PROBABILITY_DITHER) {
+        probability_dither=TRUE;
+        color.u1[7]=color.u1[3];
+        dither_colors=color;
+      } else {
+        probability_dither=FALSE;
+        color.u1[7]=color.u1[3];
+      }
+    } else
+      dither=FALSE;
+    plane_size1=base-&gt;plane_size&lt;&lt;3;
+    nobound_switch (base-&gt;type) {
+      case BMT_COLOR4:
+        plane_limit1=plane_size1*4;
+        break;
+      case BMT_MONO:
+        plane_limit1=plane_size1;
+        break;
+    }
+    i1= -w1&amp;7;
+    if (i1&gt;w2) i1=w2;
+    i2=w2-w1-i1;
+    if (i2&lt;0)
+      i2=0;
+    else
+      i2&gt;&gt;=3;
+    i3=w2-w1-i2&lt;&lt;3-i1;
+    bit_shift=x&amp;7;
+    bit_mask=-1-255&lt;&lt;bit_shift;
+    if (dither) {
+      if (probability_dither) {
+        if (RandU2&lt;base-&gt;dither_probability)
+          color.u4[0]=dither_colors.u4[1];
+        else
+          color.u4[0]=dither_colors.u4[0];
+      } else
+        if (((x+w1)^(y+h1))&amp;1)
+          SwapU4(&amp;color.u4[0],&amp;color.u4[1]);
+      if (color.u1[3]==ROPB_COLLISION) {
+        color =base-&gt;bkcolor&amp;0xFFFFFF;
+        k1=(h1+y)*base-&gt;width_internal+x;
+        for (j=h2-h1;j;j--) {
+          for (i=w1;i&lt;w2;i++) {
+            c=0;
+            for (plane1=0,p=1;plane1&lt;plane_limit1;
+            plane1+=plane_size1,p&lt;&lt;=1)
+              if (Bt(base-&gt;body,k1+i+plane1))
+                c+=p;
+            if (c!=color)
+              base-&gt;collision_cnt++;
+          }
+          k1+=base-&gt;width_internal;
+        }
+        } else {
+        bit_mask=-1-0x55&lt;&lt;bit_shift;
+        for (p1=0,plane1=0;plane1&lt;plane_limit1;
+        plane1+=plane_size1,p1++) {
+          kk1=(h1+y)*base-&gt;width_internal+x+w1+plane1;
+          nobound_switch (color.u1[3]) {
+            case ROPB_EQU:
+            case ROPB_CLEAR_MASK_EQU:
+            case ROPB_CLEAR_MASK_TRANSPARENT:
+            case ROPB_TRANSPARENT:
+              for (j=h2-h1;j;j--) {
+                if (Bt(&amp;color,p1))
+                  color_byte=0x55&lt;&lt;bit_shift;
+                else
+                  color_byte=0;
+                k1=kk1;
+                for (i=0;i&lt;i1;i+=2,k1+=2)
+                  BEqu(base-&gt;body,k1,color_byte);
+                k1-=i1&amp;1;
+                ptr1=k1&gt;&gt;3+base-&gt;body;
+                for (i=0;i&lt;i2;i++,ptr1&gt;&lt;(U1 *)++)
+                  *ptr1=*ptr1 &amp; bit_mask | color_byte;
+                k1+=i2&lt;&lt;3;
+                for (i=0;i&lt;i3;i+=2,k1+=2)
+                  BEqu(base-&gt;body,k1,color_byte);
+                kk1+=base-&gt;width_internal;
+                if (probability_dither) {
+                  if (RandU2&lt;base-&gt;dither_probability)
+                    color.u4[0]=dither_colors.u4[1];
+                  else
+                    color.u4[0]=dither_colors.u4[0];
+                } else
+                  SwapU4(&amp;color.u4[0],&amp;color.u4[1]);
+              }
+              break;
+            case ROPB_XOR:
+              for (j=h2-h1;j;j--) {
+                if (Bt(&amp;color,p1))
+                  color_byte=0x55&lt;&lt;bit_shift;
+                else
+                  color_byte=0;
+                if (color_byte) {
+                  k1=kk1;
+                  for (i=0;i&lt;i1;i+=2,k1+=2)
+                    Btc(base-&gt;body,k1);
+                  k1-=i1&amp;1;
+                  ptr1=k1&gt;&gt;3+base-&gt;body;
+                  for (i=0;i&lt;i2;i++,ptr1&gt;&lt;(U1 *)++)
+                    *ptr1^=color_byte;
+                  k1+=i2&lt;&lt;3;
+                  for (i=0;i&lt;i3;i+=2,k1+=2)
+                    Btc(base-&gt;body,k1);
+                  kk1+=base-&gt;width_internal;
+                }
+                if (probability_dither) {
+                  if (RandU2&lt;base-&gt;dither_probability)
+                    color.u4[0]=dither_colors.u4[1];
+                  else
+                    color.u4[0]=dither_colors.u4[0];
+                } else
+                  SwapU4(&amp;color.u4[0],&amp;color.u4[1]);
+              }
+              break;
+          }
+          if (probability_dither) {
+            if (RandU2&lt;base-&gt;dither_probability)
+              color.u4[0]=dither_colors.u4[1];
+            else
+              color.u4[0]=dither_colors.u4[0];
+          } else
+            if ((h2-h1)&amp;1)
+              SwapU4(&amp;color.u4[0],&amp;color.u4[1]);
+        }
+        bit_mask=-1-0xAA&lt;&lt;bit_shift;
+        color=base-&gt;color;
+        color.u1[7]=color.u1[3];
+        if (probability_dither) {
+          if (RandU2&lt;base-&gt;dither_probability)
+            color.u4[0]=dither_colors.u4[1];
+          else
+            color.u4[0]=dither_colors.u4[0];
+        } else
+          if (((x+w1+1)^(y+h1))&amp;1)
+            SwapU4(&amp;color.u4[0],&amp;color.u4[1]);
+        for (p1=0,plane1=0;plane1&lt;plane_limit1;
+        plane1+=plane_size1,p1++) {
+          kk1=(h1+y)*base-&gt;width_internal+x+1+w1+plane1;
+          nobound_switch (color.u1[3]) {
+            case ROPB_EQU:
+            case ROPB_CLEAR_MASK_EQU:
+            case ROPB_CLEAR_MASK_TRANSPARENT:
+            case ROPB_TRANSPARENT:
+              for (j=h2-h1;j;j--) {
+                if (Bt(&amp;color,p1))
+                  color_byte=0xAA&lt;&lt;bit_shift;
+                else
+                  color_byte=0;
+                k1=kk1;
+                for (i=1;i&lt;i1;i+=2,k1+=2)
+                  BEqu(base-&gt;body,k1,color_byte);
+                k1+=i1&amp;1;
+                ptr1=(k1-1)&gt;&gt;3+base-&gt;body;
+                for (i=0;i&lt;i2;i++,ptr1&gt;&lt;(U1 *)++)
+                  *ptr1=*ptr1 &amp; bit_mask | color_byte;
+                k1+=i2&lt;&lt;3;
+                for (i=1;i&lt;i3;i+=2,k1+=2)
+                  BEqu(base-&gt;body,k1,color_byte);
+                kk1+=base-&gt;width_internal;
+                if (probability_dither) {
+                  if (RandU2&lt;base-&gt;dither_probability)
+                    color.u4[0]=dither_colors.u4[1];
+                  else
+                    color.u4[0]=dither_colors.u4[0];
+                } else
+                  SwapU4(&amp;color.u4[0],&amp;color.u4[1]);
+              }
+              break;
+            case ROPB_XOR:
+              for (j=h2-h1;j;j--) {
+                if (Bt(&amp;color,p1))
+                  color_byte=0xAA&lt;&lt;bit_shift;
+                else
+                  color_byte=0;
+                if (color_byte) {
+                  k1=kk1;
+                  for (i=1;i&lt;i1;i+=2,k1+=2)
+                    Btc(base-&gt;body,k1);
+                  k1+=i1&amp;1;
+                  ptr1=(k1-1)&gt;&gt;3+base-&gt;body;
+                  for (i=0;i&lt;i2;i++,ptr1&gt;&lt;(U1 *)++)
+                    *ptr1^=color_byte;
+                  k1+=i2&lt;&lt;3;
+                  for (i=1;i&lt;i3;i+=2,k1+=2)
+                    Btc(base-&gt;body,k1);
+                  kk1+=base-&gt;width_internal;
+                }
+                if (probability_dither) {
+                  if (RandU2&lt;base-&gt;dither_probability)
+                    color.u4[0]=dither_colors.u4[1];
+                  else
+                    color.u4[0]=dither_colors.u4[0];
+                } else
+                  SwapU4(&amp;color.u4[0],&amp;color.u4[1]);
+              }
+              break;
+          }
+          if (probability_dither) {
+            if (RandU2&lt;base-&gt;dither_probability)
+              color.u4[0]=dither_colors.u4[1];
+            else
+              color.u4[0]=dither_colors.u4[0];
+          } else
+            if ((h2-h1)&amp;1)
+              SwapU4(&amp;color.u4[0],&amp;color.u4[1]);
+        }
+        }
+    } else {
+      if (color.u1[3]==ROPB_COLLISION) {
+        color =base-&gt;bkcolor&amp;0xFFFFFF;
+        k1=(h1+y)*base-&gt;width_internal+x;
+        for (j=h2-h1;j;j--) {
+          for (i=w1;i&lt;w2;i++) {
+            c=0;
+            for (plane1=0,p=1;plane1&lt;plane_limit1;
+            plane1+=plane_size1,p&lt;&lt;=1)
+              if (Bt(base-&gt;body,k1+i+plane1))
+                c+=p;
+            if (c!=color)
+              base-&gt;collision_cnt++;
+          }
+          k1+=base-&gt;width_internal;
+        }
+        } else
+        for (p1=0,plane1=0;plane1&lt;plane_limit1;
+        plane1+=plane_size1,p1++) {
+          if (Bt(&amp;color,p1))
+            color_byte=255&lt;&lt;bit_shift;
+          else
+            color_byte=0;
+          kk1=(h1+y)*base-&gt;width_internal+x+w1+plane1;
+          nobound_switch (color.u1[3]) {
+            case ROPB_EQU:
+            case ROPB_CLEAR_MASK_EQU:
+            case ROPB_CLEAR_MASK_TRANSPARENT:
+            case ROPB_TRANSPARENT:
+              for (j=h2-h1;j;j--) {
+                k1=kk1;
+                for (i=0;i&lt;i1;i++,k1++)
+                  BEqu(base-&gt;body,k1,color_byte);
+                ptr1=k1&gt;&gt;3+base-&gt;body;
+                for (i=0;i&lt;i2;i++,ptr1&gt;&lt;(U1 *)++)
+                  *ptr1=*ptr1 &amp; bit_mask | color_byte;
+                k1+=i2&lt;&lt;3;
+                for (i=0;i&lt;i3;i++,k1++)
+                  BEqu(base-&gt;body,k1,color_byte);
+                kk1+=base-&gt;width_internal;
+              }
+              break;
+            case ROPB_XOR:
+              if (color_byte)
+                for (j=h2-h1;j;j--) {
+                  k1=kk1;
+                  for (i=0;i&lt;i1;i++,k1++)
+                    Btc(base-&gt;body,k1);
+                  ptr1=k1&gt;&gt;3+base-&gt;body;
+                  for (i=0;i&lt;i2;i++,ptr1&gt;&lt;(U1 *)++)
+                    *ptr1^=color_byte;
+                  k1+=i2&lt;&lt;3;
+                  for (i=0;i&lt;i3;i++,k1++)
+                    Btc(base-&gt;body,k1);
+                  kk1+=base-&gt;width_internal;
+                }
+                break;
+          }
+        }
+        }
+    if (mask=base-&gt;mask) {
+      mask-&gt;brush=base-&gt;brush;
+      mask-&gt;color=WHITE;
+      if (base-&gt;color.u1[3]==ROPB_CLEAR_MASK_EQU)
+        mask-&gt;color=ROPB_EQU+BLACK;
+      else if (base-&gt;color.u1[3]==ROPB_CLEAR_MASK_TRANSPARENT)
+        mask-&gt;color=ROPB_TRANSPARENT+BLACK;
+      else
+        mask-&gt;color.u1[3]=base-&gt;color.u1[3];
+      mask-&gt;win_task=base-&gt;win_task;
+      if (mask-&gt;alias)
+        mask-&gt;alias-&gt;flags|=BMF_DIRTY;
+      GrRect(mask,_x,_y,w,h);
+    }
+    return TRUE;
+  } else
+    return FALSE;
+}
+
+
+I8 GrRayLenMinus(GrBitMap *base,I8 x,I8 y)
+{
+  I8 cnt=0,c,x3=x,y3=y,d,bit;
+  U1 *dst,*dst2,*mask_dst;
+  BoolI1 not_color=ToBool(base-&gt;flags&amp;BMF_FILL_NOT_COLOR);
+  GrBitMap *mask;
+
+  if (x3&lt;0 || y3&lt;0)
+    goto gr_done;
+  if (base-&gt;flags &amp; BMF_SCREEN_BITMAP) {
+    x3+=base-&gt;win_task-&gt;win_pixel_left;
+    y3+=base-&gt;win_task-&gt;win_pixel_top;
+    if (x3&lt;0 || y3&lt;0 ||
+        x3&gt;base-&gt;win_task-&gt;win_pixel_right ||
+        y3&gt;base-&gt;win_task-&gt;win_pixel_bottom ||
+        !(base-&gt;flags&amp;BMF_ON_TOP) &amp;&amp;
+          IsPixelCovered(base-&gt;win_task,x3,y3))
+      goto gr_done;
+  }
+  if (x3&gt;=base-&gt;width || y3&gt;=base-&gt;height)
+    goto gr_done;
+
+  d=y3*base-&gt;width_internal;
+  nobound_switch (base-&gt;type) {
+    case BMT_COLOR4:
+      if (mask=base-&gt;mask)
+        mask_dst=mask-&gt;body-base-&gt;body;
+      else
+        mask_dst=NULL;
+      dst2=base-&gt;body+d&gt;&gt;3;
+      d=base-&gt;plane_size;
+
+      while (TRUE) {
+        x3=x;
+        if (x3&amp;(FONT_WIDTH-1)==FONT_WIDTH-1) {
+          if (base-&gt;flags &amp; BMF_SCREEN_BITMAP) {
+            if (x3&lt;0) break;
+            x3+=base-&gt;win_task-&gt;win_pixel_left;
+            if (x3&lt;0 || x3&gt;base-&gt;win_task-&gt;win_pixel_right ||
+                x3&gt;=base-&gt;width ||
+                !(base-&gt;flags&amp;BMF_ON_TOP) &amp;&amp;
+                  IsPixelCovered(base-&gt;win_task,x3,y3))
+             break;
+          } else
+            if (!(0&lt;=x3&lt;base-&gt;width))
+              break;
+        } else if (base-&gt;flags &amp; BMF_SCREEN_BITMAP)
+          x3+=base-&gt;win_task-&gt;win_pixel_left;
+
+        dst=dst2+x3&gt;&gt;3;
+        bit=1&lt;&lt;(x3&amp;7);
+
+        if (mask_dst)
+          if (!(mask_dst[dst]&amp;bit)) {
+            c=MAX_I4;
+            goto here1a;
+          }
+
+        c=0;
+        if (*dst &amp; bit)
+          c|=1;
+        dst+=d;
+        if (*dst &amp; bit)
+          c|=2;
+        dst+=d;
+        if (*dst &amp; bit)
+          c|=4;
+        dst+=d;
+        if (*dst &amp; bit)
+          c|=8;
+
+here1a:
+        if (not_color) {
+          if (c!=base-&gt;color2) {
+            cnt++;
+            x--;
+          } else
+            break;
+        } else {
+          if (c==base-&gt;color2) {
+            cnt++;
+            x--;
+          } else
+            break;
+        }
+      }
+      return cnt;
+    case BMT_MONO:
+      while (TRUE) {
+        x3=x;
+        if (x3&amp;(FONT_WIDTH-1)==FONT_WIDTH-1) {
+          if (base-&gt;flags &amp; BMF_SCREEN_BITMAP) {
+            if (x3&lt;0) break;
+            x3+=base-&gt;win_task-&gt;win_pixel_left;
+            if (x3&lt;0 || x3&gt;base-&gt;win_task-&gt;win_pixel_right ||
+                x3&gt;=base-&gt;width ||
+                !(base-&gt;flags&amp;BMF_ON_TOP) &amp;&amp;
+                IsPixelCovered(base-&gt;win_task,x3,y3))
+              break;
+          } else
+            if (!(0&lt;=x3&lt;base-&gt;width))
+              break;
+        } else if (base-&gt;flags &amp; BMF_SCREEN_BITMAP)
+          x3+=base-&gt;win_task-&gt;win_pixel_left;
+        c=1;
+        if (mask=base-&gt;mask)
+          c=Bt(mask-&gt;body,d+x3);
+        if (not_color) {
+          if (!c || Bt(base-&gt;body,d+x3)!=base-&gt;color2) {
+            cnt++;
+            x--;
+          } else
+            break;
+        } else {
+          if (c &amp;&amp; Bt(base-&gt;body,d+x3)==base-&gt;color2) {
+            cnt++;
+            x--;
+          } else
+            break;
+        }
+      }
+      return cnt;
+  }
+gr_done:
+return 0;
+}
+
+I8 GrRayLen(GrBitMap *base,I8 *x1,I8 y,I8 z=0,I4 *db=NULL)
+{
+  I8 cnt=0,d,c,c2,x=*x1,x2=x,x3=x,y3=y,dist;
+  BoolI1 dither,probability_dither,not_color=ToBool(base-&gt;flags&amp;BMF_FILL_NOT_COLOR);
+  U1 *dst,*dst2,*mask_dst;
+  U8 color=base-&gt;color,bkcolor=base-&gt;bkcolor,bit,not_bit;
+  I4 *db2;
+  BoolI1 plot;
+  GrBitMap *mask;
+
+  if (x3&lt;0 || y3&lt;0)
+    goto gr_done;
+  if (base-&gt;flags &amp; BMF_SCREEN_BITMAP) {
+    x3+=base-&gt;win_task-&gt;win_pixel_left;
+    y3+=base-&gt;win_task-&gt;win_pixel_top;
+    if (x3&lt;0 || y3&lt;0 ||
+        x3&gt;base-&gt;win_task-&gt;win_pixel_right ||
+        y3&gt;base-&gt;win_task-&gt;win_pixel_bottom ||
+        !(base-&gt;flags&amp;BMF_ON_TOP) &amp;&amp;
+        IsPixelCovered(base-&gt;win_task,x3,y3))
+      goto gr_done;
+  }
+  if (x3&gt;=base-&gt;width || y3&gt;=base-&gt;height)
+    goto gr_done;
+
+  d=base-&gt;width_internal*y3;
+  if (db) db+=d;
+
+  color=base-&gt;color;
+  if (color&amp;(ROP_DITHER|ROP_PROBABILITY_DITHER)) {
+    dither=TRUE;
+    if (color&amp;ROP_PROBABILITY_DITHER) {
+      probability_dither=TRUE;
+      color.u1[7]=color.u1[3];
+    } else {
+      probability_dither=FALSE;
+      color.u1[7]=color.u1[3];
+      if (color&amp;0xFFFFFF==base-&gt;color2&amp;0xFFFFFF)
+        SwapU4(&amp;color.u4[0],&amp;color.u4[1]);
+    }
+  } else
+    dither=FALSE;
+  nobound_switch (base-&gt;type) {
+    case BMT_COLOR4:
+      if (mask=base-&gt;mask) {
+        mask_dst=mask-&gt;body-base-&gt;body;
+        if (mask-&gt;alias)
+          mask-&gt;alias-&gt;flags|=BMF_DIRTY;
+      } else
+        mask_dst=NULL;
+      dst2=base-&gt;body+d&gt;&gt;3;
+      d=base-&gt;plane_size;
+      while (TRUE) {
+        x3=x;
+        if (!(x3&amp;(FONT_WIDTH-1))) {
+          if (base-&gt;flags &amp; BMF_SCREEN_BITMAP) {
+            if (x3&lt;0) break;
+            x3+=base-&gt;win_task-&gt;win_pixel_left;
+            if (x3&lt;0 || x3&gt;base-&gt;win_task-&gt;win_pixel_right ||
+                x3&gt;=base-&gt;width ||
+                !(base-&gt;flags&amp;BMF_ON_TOP) &amp;&amp;
+                IsPixelCovered(base-&gt;win_task,x3,y3))
+              break;
+          } else {
+            if (!(0&lt;=x3&lt;base-&gt;width))
+              break;
+          }
+        } else if (base-&gt;flags &amp; BMF_SCREEN_BITMAP)
+          x3+=base-&gt;win_task-&gt;win_pixel_left;
+
+        dst=dst2+x3&gt;&gt;3;
+        bit=1&lt;&lt;(x3&amp;7);
+        not_bit=~bit;
+
+        if (mask_dst)
+          if (!(mask_dst[dst]&amp;bit)) {
+            c=MAX_I4;
+            goto here3a;
+          }
+
+        c=0;
+        if (*dst &amp; bit)
+          c|=1;
+        dst+=d;
+        if (*dst &amp; bit)
+          c|=2;
+        dst+=d;
+        if (*dst &amp; bit)
+          c|=4;
+        dst+=d;
+        if (*dst &amp; bit)
+          c|=8;
+
+here3a:
+        if (db) {
+          db2=db+x3;
+          if (0&lt;=z&lt;=*db2) {
+            *db2=z;
+            plot=TRUE;
+          } else
+            plot=FALSE;
+        } else
+          plot=TRUE;
+
+        if ((not_color &amp;&amp; c!=base-&gt;color2 ||
+            !not_color &amp;&amp; c==base-&gt;color2) &amp;&amp; plot) {
+          if (base-&gt;flags &amp; BMF_LOCATE_NEAREST) {
+            dist=DistI8(x3,y3,base-&gt;cur_x,base-&gt;cur_y);
+            if (dist&lt;=base-&gt;nearest_dist) {
+              base-&gt;nearest_grelem_num=base-&gt;cur_grelem_num;
+              base-&gt;nearest_dist=dist;
+            }
+          }
+          if (base-&gt;flags &amp; BMF_RECORD_EXTENTS) {
+            if (x3&lt;base-&gt;min_x) base-&gt;min_x=x3;
+            if (x3&gt;base-&gt;max_x) base-&gt;max_x=x3;
+            if (y3&lt;base-&gt;min_y) base-&gt;min_y=y3;
+            if (y3&gt;base-&gt;max_y) base-&gt;max_y=y3;
+          }
+          dst=dst2+x3&gt;&gt;3;
+
+          c=color.u1[0];
+          if (dither) {
+            if (probability_dither) {
+              if (RandU2&lt;base-&gt;dither_probability)
+                c=color.u1[4];
+            } else
+              if ((x3^y3)&amp;1)
+                c=color.u1[4];
+          }
+          nobound_switch (color.u1[3]) {
+            case ROPB_CLEAR_MASK_EQU:
+            case ROPB_CLEAR_MASK_TRANSPARENT:
+              if (mask_dst)
+                mask_dst[dst]&amp;=not_bit;
+              goto here1a;
+            case ROPB_EQU:
+            case ROPB_TRANSPARENT:
+              if (mask_dst)
+                mask_dst[dst]|=bit;
+here1a:
+              if (c &amp; 1)
+                *dst|=bit;
+              else
+                *dst&amp;=not_bit;
+              dst+=d;
+              if (c &amp; 2)
+                *dst|=bit;
+              else
+                *dst&amp;=not_bit;
+              dst+=d;
+              if (c &amp; 4)
+                *dst|=bit;
+              else
+                *dst&amp;=not_bit;
+              dst+=d;
+              if (c &amp; 8)
+                *dst|=bit;
+              else
+                *dst&amp;=not_bit;
+              break;
+            case ROPB_COLLISION:
+              c2=0;
+              if (*dst&amp;bit)
+                c2+=1;
+              dst+=d;
+              if (*dst&amp;bit)
+                c2+=2;
+              dst+=d;
+              if (*dst&amp;bit)
+                c2+=4;
+              dst+=d;
+              if (*dst&amp;bit)
+                c2+=8;
+              if (c2!=bkcolor.u1[0])
+                base-&gt;collision_cnt++;
+              break;
+            case ROPB_XOR:
+              if (mask_dst)
+                mask_dst[dst]|=bit;
+              if (c &amp; 1) *dst^=bit;
+              dst+=d;
+              if (c &amp; 2) *dst^=bit;
+              dst+=d;
+              if (c &amp; 4) *dst^=bit;
+              dst+=d;
+              if (c &amp; 8) *dst^=bit;
+              break;
+          }
+          cnt++;
+          x++;
+        } else
+          break;
+      }
+      *x1=x-1;
+      x=x2-1;
+      while (TRUE) {
+        x3=x;
+        if (x3&amp;(FONT_WIDTH-1)==FONT_WIDTH-1) {
+          if (base-&gt;flags &amp; BMF_SCREEN_BITMAP) {
+            if (x3&lt;0) break;
+            x3+=base-&gt;win_task-&gt;win_pixel_left;
+            if (x3&lt;0 || x3&gt;base-&gt;win_task-&gt;win_pixel_right ||
+                x3&gt;=base-&gt;width ||
+                !(base-&gt;flags&amp;BMF_ON_TOP) &amp;&amp;
+                IsPixelCovered(base-&gt;win_task,x3,y3))
+              break;
+          } else
+            if (!(0&lt;=x3&lt;base-&gt;width))
+            break;
+        } else if (base-&gt;flags &amp; BMF_SCREEN_BITMAP)
+          x3+=base-&gt;win_task-&gt;win_pixel_left;
+
+        dst=dst2+x3&gt;&gt;3;
+        bit=1&lt;&lt;(x3&amp;7);
+        not_bit=~bit;
+
+        if (mask_dst)
+          if (!(mask_dst[dst]&amp;bit)) {
+            c=MAX_I4;
+            goto here4a;
+          }
+
+        c=0;
+        if (*dst &amp; bit)
+          c|=1;
+        dst+=d;
+        if (*dst &amp; bit)
+          c|=2;
+        dst+=d;
+        if (*dst &amp; bit)
+          c|=4;
+        dst+=d;
+        if (*dst &amp; bit)
+          c|=8;
+
+here4a:
+        if (db) {
+          db2=db+x3;
+          if (0&lt;=z&lt;=*db2) {
+            *db2=z;
+            plot=TRUE;
+          } else
+            plot=FALSE;
+        } else
+          plot=TRUE;
+
+        if ((not_color &amp;&amp; c!=base-&gt;color2 ||
+            !not_color &amp;&amp; c==base-&gt;color2) &amp;&amp; plot) {
+          if (base-&gt;flags &amp; BMF_LOCATE_NEAREST) {
+            dist=DistI8(x3,y3,base-&gt;cur_x,base-&gt;cur_y);
+            if (dist&lt;=base-&gt;nearest_dist) {
+              base-&gt;nearest_grelem_num=base-&gt;cur_grelem_num;
+              base-&gt;nearest_dist=dist;
+            }
+          }
+          if (base-&gt;flags &amp; BMF_RECORD_EXTENTS) {
+            if (x3&lt;base-&gt;min_x) base-&gt;min_x=x3;
+            if (x3&gt;base-&gt;max_x) base-&gt;max_x=x3;
+            if (y3&lt;base-&gt;min_y) base-&gt;min_y=y3;
+            if (y3&gt;base-&gt;max_y) base-&gt;max_y=y3;
+          }
+          dst=dst2+x3&gt;&gt;3;
+
+          c=color.u1[0];
+          if (dither) {
+            if (probability_dither) {
+              if (RandU2&lt;base-&gt;dither_probability)
+                c=color.u1[4];
+            } else
+              if ((x3^y3)&amp;1)
+                c=color.u1[4];
+          }
+          nobound_switch (color.u1[3]) {
+            case ROPB_CLEAR_MASK_EQU:
+            case ROPB_CLEAR_MASK_TRANSPARENT:
+              if (mask_dst)
+                mask_dst[dst]&amp;=not_bit;
+              goto here2a;
+            case ROPB_EQU:
+            case ROPB_TRANSPARENT:
+              if (mask_dst)
+                mask_dst[dst]|=bit;
+here2a:
+              if (c &amp; 1)
+                *dst|=bit;
+              else
+                *dst&amp;=not_bit;
+              dst+=d;
+              if (c &amp; 2)
+                *dst|=bit;
+              else
+                *dst&amp;=not_bit;
+              dst+=d;
+              if (c &amp; 4)
+                *dst|=bit;
+              else
+                *dst&amp;=not_bit;
+              dst+=d;
+              if (c &amp; 8)
+                *dst|=bit;
+              else
+                *dst&amp;=not_bit;
+              break;
+            case ROPB_COLLISION:
+              c2=0;
+              if (*dst&amp;bit)
+                c2+=1;
+              dst+=d;
+              if (*dst&amp;bit)
+                c2+=2;
+              dst+=d;
+              if (*dst&amp;bit)
+                c2+=4;
+              dst+=d;
+              if (*dst&amp;bit)
+                c2+=8;
+              if (c2!=bkcolor.u1[0])
+                base-&gt;collision_cnt++;
+              break;
+            case ROPB_XOR:
+              if (mask_dst)
+                mask_dst[dst]|=bit;
+              if (c &amp; 1) *dst^=bit;
+              dst+=d;
+              if (c &amp; 2) *dst^=bit;
+              dst+=d;
+              if (c &amp; 4) *dst^=bit;
+              dst+=d;
+              if (c &amp; 8) *dst^=bit;
+              break;
+          }
+          cnt++;
+          x--;
+        } else
+          break;
+      }
+      return cnt;
+    case BMT_MONO:
+      if (mask=base-&gt;mask)
+        if (mask-&gt;alias)
+          mask-&gt;alias-&gt;flags|=BMF_DIRTY;
+      while (TRUE) {
+        x3=x;
+        if (!(x3&amp;(FONT_WIDTH-1))) {
+          if (base-&gt;flags &amp; BMF_SCREEN_BITMAP) {
+            if (x3&lt;0) break;
+            x3+=base-&gt;win_task-&gt;win_pixel_left;
+            if (x3&lt;0 || x3&gt;base-&gt;win_task-&gt;win_pixel_right ||
+                x3&gt;=base-&gt;width ||
+                !(base-&gt;flags&amp;BMF_ON_TOP) &amp;&amp;
+                IsPixelCovered(base-&gt;win_task,x3,y3))
+              break;
+          } else
+            if (!(0&lt;=x3&lt;base-&gt;width))
+            break;
+        } else if (base-&gt;flags &amp; BMF_SCREEN_BITMAP)
+          x3+=base-&gt;win_task-&gt;win_pixel_left;
+        c=Bt(base-&gt;body,d+x3);
+        if (mask)
+          if (!Bt(mask-&gt;body,d+x3))
+            c=MAX_I4;
+
+        if (db) {
+          db2=db+x3;
+          if (0&lt;=z&lt;=*db2) {
+            *db2=z;
+            plot=TRUE;
+          } else
+            plot=FALSE;
+        } else
+          plot=TRUE;
+
+        if ((not_color &amp;&amp; c!=base-&gt;color2 ||
+            !not_color &amp;&amp; c==base-&gt;color2) &amp;&amp; plot) {
+          if (base-&gt;flags &amp; BMF_LOCATE_NEAREST) {
+            dist=DistI8(x3,y3,base-&gt;cur_x,base-&gt;cur_y);
+            if (dist&lt;=base-&gt;nearest_dist) {
+              base-&gt;nearest_grelem_num=base-&gt;cur_grelem_num;
+              base-&gt;nearest_dist=dist;
+            }
+          }
+          if (base-&gt;flags &amp; BMF_RECORD_EXTENTS) {
+            if (x3&lt;base-&gt;min_x) base-&gt;min_x=x3;
+            if (x3&gt;base-&gt;max_x) base-&gt;max_x=x3;
+            if (y3&lt;base-&gt;min_y) base-&gt;min_y=y3;
+            if (y3&gt;base-&gt;max_y) base-&gt;max_y=y3;
+          }
+          c=color.u1[0];
+          if (dither) {
+            if (probability_dither) {
+              if (RandU2&lt;base-&gt;dither_probability)
+                c=color.u1[4];
+            } else
+              if ((x3^y3)&amp;1)
+                c=color.u1[4];
+          }
+          nobound_switch (color.u1[3]) {
+            case ROPB_CLEAR_MASK_EQU:
+            case ROPB_CLEAR_MASK_TRANSPARENT:
+              BEqu(base-&gt;body,d+x3,c);
+              if (mask)
+                Btr(mask-&gt;body,d+x3);
+              break;
+            case ROPB_EQU:
+            case ROPB_TRANSPARENT:
+              BEqu(base-&gt;body,d+x3,c);
+              if (mask)
+                Bts(mask-&gt;body,d+x3);
+              break;
+            case ROPB_COLLISION:
+              if (c) {
+                if (bkcolor&amp;0xFFFFFF00FFFFFF)
+                  base-&gt;collision_cnt+=Bt(base-&gt;body,d+x3);
+                else
+                  base-&gt;collision_cnt+=!Bt(base-&gt;body,d+x3);
+              } else {
+                if (bkcolor&amp;0xFFFFFF00FFFFFF)
+                  base-&gt;collision_cnt+=!Bt(base-&gt;body,d+x3);
+                else
+                  base-&gt;collision_cnt+=Bt(base-&gt;body,d+x3);
+              }
+              break;
+            case ROPB_XOR:
+              if (c)
+                Btc(base-&gt;body,d+x3);
+              if (mask)
+                Bts(mask-&gt;body,d+x3);
+              break;
+          }
+          cnt++;
+          x++;
+        } else
+          break;
+      }
+      *x1=x-1;
+      x=x2-1;
+      while (TRUE) {
+        x3=x;
+        if (x3&amp;(FONT_WIDTH-1)==FONT_WIDTH-1) {
+          if (base-&gt;flags &amp; BMF_SCREEN_BITMAP) {
+            if (x3&lt;0) break;
+            x3+=base-&gt;win_task-&gt;win_pixel_left;
+            if (x3&lt;0 || x3&gt;base-&gt;win_task-&gt;win_pixel_right ||
+                x3&gt;=base-&gt;width ||
+                !(base-&gt;flags&amp;BMF_ON_TOP) &amp;&amp;
+                IsPixelCovered(base-&gt;win_task,x3,y3))
+              break;
+          } else
+            if (!(0&lt;=x3&lt;base-&gt;width) )
+            break;
+        } else if (base-&gt;flags &amp; BMF_SCREEN_BITMAP)
+          x3+=base-&gt;win_task-&gt;win_pixel_left;
+
+        c=Bt(base-&gt;body,d+x3);
+        if (mask)
+          if (!Bt(mask-&gt;body,d+x3))
+            c=MAX_I4;
+
+        if (db) {
+          db2=db+x3;
+          if (0&lt;=z&lt;=*db2) {
+            *db2=z;
+            plot=TRUE;
+          } else
+            plot=FALSE;
+        } else
+          plot=TRUE;
+
+        if ((not_color &amp;&amp; c!=base-&gt;color2 ||
+            !not_color &amp;&amp; c==base-&gt;color2) &amp;&amp; plot) {
+          if (base-&gt;flags &amp; BMF_LOCATE_NEAREST) {
+            dist=DistI8(x3,y3,base-&gt;cur_x,base-&gt;cur_y);
+            if (dist&lt;=base-&gt;nearest_dist) {
+              base-&gt;nearest_grelem_num=base-&gt;cur_grelem_num;
+              base-&gt;nearest_dist=dist;
+            }
+          }
+          if (base-&gt;flags &amp; BMF_RECORD_EXTENTS) {
+            if (x3&lt;base-&gt;min_x) base-&gt;min_x=x3;
+            if (x3&gt;base-&gt;max_x) base-&gt;max_x=x3;
+            if (y3&lt;base-&gt;min_y) base-&gt;min_y=y3;
+            if (y3&gt;base-&gt;max_y) base-&gt;max_y=y3;
+          }
+          c=color.u1[0];
+          if (dither) {
+            if (probability_dither) {
+              if (RandU2&lt;base-&gt;dither_probability)
+                c=color.u1[4];
+            } else
+              if ((x3^y3)&amp;1)
+                c=color.u1[4];
+          }
+          nobound_switch (color.u1[3]) {
+            case ROPB_CLEAR_MASK_EQU:
+            case ROPB_CLEAR_MASK_TRANSPARENT:
+              BEqu(base-&gt;body,d+x3,c);
+              if (mask)
+                Btr(mask-&gt;body,d+x3);
+              break;
+            case ROPB_EQU:
+            case ROPB_TRANSPARENT:
+              BEqu(base-&gt;body,d+x3,c);
+              if (mask)
+                Bts(mask-&gt;body,d+x3);
+              break;
+            case ROPB_COLLISION:
+              if (c) {
+                if (bkcolor&amp;0xFFFFFF00FFFFFF)
+                  base-&gt;collision_cnt+=Bt(base-&gt;body,d+x3);
+                else
+                  base-&gt;collision_cnt+=!Bt(base-&gt;body,d+x3);
+              } else {
+                if (bkcolor&amp;0xFFFFFF00FFFFFF)
+                  base-&gt;collision_cnt+=!Bt(base-&gt;body,d+x3);
+                else
+                  base-&gt;collision_cnt+=Bt(base-&gt;body,d+x3);
+              }
+              break;
+            case ROPB_XOR:
+              if (c)
+                Btc(base-&gt;body,d+x3);
+              if (mask)
+                Bts(mask-&gt;body,d+x3);
+              break;
+          }
+          cnt++;
+          x--;
+        } else
+          break;
+      }
+      return cnt;
+  }
+gr_done:
+return 0;
+}
+
+public I8 GrHLine(GrBitMap *base,I8 x1,I8 x2,I8 y,I8 z1=0,I8 z2=0)
+{  //No transformation or pen width
+  I8 dx,dz,z,cnt=0,i,j,_x1=x1,_x2=x2,_y=y,_z1=z1,_z2=z2,dist;
+  U8 d,dd,c,c2,bit,not_bit;
+  U1 *dst;
+  U8 color=base-&gt;color,bkcolor=base-&gt;bkcolor,dither_colors;
+  I4 *db;
+  BoolI1 plot=TRUE,char_clear,dither,probability_dither;
+  GrBitMap *mask;
+
+  if (base-&gt;flags &amp; BMF_RECORD_EXTENTS) {
+    if (x1&lt;base-&gt;min_x) base-&gt;min_x=x1;
+    if (x1&gt;base-&gt;max_x) base-&gt;max_x=x1;
+    if (x2&lt;base-&gt;min_x) base-&gt;min_x=x2;
+    if (x2&gt;base-&gt;max_x) base-&gt;max_x=x2;
+    if (y&lt;base-&gt;min_y) base-&gt;min_y=y;
+    if (y&gt;base-&gt;max_y) base-&gt;max_y=y;
+  }
+  if (y&lt;0) goto gr_done;
+  if (x2&lt;x1) {
+    SwapU8(&amp;x1,&amp;x2);
+    SwapU8(&amp;z1,&amp;z2);
+  }
+  if (x2&lt;0)
+    goto gr_done;
+  if (x1&lt;0) {
+    i=-x1;
+    x1=0;
+  } else
+    i=0;
+  j=0;
+  if (base-&gt;flags &amp; BMF_SCREEN_BITMAP) {
+    x1+=base-&gt;win_task-&gt;win_pixel_left;
+    x2+=base-&gt;win_task-&gt;win_pixel_left;
+    if (x1&gt;base-&gt;win_task-&gt;win_pixel_right)
+      goto gr_done;
+    if (x2&gt;base-&gt;win_task-&gt;win_pixel_right) {
+      j=x2-base-&gt;win_task-&gt;win_pixel_right;
+      x2=base-&gt;win_task-&gt;win_pixel_right;
+    }
+    y+=base-&gt;win_task-&gt;win_pixel_top;
+    if (y&gt;base-&gt;win_task-&gt;win_pixel_bottom ||
+        y&lt;0 ||
+        x2&lt;0)
+      goto gr_done;
+  }
+  if (x1&gt;=base-&gt;width || y&gt;=base-&gt;height)
+    goto gr_done;
+  dx=x2+j-(x1-i);
+  d=base-&gt;width_internal*y+x1;
+  if (db=base-&gt;depth_buffer) {
+    db+=d;
+    if (dx)
+      dz=(z2-z1)&lt;&lt;32/dx;
+    else
+      dz=0;
+    z=z1&lt;&lt;32;
+  }
+  if (i)
+    z+=i*dz;
+  if (x2&gt;=base-&gt;width)
+    x2=base-&gt;width-1;
+
+  dd=base-&gt;plane_size;
+
+  if (base-&gt;flags &amp; BMF_LOCATE_NEAREST) {
+    if (x1&lt;=base-&gt;cur_x&lt;=x2)
+      dist=0;
+    else if (base-&gt;cur_x&lt;x1)
+      dist=SqrI8(x1-base-&gt;cur_x);
+    else
+      dist=SqrI8(base-&gt;cur_x-x2);
+    dist+=SqrI8(y-base-&gt;cur_y);
+    if (dist&lt;=base-&gt;nearest_dist) {
+      base-&gt;nearest_grelem_num=base-&gt;cur_grelem_num;
+      base-&gt;nearest_dist=dist;
+    }
+  }
+  if (base-&gt;flags &amp; BMF_DONT_DRAW)
+    goto gr_done;
+
+  if (base-&gt;win_task-&gt;next_task==sys_winmgr_task ||
+      base-&gt;flags&amp;BMF_ON_TOP ||
+      !IsPixelCovered(base-&gt;win_task,x1,y))
+    char_clear=TRUE;
+  else
+    char_clear=FALSE;
+  if (color&amp;(ROP_DITHER|ROP_PROBABILITY_DITHER)) {
+    dither=TRUE;
+    if (color&amp;ROP_PROBABILITY_DITHER) {
+      probability_dither=TRUE;
+      color.u1[7]=color.u1[3];
+      dither_colors=color;
+      if (RandU2&lt;base-&gt;dither_probability)
+        color.u4[0]=dither_colors.u4[1];
+      else
+        color.u4[0]=dither_colors.u4[0];
+    } else {
+      probability_dither=FALSE;
+      color.u1[7]=color.u1[3];
+      if ((x1^y)&amp;1)
+        SwapU4(&amp;color.u4[0],&amp;color.u4[1]);
+    }
+  } else
+    dither=FALSE;
+  while (x1&lt;=x2) {
+    if (char_clear) {
+      if (db) {
+        if (0&lt;=z.i4[1]&lt;=*db) {
+          *db=z.i4[1];
+          plot=TRUE;
+        } else
+          plot=FALSE;
+      }
+      if (plot) {
+        nobound_switch (base-&gt;type) {
+          case BMT_COLOR4:
+            dst=base-&gt;body+d&gt;&gt;3;
+            bit=1&lt;&lt;(x1&amp;7);
+            not_bit=~bit;
+            c=color.u1[0];
+            nobound_switch (color.u1[3]) {
+              case ROPB_EQU:
+              case ROPB_CLEAR_MASK_EQU:
+              case ROPB_CLEAR_MASK_TRANSPARENT:
+              case ROPB_TRANSPARENT:
+                if (c &amp; 1)
+                  *dst|=bit;
+                else
+                  *dst&amp;=not_bit;
+                dst+=dd;
+                if (c &amp; 2)
+                  *dst|=bit;
+                else
+                  *dst&amp;=not_bit;
+                dst+=dd;
+                if (c &amp; 4)
+                  *dst|=bit;
+                else
+                  *dst&amp;=not_bit;
+                dst+=dd;
+                if (c &amp; 8)
+                  *dst|=bit;
+                else
+                  *dst&amp;=not_bit;
+                break;
+              case ROPB_COLLISION:
+                c2=0;
+                if (*dst&amp;bit)
+                  c2+=1;
+                dst+=dd;
+                if (*dst&amp;bit)
+                  c2+=2;
+                dst+=dd;
+                if (*dst&amp;bit)
+                  c2+=4;
+                dst+=dd;
+                if (*dst&amp;bit)
+                  c2+=8;
+                if (c2!=bkcolor.u1[0])
+                  base-&gt;collision_cnt++;
+                break;
+              case ROPB_XOR:
+                if (c &amp; 1) *dst^=bit;
+                dst+=dd;
+                if (c &amp; 2) *dst^=bit;
+                dst+=dd;
+                if (c &amp; 4) *dst^=bit;
+                dst+=dd;
+                if (c &amp; 8) *dst^=bit;
+                break;
+            }
+            break;
+          case BMT_MONO:
+            c=color&amp;0xFFFFFF;
+            nobound_switch (color.u1[3]) {
+              case ROPB_EQU:
+              case ROPB_CLEAR_MASK_EQU:
+              case ROPB_CLEAR_MASK_TRANSPARENT:
+              case ROPB_TRANSPARENT:
+                BEqu(base-&gt;body,d,c);
+                break;
+              case ROPB_COLLISION:
+                if (c) {
+                  if (bkcolor&amp;0xFFFFFF00FFFFFF)
+                    base-&gt;collision_cnt+=Bt(base-&gt;body,d);
+                  else
+                    base-&gt;collision_cnt+=!Bt(base-&gt;body,d);
+                } else {
+                  if (bkcolor&amp;0xFFFFFF00FFFFFF)
+                    base-&gt;collision_cnt+=!Bt(base-&gt;body,d);
+                  else
+                    base-&gt;collision_cnt+=Bt(base-&gt;body,d);
+                }
+                break;
+              case ROPB_XOR:
+                if (c)
+                  Btc(base-&gt;body,d);
+                break;
+            }
+            break;
+        }
+        cnt++;
+      }
+    }
+    if (dither) {
+      if (probability_dither) {
+        if (RandU2&lt;base-&gt;dither_probability)
+          color.u4[0]=dither_colors.u4[1];
+        else
+          color.u4[0]=dither_colors.u4[0];
+      } else
+        SwapU4(&amp;color.u4[0],&amp;color.u4[1]);
+    }
+    d++;
+    x1++;
+    if (db)
+      db++;
+    z+=dz;
+    if (!(x1&amp;(FONT_WIDTH-1)) &amp;&amp; x1&lt;=x2) {
+      if (base-&gt;win_task-&gt;next_task==sys_winmgr_task ||
+          base-&gt;flags&amp;BMF_ON_TOP ||
+          !IsPixelCovered(base-&gt;win_task,x1,y))
+        char_clear=TRUE;
+      else
+        char_clear=FALSE;
+    }
+  }
+  if (mask=base-&gt;mask) {
+    mask-&gt;brush=base-&gt;brush;
+    mask-&gt;color=WHITE;
+    if (base-&gt;color.u1[3]==ROPB_CLEAR_MASK_EQU)
+      mask-&gt;color=ROPB_EQU+BLACK;
+    else if (base-&gt;color.u1[3]==ROPB_CLEAR_MASK_TRANSPARENT)
+      mask-&gt;color=ROPB_TRANSPARENT+BLACK;
+    else
+      mask-&gt;color.u1[3]=base-&gt;color.u1[3];
+    mask-&gt;win_task=base-&gt;win_task;
+    if (mask-&gt;alias)
+      mask-&gt;alias-&gt;flags|=BMF_DIRTY;
+    GrHLine(mask,_x1,_x2,_y,_z1,_z2);
+  }
+gr_done:
+return cnt;
+}
+</pre><div class="archive-note">Historical capture: 2010-01-31. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head></html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

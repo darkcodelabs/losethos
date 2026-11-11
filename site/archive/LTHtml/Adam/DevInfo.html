@@ -1,0 +1,368 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>DevInfo</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V8.00" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cF5">                               <a href="/archive/LTHtml/Doc/TrivialSolutions.html">Trivial Solutions</a>
+                    <a href="/archive/index.html">The LoseThos 64-bit PC Operating System</a>
+File:/LT/Adam/DevInfo.APZ
+This, and all LoseThos files, are public domain.  Do whatever you like.
+God is watching; God is just; God is never out-done in generosity.  He talks!
+
+LoseThos code compiles with the 64-bit LoseThos compiler/assembler I wrote.
+Boot the LoseThos CD and you can compile it.  Not in Kansas anymore!
+
+<a href="/archive/LTHtml/Demo/Lectures/FixedPoint.html">Click here for preliminary compiler information you need.</a>
+
+</span><a name="l1"></a><span class="cF0">#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"PCI;Processor;Device;Info"</span><span class="cF0">
+<a name="l2"></a>
+<a name="l3"></a></span><span class="cF2">//The file was downloaded from</span><span class="cF0">
+<a name="l4"></a></span><span class="cF2">//http://www.pcidatabase.com/reports.php?type=tab-delimeted</span><span class="cF0">
+<a name="l5"></a>
+<a name="l6"></a>#</span><span class="cF1">define</span><span class="cF0"> PCI_DEV_FILE </span><span class="cF6">"::/LT/Misc/PCIDevices.TXZ"</span><span class="cF0">
+<a name="l7"></a>
+<a name="l8"></a></span><span class="cF2">/****</span><span class="cF0">
+<a name="l9"></a></span><span class="cF2">public U0 PCIDevFileGen()</span><span class="cF0">
+<a name="l10"></a></span><span class="cF2">{</span><span class="cF0">
+<a name="l11"></a></span><span class="cF2">  BoolI8 first=TRUE,del=FALSE,del2=FALSE,cont=FALSE;</span><span class="cF0">
+<a name="l12"></a></span><span class="cF2">  Ltf *l=LtfRead(PCI_DEV_FILE,LTFF_PLAIN_TEXT|LTFF_DBL_DOLLARS);</span><span class="cF0">
+<a name="l13"></a></span><span class="cF2">  LtfEntry *ll=l-&gt;root.next,*ll2;</span><span class="cF0">
+<a name="l14"></a></span><span class="cF2">  while (ll!=l) {</span><span class="cF0">
+<a name="l15"></a></span><span class="cF2">    ll2=ll-&gt;next;</span><span class="cF0">
+<a name="l16"></a></span><span class="cF2">    if (first) {</span><span class="cF0">
+<a name="l17"></a></span><span class="cF2">      if (ll-&gt;type_u8==LTFT_TEXT) {</span><span class="cF0">
+<a name="l18"></a>        </span><span class="cF2">if (ll-&gt;tag[0]==';')</span><span class="cF0">
+<a name="l19"></a>        </span><span class="cF2">  del=TRUE;</span><span class="cF0">
+<a name="l20"></a></span><span class="cF2">      }</span><span class="cF0">
+<a name="l21"></a></span><span class="cF2">      first=FALSE;</span><span class="cF0">
+<a name="l22"></a></span><span class="cF2">    }</span><span class="cF0">
+<a name="l23"></a></span><span class="cF2">    if (ll-&gt;type_u8==LTFT_TEXT &amp;&amp; ll-&gt;tag[StrLen(ll-&gt;tag)-1]=='=' &amp;&amp;</span><span class="cF0">
+<a name="l24"></a>        </span><span class="cF2">ll2-&gt;type_u8==LTFT_NEW_LINE) {</span><span class="cF0">
+<a name="l25"></a></span><span class="cF2">      ll-&gt;tag[StrLen(ll-&gt;tag)-1]=CH_SPACE;</span><span class="cF0">
+<a name="l26"></a></span><span class="cF2">      cont=TRUE;</span><span class="cF0">
+<a name="l27"></a></span><span class="cF2">    }</span><span class="cF0">
+<a name="l28"></a></span><span class="cF2">    del2=del;</span><span class="cF0">
+<a name="l29"></a></span><span class="cF2">    if (ll-&gt;type_u8==LTFT_NEW_LINE) {</span><span class="cF0">
+<a name="l30"></a></span><span class="cF2">      first=TRUE;</span><span class="cF0">
+<a name="l31"></a></span><span class="cF2">      del2=FALSE;</span><span class="cF0">
+<a name="l32"></a></span><span class="cF2">      if (cont) {</span><span class="cF0">
+<a name="l33"></a>        </span><span class="cF2">del=TRUE;</span><span class="cF0">
+<a name="l34"></a>        </span><span class="cF2">cont=FALSE;</span><span class="cF0">
+<a name="l35"></a></span><span class="cF2">      }</span><span class="cF0">
+<a name="l36"></a></span><span class="cF2">    }</span><span class="cF0">
+<a name="l37"></a></span><span class="cF2">    if (del)</span><span class="cF0">
+<a name="l38"></a></span><span class="cF2">      LtfEntryDel(l,ll);</span><span class="cF0">
+<a name="l39"></a></span><span class="cF2">    del=del2;</span><span class="cF0">
+<a name="l40"></a></span><span class="cF2">    ll=ll2;</span><span class="cF0">
+<a name="l41"></a></span><span class="cF2">  }</span><span class="cF0">
+<a name="l42"></a></span><span class="cF2">  LtfWrite(l);</span><span class="cF0">
+<a name="l43"></a></span><span class="cF2">}</span><span class="cF0">
+<a name="l44"></a></span><span class="cF2">****/</span><span class="cF0">
+<a name="l45"></a>
+<a name="l46"></a></span><span class="cF2">//</span><a href="https://web.archive.org/web/20120302232100/http://www.losethos.com/LTHtml/Misc/PCIDevices.html"><span class="cF4">::/LT/Misc/PCIDevices.TXZ</span></a><span class="cF0">
+<a name="l47"></a></span><span class="cF1">U0</span><span class="cF0"> PCILookUpSingle(Ltf *l,</span><span class="cF1">I64</span><span class="cF0"> m,</span><span class="cF1">I64</span><span class="cF0"> d,</span><span class="cF1">U8</span><span class="cF0"> **_vendor,</span><span class="cF1">U8</span><span class="cF0"> **_dev)
+<a name="l48"></a>{
+<a name="l49"></a>  BoolI8 first=TRUE;
+<a name="l50"></a>  </span><span class="cF1">U8</span><span class="cF0"> buf[8],*vendor=NULL,*dev=NULL;
+<a name="l51"></a>  LtfEntry *ll=l-&gt;root.next;
+<a name="l52"></a>  </span><span class="cF1">while</span><span class="cF0"> (ll!=l) </span><span class="cF7">{</span><span class="cF0">
+<a name="l53"></a>    </span><span class="cF1">if</span><span class="cF0"> (first) {
+<a name="l54"></a>      </span><span class="cF1">if</span><span class="cF0"> (ll-&gt;type_u8==LTFT_TEXT &amp;&amp; ll-&gt;tag[0]!=</span><span class="cF6">';'</span><span class="cF0"> &amp;&amp; StrLen</span><span class="cF7">(</span><span class="cF0">ll-&gt;tag</span><span class="cF7">)</span><span class="cF0">&gt;=4) </span><span class="cF7">{</span><span class="cF0">
+<a name="l55"></a>        buf[0]=</span><span class="cF6">'0'</span><span class="cF0">;
+<a name="l56"></a>        buf[1]=</span><span class="cF6">'x'</span><span class="cF0">;
+<a name="l57"></a>        buf[2]=ll-&gt;tag[0];
+<a name="l58"></a>        buf[3]=ll-&gt;tag[1];
+<a name="l59"></a>        buf[4]=ll-&gt;tag[2];
+<a name="l60"></a>        buf[5]=ll-&gt;tag[3];
+<a name="l61"></a>        buf[6]=0;
+<a name="l62"></a>        </span><span class="cF1">if</span><span class="cF0"> (A2I</span><span class="cF7">(</span><span class="cF0">buf</span><span class="cF7">)</span><span class="cF0">==m) {
+<a name="l63"></a>          ll=ll-&gt;next-&gt;next;
+<a name="l64"></a>          </span><span class="cF1">if</span><span class="cF0"> (ll-&gt;type_u8==LTFT_TEXT) </span><span class="cF7">{</span><span class="cF0">
+<a name="l65"></a>            vendor=AStrNew(ll-&gt;tag);
+<a name="l66"></a>            first=FALSE;
+<a name="l67"></a>            </span><span class="cF1">break</span><span class="cF0">;
+<a name="l68"></a>          </span><span class="cF7">}</span><span class="cF0">
+<a name="l69"></a>        }
+<a name="l70"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l71"></a>      first=FALSE;
+<a name="l72"></a>    }
+<a name="l73"></a>    </span><span class="cF1">if</span><span class="cF0"> (ll-&gt;type_u8==LTFT_NEW_LINE)
+<a name="l74"></a>      first=TRUE;
+<a name="l75"></a>    ll=ll-&gt;next;
+<a name="l76"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l77"></a>
+<a name="l78"></a>  </span><span class="cF1">if</span><span class="cF0"> (vendor) </span><span class="cF7">{</span><span class="cF0">
+<a name="l79"></a>    </span><span class="cF1">while</span><span class="cF0"> (ll!=l) {
+<a name="l80"></a>      </span><span class="cF1">if</span><span class="cF0"> (first) </span><span class="cF7">{</span><span class="cF0">
+<a name="l81"></a>        </span><span class="cF1">if</span><span class="cF0"> (ll-&gt;type_u8==LTFT_TAB) {
+<a name="l82"></a>          ll=ll-&gt;next;
+<a name="l83"></a>          </span><span class="cF1">if</span><span class="cF0"> (ll-&gt;type_u8==LTFT_TEXT &amp;&amp; StrLen</span><span class="cF7">(</span><span class="cF0">ll-&gt;tag</span><span class="cF7">)</span><span class="cF0">&gt;=4) </span><span class="cF7">{</span><span class="cF0">
+<a name="l84"></a>            buf[0]=</span><span class="cF6">'0'</span><span class="cF0">;
+<a name="l85"></a>            buf[1]=</span><span class="cF6">'x'</span><span class="cF0">;
+<a name="l86"></a>            buf[2]=ll-&gt;tag[0];
+<a name="l87"></a>            buf[3]=ll-&gt;tag[1];
+<a name="l88"></a>            buf[4]=ll-&gt;tag[2];
+<a name="l89"></a>            buf[5]=ll-&gt;tag[3];
+<a name="l90"></a>            buf[6]=0;
+<a name="l91"></a>            </span><span class="cF1">if</span><span class="cF0"> (A2I</span><span class="cF7">(</span><span class="cF0">buf</span><span class="cF7">)</span><span class="cF0">==d) {
+<a name="l92"></a>              ll=ll-&gt;next-&gt;next;
+<a name="l93"></a>              </span><span class="cF1">if</span><span class="cF0"> (ll-&gt;type_u8==LTFT_TEXT) </span><span class="cF7">{</span><span class="cF0">
+<a name="l94"></a>                dev=AStrNew(ll-&gt;tag);
+<a name="l95"></a>                </span><span class="cF1">break</span><span class="cF0">;
+<a name="l96"></a>              </span><span class="cF7">}</span><span class="cF0">
+<a name="l97"></a>            }
+<a name="l98"></a>          </span><span class="cF7">}</span><span class="cF0">
+<a name="l99"></a>        } </span><span class="cF1">else</span><span class="cF0">
+<a name="l100"></a>          </span><span class="cF1">break</span><span class="cF0">;
+<a name="l101"></a>        first=FALSE;
+<a name="l102"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l103"></a>      </span><span class="cF1">if</span><span class="cF0"> (ll-&gt;type_u8==LTFT_NEW_LINE)
+<a name="l104"></a>        first=TRUE;
+<a name="l105"></a>      ll=ll-&gt;next;
+<a name="l106"></a>    }
+<a name="l107"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l108"></a>
+<a name="l109"></a>  </span><span class="cF1">if</span><span class="cF0"> (vendor)
+<a name="l110"></a>    *_vendor=vendor;
+<a name="l111"></a>  </span><span class="cF1">else</span><span class="cF0">
+<a name="l112"></a>    *_vendor=AStrNew(</span><span class="cF6">"Unknown"</span><span class="cF0">);
+<a name="l113"></a>
+<a name="l114"></a>  </span><span class="cF1">if</span><span class="cF0"> (dev)
+<a name="l115"></a>    *_dev=dev;
+<a name="l116"></a>  </span><span class="cF1">else</span><span class="cF0">
+<a name="l117"></a>    *_dev=AStrNew(</span><span class="cF6">"Unknown"</span><span class="cF0">);
+<a name="l118"></a>}
+<a name="l119"></a>
+<a name="l120"></a></span><span class="cF1">U0</span><span class="cF0"> PCILookUpDevs()
+<a name="l121"></a>{
+<a name="l122"></a>  PCIDevStruct *temppci;
+<a name="l123"></a>  </span><span class="cF1">U16</span><span class="cF0"> w1,w2;
+<a name="l124"></a>  </span><span class="cF1">I64</span><span class="cF0"> b,d,f,timeout=32*8*2;
+<a name="l125"></a>  Ltf *l;
+<a name="l126"></a>  </span><span class="cF1">if</span><span class="cF0"> (sys_pci_dev_root.next!=&amp;sys_pci_dev_root)
+<a name="l127"></a>    </span><span class="cF1">return</span><span class="cF0">;
+<a name="l128"></a>  l=LtfRead(PCI_DEV_FILE,LTFF_PLAIN_TEXT);
+<a name="l129"></a>  </span><span class="cF1">for</span><span class="cF0"> (b=0;b&lt;sys_pci_busses;b++)
+<a name="l130"></a>    </span><span class="cF1">for</span><span class="cF0"> (d=0;d&lt;32;d++)
+<a name="l131"></a>      </span><span class="cF1">for</span><span class="cF0"> (f=0;f&lt;8;f++) </span><span class="cF7">{</span><span class="cF0">
+<a name="l132"></a>        w1=PCIReadU16(b,d,f,0);
+<a name="l133"></a>        </span><span class="cF1">if</span><span class="cF0"> (w1!=0xFFFF) {
+<a name="l134"></a>          temppci=ACAlloc(</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF0">PCIDevStruct</span><span class="cF7">)</span><span class="cF0">);
+<a name="l135"></a>          temppci-&gt;bus=b;
+<a name="l136"></a>          temppci-&gt;dev=d;
+<a name="l137"></a>          temppci-&gt;fun=f;
+<a name="l138"></a>          temppci-&gt;vendor=w1;
+<a name="l139"></a>          temppci-&gt;dev_id=w2=PCIReadU16(b,d,f,2);
+<a name="l140"></a>          temppci-&gt;sub_code=PCIReadU8(b,d,f,0xA);
+<a name="l141"></a>          temppci-&gt;base_code=PCIReadU8(b,d,f,0xB);
+<a name="l142"></a>          PCILookUpSingle(l,w1,w2,&amp;temppci-&gt;vendor_str,&amp;temppci-&gt;dev_id_str);
+<a name="l143"></a>          InsQue(temppci,sys_pci_dev_root.last);
+<a name="l144"></a>          timeout=32*8*2;
+<a name="l145"></a>        } </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF1">if</span><span class="cF0"> (sys_pci_busses==256 &amp;&amp; --timeout&lt;=0)
+<a name="l146"></a>          </span><span class="cF1">goto</span><span class="cF0"> lud_done;
+<a name="l147"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l148"></a>lud_done:
+<a name="l149"></a>  LtfDel(l);
+<a name="l150"></a>}
+<a name="l151"></a>
+<a name="l152"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">U0</span><span class="cF0"> PCIRep()
+<a name="l153"></a>{
+<a name="l154"></a>  PCIDevStruct *temppci;
+<a name="l155"></a>  </span><span class="cF6">"PCI Busses:%d\n"</span><span class="cF0">,sys_pci_busses;
+<a name="l156"></a>  </span><span class="cF1">if</span><span class="cF0"> (!FileFind</span><span class="cF7">(</span><span class="cF0">PCI_DEV_FILE</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF7">{</span><span class="cF0">
+<a name="l157"></a>    </span><span class="cF6">"You don't have the PCI device file.\n"</span><span class="cF0">;
+<a name="l158"></a>    </span><span class="cF1">return</span><span class="cF0">;
+<a name="l159"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l160"></a>  PCILookUpDevs;
+<a name="l161"></a>  temppci=sys_pci_dev_root.next;
+<a name="l162"></a>  </span><span class="cF1">while</span><span class="cF0"> (temppci!=&amp;sys_pci_dev_root) </span><span class="cF7">{</span><span class="cF0">
+<a name="l163"></a>    </span><span class="cF6">"%02X:%02X:%01X %02X%02X $FG,GREEN$%s $FG,CYAN$%s$FG$\n"</span><span class="cF0">,
+<a name="l164"></a>      temppci-&gt;bus,temppci-&gt;dev,temppci-&gt;fun,
+<a name="l165"></a>      temppci-&gt;base_code,temppci-&gt;sub_code,
+<a name="l166"></a>      temppci-&gt;vendor_str,temppci-&gt;dev_id_str;
+<a name="l167"></a>    temppci=temppci-&gt;next;
+<a name="l168"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l169"></a>}
+<a name="l170"></a>
+<a name="l171"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Info;Time/CPU Cycles"</span><span class="cF0">
+<a name="l172"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">U0</span><span class="cF0"> CPURep()
+<a name="l173"></a>{
+<a name="l174"></a>  </span><span class="cF6">"%d Cores %6h?nHz\n"</span><span class="cF0">,mp_cnt,ToF64(time_stamp_freq);
+<a name="l175"></a>}
+<a name="l176"></a>
+<a name="l177"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"PCI;Info;File/System/Hardware;Device"</span><span class="cF0">
+<a name="l178"></a></span><span class="cF1">U0</span><span class="cF0"> ATARepEntry(</span><span class="cF1">I64</span><span class="cF0"> base0,</span><span class="cF1">I64</span><span class="cF0"> base1,</span><span class="cF1">I64</span><span class="cF0"> unit,</span><span class="cF1">I64</span><span class="cF0"> irq,</span><span class="cF1">U8</span><span class="cF0"> *msg,ATARepStruct **root,</span><span class="cF1">I64</span><span class="cF0"> *num_hints)
+<a name="l179"></a>{
+<a name="l180"></a>  </span><span class="cF1">I64</span><span class="cF0"> type;
+<a name="l181"></a>  base0&amp;=-8;
+<a name="l182"></a>  base1&amp;=-4;
+<a name="l183"></a>  ATARepStruct *tempha;
+<a name="l184"></a>  </span><span class="cF1">if</span><span class="cF0"> (type=ATAProbe</span><span class="cF7">(</span><span class="cF0">base0,base1,unit</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF7">{</span><span class="cF0">
+<a name="l185"></a>    *num_hints+=1;
+<a name="l186"></a>    </span><span class="cF6">"\n\n$FG,PURPLE$ $BT-LE+LM+X,\"%d\",\"%d\\r\"$$FG$$LM,4$"</span><span class="cF0">,*num_hints,*num_hints;
+<a name="l187"></a>    </span><span class="cF1">if</span><span class="cF0"> (type==LTBDT_ATA)
+<a name="l188"></a>      </span><span class="cF6">"$FG,RED$ATA   "</span><span class="cF0">;
+<a name="l189"></a>    </span><span class="cF1">else</span><span class="cF0">
+<a name="l190"></a>      </span><span class="cF6">"$FG,RED$ATAPI "</span><span class="cF0">;
+<a name="l191"></a>    </span><span class="cF6">"$FG,LTBLUE$%s$FG$\nBase0: 0x%04X\nBase1: 0x%04X\nIrq: 0x%02X Unit:%d$LM,0$\n"</span><span class="cF0">,msg,base0,base1,irq,unit;
+<a name="l192"></a>    </span><span class="cF1">if</span><span class="cF0"> (root) {
+<a name="l193"></a>      tempha=CAlloc(</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF0">ATARepStruct</span><span class="cF7">)</span><span class="cF0">);
+<a name="l194"></a>      tempha-&gt;next=*root;
+<a name="l195"></a>      *root=tempha;
+<a name="l196"></a>      tempha-&gt;num=*num_hints;
+<a name="l197"></a>      tempha-&gt;base0=base0;
+<a name="l198"></a>      tempha-&gt;base1=base1;
+<a name="l199"></a>      tempha-&gt;unit=unit;
+<a name="l200"></a>    }
+<a name="l201"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l202"></a>}
+<a name="l203"></a>
+<a name="l204"></a>BoolI8 hint_ata_disable=FALSE;
+<a name="l205"></a>
+<a name="l206"></a></span><span class="cF1">U0</span><span class="cF0"> ATARepExitAllApplications()
+<a name="l207"></a>{
+<a name="l208"></a>  </span><span class="cF1">U64</span><span class="cF0"> ch;
+<a name="l209"></a>  PutDefine(</span><span class="cF6">"ST_GOING_TO_PROBE_HARDWARE"</span><span class="cF0">);
+<a name="l210"></a>  PutDefine(</span><span class="cF6">"ST_EXIT_ALL_APPLICATIONS"</span><span class="cF0">);
+<a name="l211"></a>  PutDefine(</span><span class="cF6">"ST_PRESS_A_KEY"</span><span class="cF0">);
+<a name="l212"></a>  </span><span class="cF6">"Press '$FG,PURPLE$p$FG$' to probe or '$FG,PURPLE$s$FG$' to skip.\n"</span><span class="cF0">;
+<a name="l213"></a>  ch=ToUpper(GetChar</span><span class="cF7">(</span><span class="cF0">NULL,FALSE</span><span class="cF7">)</span><span class="cF0">);
+<a name="l214"></a>  </span><span class="cF1">if</span><span class="cF0"> (ch==</span><span class="cF6">'S'</span><span class="cF0">)
+<a name="l215"></a>    hint_ata_disable=TRUE;
+<a name="l216"></a>  </span><span class="cF1">else</span><span class="cF0">
+<a name="l217"></a>    hint_ata_disable=FALSE;
+<a name="l218"></a>}
+<a name="l219"></a>
+<a name="l220"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">I64</span><span class="cF0"> ATARep(BoolI8 pmt=TRUE,ATARepStruct **root=NULL)
+<a name="l221"></a>{
+<a name="l222"></a>  </span><span class="cF1">U32</span><span class="cF0"> d1,d2;
+<a name="l223"></a>  </span><span class="cF1">U8</span><span class="cF0"> d3;
+<a name="l224"></a>  </span><span class="cF1">I64</span><span class="cF0"> i,unlock_flags=0,num_hints=0;
+<a name="l225"></a>#</span><span class="cF1">assert</span><span class="cF0"> NUM_LTBLKDEVS&lt;=64
+<a name="l226"></a>  BoolI8 old_preempt;
+<a name="l227"></a>
+<a name="l228"></a>  </span><span class="cF1">if</span><span class="cF0"> (root) *root=NULL;
+<a name="l229"></a>
+<a name="l230"></a>  </span><span class="cF1">if</span><span class="cF0"> (pmt)
+<a name="l231"></a>    ATARepExitAllApplications;
+<a name="l232"></a>  </span><span class="cF1">if</span><span class="cF0"> (hint_ata_disable)
+<a name="l233"></a>    </span><span class="cF1">return</span><span class="cF0"> 0;
+<a name="l234"></a>
+<a name="l235"></a>  old_preempt=Preempt(OFF);
+<a name="l236"></a>  </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;num_blkdevs;i++)
+<a name="l237"></a>    BEqu(&amp;unlock_flags,i,
+<a name="l238"></a>      BlkDevLock</span><span class="cF7">(</span><span class="cF0">&amp;local_blkdevs[i]</span><span class="cF7">)</span><span class="cF0">);
+<a name="l239"></a>
+<a name="l240"></a>  </span><span class="cF1">if</span><span class="cF0"> (PCIReadU16</span><span class="cF7">(</span><span class="cF0">0,31,1,0</span><span class="cF7">)</span><span class="cF0">==0x8086) </span><span class="cF7">{</span><span class="cF0">
+<a name="l241"></a>    d1=PCIReadU32(0,31,1,0x10);
+<a name="l242"></a>    d2=PCIReadU32(0,31,1,0x14);
+<a name="l243"></a>    d3=PCIReadU8(0,31,1,0x3C);
+<a name="l244"></a>    </span><span class="cF1">if</span><span class="cF0"> (d1&amp;1 &amp;&amp; d2&amp;1) {
+<a name="l245"></a>      ATARepEntry(d1,d2,0,d3,</span><span class="cF6">"Primary IDE"</span><span class="cF0">,root,&amp;num_hints);
+<a name="l246"></a>      ATARepEntry(d1,d2,1,d3,</span><span class="cF6">"Primary IDE"</span><span class="cF0">,root,&amp;num_hints);
+<a name="l247"></a>    }
+<a name="l248"></a>    d1=PCIReadU32(0,31,1,0x18);
+<a name="l249"></a>    d2=PCIReadU32(0,31,1,0x1C);
+<a name="l250"></a>    </span><span class="cF1">if</span><span class="cF0"> (d1&amp;1 &amp;&amp; d2&amp;1) {
+<a name="l251"></a>      ATARepEntry(d1,d2,0,d3,</span><span class="cF6">"Secondary IDE"</span><span class="cF0">,root,&amp;num_hints);
+<a name="l252"></a>      ATARepEntry(d1,d2,1,d3,</span><span class="cF6">"Secondary IDE"</span><span class="cF0">,root,&amp;num_hints);
+<a name="l253"></a>    }
+<a name="l254"></a>  </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l255"></a>    d1=0x1F0;
+<a name="l256"></a>    d2=0x3F6;
+<a name="l257"></a>    d3=14;
+<a name="l258"></a>    ATARepEntry(d1,d2,0,d3,</span><span class="cF6">"Primary IDE"</span><span class="cF0">,root,&amp;num_hints);
+<a name="l259"></a>    ATARepEntry(d1,d2,1,d3,</span><span class="cF6">"Primary IDE"</span><span class="cF0">,root,&amp;num_hints);
+<a name="l260"></a>
+<a name="l261"></a>    d1=0x170;
+<a name="l262"></a>    d2=0x376;
+<a name="l263"></a>    d3=15;
+<a name="l264"></a>    ATARepEntry(d1,d2,0,d3,</span><span class="cF6">"Secondary IDE"</span><span class="cF0">,root,&amp;num_hints);
+<a name="l265"></a>    ATARepEntry(d1,d2,1,d3,</span><span class="cF6">"Secondary IDE"</span><span class="cF0">,root,&amp;num_hints);
+<a name="l266"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l267"></a>  </span><span class="cF1">if</span><span class="cF0"> (PCIReadU16</span><span class="cF7">(</span><span class="cF0">0,31,2,0</span><span class="cF7">)</span><span class="cF0">==0x8086) </span><span class="cF7">{</span><span class="cF0">
+<a name="l268"></a>    d1=PCIReadU32(0,31,2,0x10);
+<a name="l269"></a>    d2=PCIReadU32(0,31,2,0x14);
+<a name="l270"></a>    d3=PCIReadU8(0,31,2,0x3C);
+<a name="l271"></a>    </span><span class="cF1">if</span><span class="cF0"> (d1&amp;1 &amp;&amp; d2&amp;1) {
+<a name="l272"></a>      ATARepEntry(d1,d2,0,d3,</span><span class="cF6">"Primary SATA"</span><span class="cF0">,root,&amp;num_hints);
+<a name="l273"></a>      ATARepEntry(d1,d2,1,d3,</span><span class="cF6">"Primary SATA"</span><span class="cF0">,root,&amp;num_hints);
+<a name="l274"></a>    }
+<a name="l275"></a>    d1=PCIReadU32(0,31,2,0x18);
+<a name="l276"></a>    d2=PCIReadU32(0,31,2,0x1C);
+<a name="l277"></a>    </span><span class="cF1">if</span><span class="cF0"> (d1&amp;1 &amp;&amp; d2&amp;1) {
+<a name="l278"></a>      ATARepEntry(d1,d2,0,d3,</span><span class="cF6">"Secondary SATA"</span><span class="cF0">,root,&amp;num_hints);
+<a name="l279"></a>      ATARepEntry(d1,d2,1,d3,</span><span class="cF6">"Secondary SATA"</span><span class="cF0">,root,&amp;num_hints);
+<a name="l280"></a>    }
+<a name="l281"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l282"></a>  NewLine(2);
+<a name="l283"></a>  </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;num_blkdevs;i++)
+<a name="l284"></a>    </span><span class="cF1">if</span><span class="cF0"> (Bt</span><span class="cF7">(</span><span class="cF0">&amp;unlock_flags,i</span><span class="cF7">)</span><span class="cF0">)
+<a name="l285"></a>     BlkDevUnlock(&amp;local_blkdevs[i]);
+<a name="l286"></a>  Preempt(old_preempt);
+<a name="l287"></a>  </span><span class="cF1">return</span><span class="cF0"> num_hints;
+<a name="l288"></a>}
+<a name="l289"></a>
+<a name="l290"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Info;Memory/Info"</span><span class="cF0">
+<a name="l291"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">U0</span><span class="cF0"> MemBIOSRep()
+<a name="l292"></a>{
+<a name="l293"></a>  </span><span class="cF1">U16</span><span class="cF0">           *m01=SYS_MEM_E801;
+<a name="l294"></a>  MemE820Entry  *m20=SYS_MEM_E820;
+<a name="l295"></a>  MemRange      *tempmr;
+<a name="l296"></a>        </span><span class="cF6">"Standard Addresses\n"</span><span class="cF0">
+<a name="l297"></a>        </span><span class="cF6">"0x000A0000-0x000BFFFF VGA\n"</span><span class="cF0">
+<a name="l298"></a>        </span><span class="cF6">"0xFEE00000-0xFEE00FFF See $LK,\"APIC\",\"MN:LAPIC_BASE\"$\n\n"</span><span class="cF0">
+<a name="l299"></a>        </span><span class="cF6">"32 Bit Device Mem\n"</span><span class="cF0">;
+<a name="l300"></a>  </span><span class="cF1">while</span><span class="cF0"> (LBts</span><span class="cF7">(</span><span class="cF0">&amp;sys_semas[SYS_SEMA_DEV_MEM],0</span><span class="cF7">)</span><span class="cF0">)
+<a name="l301"></a>    Yield;
+<a name="l302"></a>  tempmr=sys_mem32_dev_root.next;
+<a name="l303"></a>  </span><span class="cF1">while</span><span class="cF0"> (tempmr!=&amp;sys_mem32_dev_root) </span><span class="cF7">{</span><span class="cF0">
+<a name="l304"></a>    </span><span class="cF6">"%02X:0x%016X-0x%016X\n"</span><span class="cF0">,tempmr-&gt;type,tempmr-&gt;base,tempmr-&gt;base+tempmr-&gt;size-1;
+<a name="l305"></a>    tempmr=tempmr-&gt;next;
+<a name="l306"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l307"></a>  LBtr(&amp;sys_semas[SYS_SEMA_DEV_MEM],0);
+<a name="l308"></a>
+<a name="l309"></a>  </span><span class="cF6">"\nBIOS Memory Report 15:E801\n"</span><span class="cF0">
+<a name="l310"></a>  </span><span class="cF6">"01:0x0000000000000000-0x%016X\n"</span><span class="cF0">,0x100000+m01[0]&lt;&lt;10-1;
+<a name="l311"></a>  </span><span class="cF6">"01:0x0000000001000000-0x%016X\n"</span><span class="cF0">,0x1000000+m01[1]&lt;&lt;16-1;
+<a name="l312"></a>
+<a name="l313"></a>  </span><span class="cF1">if</span><span class="cF0"> (m20-&gt;type) </span><span class="cF7">{</span><span class="cF0">
+<a name="l314"></a>    NewLine;
+<a name="l315"></a>    </span><span class="cF6">"BIOS Memory Report 15:E820\n"</span><span class="cF0">;
+<a name="l316"></a>    </span><span class="cF1">while</span><span class="cF0"> (m20-&gt;type) {
+<a name="l317"></a>      </span><span class="cF6">"%02X:0x%016X-0x%016X\n"</span><span class="cF0">,m20-&gt;type,m20-&gt;base,m20-&gt;base+m20-&gt;len-1;
+<a name="l318"></a>      m20++;
+<a name="l319"></a>    }
+<a name="l320"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l321"></a>
+<a name="l322"></a>}
+<a name="l323"></a>
+<a name="l324"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">""</span><span class="cF0">
+</span></pre><div class="archive-note">Historical capture: 2012-03-02. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

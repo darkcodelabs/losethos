@@ -1,0 +1,591 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="description"/>
+<meta content="64-Bit, Operating System, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="keywords"/>
+<meta content="LoseThos V6.13" name="generator"/>
+<style type="text/css">
+.cBLACK{color:rgb(0,0,0);}
+.cBLUE{color:rgb(0,0,168);}
+.cGREEN{color:rgb(0,168,0);}
+.cCYAN{color:rgb(0,168,168);}
+.cRED{color:rgb(168,0,0);}
+.cPURPLE{color:rgb(168,0,168);}
+.cBROWN{color:rgb(168,84,0);}
+.cLTGRAY{color:rgb(168,168,168);}
+.cDKGRAY{color:rgb(84,84,84);}
+.cLTBLUE{color:rgb(84,84,252);}
+.cLTGREEN{color:rgb(84,252,84);}
+.cLTCYAN{color:rgb(84,252,252);}
+.cLTRED{color:rgb(252,84,84);}
+.cLTPURPLE{color:rgb(252,84,252);}
+.cYELLOW{color:rgb(252,252,84);}
+.cWHITE{color:rgb(252,252,252);}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cPURPLE">                               <a href="/archive/doc/TrivialSolutions.html">Trivial Solutions</a>
+                        Happy Programmers Make Us Happy
+
+<a href="/archive/index.html">The LoseThos 64-bit PC Operating System</a>
+File:/LT/OSMain/MultiProc.CPZ
+This, and all LoseThos files, are public domain.  Do whatever you like.
+God is watching; God is just; God is never out-done in generosity.  He talks to me!
+
+LoseThos code compiles with the 64-bit LoseThos compiler/assembler I wrote.
+Boot the LoseThos CD and you can compile it.  Not in Kansas anymore!
+
+<a href="/archive/code/FixedPoint.html">Click here for preliminary compiler information you need.</a>
+
+</span><span class="cDKGRAY">Project: OSMain</span><span class="cBLACK">
+</span><span class="cBLUE">asm</span><span class="cBLACK"> {
+        </span><span class="cBLUE">ALIGN</span><span class="cBLACK">   16,OC_NOP
+</span><span class="cBLUE">USE16</span><span class="cBLACK">
+</span><span class="cGREEN">//See </span><a href="/archive/doc/MultiCore.html"><span class="cRED">LoseThos MultiCore</span></a><span class="cGREEN">.</span><span class="cBLACK">
+
+</span><span class="cGREEN">//This code gets copied to </span><a href="/archive/code/Adam1a.html"><span class="cRED">MP_VECTOR_ADDRESS</span></a><span class="cGREEN">.</span><span class="cBLACK">
+</span><span class="cGREEN">//See </span><a href="/archive/code/MultiProc.html"><span class="cRED">MemCpy(MP_VECTOR_ADDRESS</span></a><span class="cGREEN">.</span><span class="cBLACK">
+SYS_MP_INIT_START::
+        </span><span class="cBLUE">JMP</span><span class="cBLACK">     MP2_START2
+        </span><span class="cBLUE">ALIGN</span><span class="cBLACK">   4,OC_NOP
+MP2_SYS_TEMP_PTR:       </span><span class="cBLUE">DU32</span><span class="cBLACK">    0,0;
+
+MP2_START2:
+        </span><span class="cBLUE">CLI</span><span class="cBLACK">
+
+        </span><span class="cBLUE">WBINVD</span><span class="cBLACK">
+
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cLTRED">AX</span><span class="cBLACK">,MP_VECTOR_ADDRESS/16
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cLTRED">DS</span><span class="cBLACK">,</span><span class="cLTRED">AX</span><span class="cBLACK">
+
+</span><span class="cGREEN">//See </span><a href="/archive/code/MultiProc.html"><span class="cRED">mp-&gt;sys_temp_ptr</span></a><span class="cBLACK">
+#</span><span class="cBLUE">assert</span><span class="cBLACK"> MP2_SYS_TEMP_PTR-SYS_MP_INIT_START==MP_SYS_TEMP_PTR
+        </span><span class="cBLUE">LGDT</span><span class="cBLACK">    </span><span class="cBLUE">U32</span><span class="cBLACK"> [MP_SYS_TEMP_PTR]
+
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cLTRED">EAX</span><span class="cBLACK">,SYS_START_CR0
+        </span><span class="cBLUE">MOV_CR0_EAX</span><span class="cBLACK">
+
+        </span><span class="cBLUE">DU8</span><span class="cBLACK">     0x66,0xEA;               </span><span class="cGREEN">//JMP SYS_CS_SEL:MP_INIT_OS</span><span class="cBLACK">
+        </span><span class="cBLUE">DU32</span><span class="cBLACK">    MP_INIT_OS;
+        </span><span class="cBLUE">DU16</span><span class="cBLACK">    SYS_CS_SEL;
+
+SYS_MP_INIT_END::
+</span><span class="cBLUE">USE32</span><span class="cBLACK">
+MP_INIT_OS:
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cLTRED">AX</span><span class="cBLACK">,ZERO_DS_SEL
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cLTRED">DS</span><span class="cBLACK">,</span><span class="cLTRED">AX</span><span class="cBLACK">
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cLTRED">ES</span><span class="cBLACK">,</span><span class="cLTRED">AX</span><span class="cBLACK">
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cLTRED">FS</span><span class="cBLACK">,</span><span class="cLTRED">AX</span><span class="cBLACK">
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cLTRED">GS</span><span class="cBLACK">,</span><span class="cLTRED">AX</span><span class="cBLACK">
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cLTRED">SS</span><span class="cBLACK">,</span><span class="cLTRED">AX</span><span class="cBLACK">
+
+@@1:    </span><span class="cBLUE">LOCK</span><span class="cBLACK">
+        </span><span class="cBLUE">BTS</span><span class="cBLACK">     </span><span class="cBLUE">U32</span><span class="cBLACK"> [SYS_MP_CNT_LOCK],0
+        </span><span class="cBLUE">JC</span><span class="cBLACK">      @@1
+
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cLTRED">ESI</span><span class="cBLACK">,</span><span class="cBLUE">U32</span><span class="cBLACK"> [SYS_MP_CNT]
+        </span><span class="cBLUE">LOCK</span><span class="cBLACK">
+        </span><span class="cBLUE">INC</span><span class="cBLACK">     </span><span class="cBLUE">U32</span><span class="cBLACK"> [SYS_MP_CNT]
+        </span><span class="cBLUE">LOCK</span><span class="cBLACK">
+        </span><span class="cBLUE">BTR</span><span class="cBLACK">     </span><span class="cBLUE">U32</span><span class="cBLACK"> [SYS_MP_CNT_LOCK],0
+
+
+        </span><span class="cBLUE">CMP</span><span class="cBLACK">     </span><span class="cLTRED">ESI</span><span class="cBLACK">,MP_MAX_PROCESSORS
+        </span><span class="cBLUE">JAE</span><span class="cBLACK">     </span><span class="cBLUE">I32</span><span class="cBLACK"> _SYS_HLT
+
+        </span><span class="cBLUE">IMUL2</span><span class="cBLACK">   </span><span class="cLTRED">ESI</span><span class="cBLACK">,CPU_STRUCT_SIZE
+        </span><span class="cBLUE">ADD</span><span class="cBLACK">     </span><span class="cLTRED">ESI</span><span class="cBLACK">,</span><span class="cBLUE">U32</span><span class="cBLACK"> [SYS_CPU_STRUCTS]
+
+        </span><span class="cBLUE">LEA</span><span class="cBLACK">     </span><span class="cLTRED">EAX</span><span class="cBLACK">,</span><span class="cBLUE">U32</span><span class="cBLACK"> CPU_START_STK_TOP[</span><span class="cLTRED">ESI</span><span class="cBLACK">]
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cLTRED">ESP</span><span class="cBLACK">,</span><span class="cLTRED">EAX</span><span class="cBLACK">
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    </span><span class="cBLUE">U32</span><span class="cBLACK"> SYS_START_RFLAGS
+        </span><span class="cBLUE">POPFD</span><span class="cBLACK">
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    </span><span class="cBLUE">U32</span><span class="cBLACK"> 0
+        </span><span class="cBLUE">CALL</span><span class="cBLACK">    INIT_EM64T
+</span><span class="cBLUE">USE64</span><span class="cBLACK">
+        </span><span class="cBLUE">FNINIT</span><span class="cBLACK">
+
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    </span><span class="cLTRED">RSI</span><span class="cBLACK">
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    </span><span class="cLTRED">RSI</span><span class="cBLACK">
+        </span><span class="cBLUE">CALL</span><span class="cBLACK">    _SET_GS_BASE
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     </span><span class="cLTRED">RSI</span><span class="cBLACK">
+@@2:    </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cLTRED">RBX</span><span class="cBLACK">,</span><span class="cBLUE">U64</span><span class="cBLACK"> CPU_SETH_TASK[</span><span class="cLTRED">RSI</span><span class="cBLACK">]
+        </span><span class="cBLUE">OR</span><span class="cBLACK">      </span><span class="cLTRED">RBX</span><span class="cBLACK">,</span><span class="cLTRED">RBX</span><span class="cBLACK">
+        </span><span class="cBLUE">JZ</span><span class="cBLACK">      @@2
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cBLUE">U64</span><span class="cBLACK"> TASK_GS[</span><span class="cLTRED">RBX</span><span class="cBLACK">],</span><span class="cLTRED">RSI</span><span class="cBLACK">
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cLTRED">RAX</span><span class="cBLACK">,</span><span class="cLTRED">RBX</span><span class="cBLACK">
+        </span><span class="cBLUE">CALL</span><span class="cBLACK">    SET_FS_BASE
+
+        </span><span class="cBLUE">JMP</span><span class="cBLACK">     </span><span class="cBLUE">I32</span><span class="cBLACK"> SYS_RESTORE_CONTEXT
+}
+
+TssStruct *TssNew(</span><span class="cBLUE">I64</span><span class="cBLACK"> cpu_num)
+{
+  </span><span class="cBLUE">U32</span><span class="cBLACK"> *d,*d1;
+  TssStruct *tss=CAlloc(</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">TssStruct</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+  tss-&gt;io_map_offset=</span><span class="cBLUE">offset</span><span class="cBLACK">(TssStruct.io_map);
+  MemSet(tss-&gt;io_map,0xFF,0x10000/8);
+
+  tss-&gt;st0=MAlloc(INTERRUPT_STK);
+  tss-&gt;rsp0=tss-&gt;st0&gt;&lt;(</span><span class="cBLUE">U8</span><span class="cBLACK"> *)+MSize(tss-&gt;st0);
+  tss-&gt;st1=MAlloc(INTERRUPT_STK);
+  tss-&gt;rsp1=tss-&gt;st1&gt;&lt;(</span><span class="cBLUE">U8</span><span class="cBLACK"> *)+MSize(tss-&gt;st1);
+  tss-&gt;st2=MAlloc(INTERRUPT_STK);
+  tss-&gt;rsp2=tss-&gt;st2&gt;&lt;(</span><span class="cBLUE">U8</span><span class="cBLACK"> *)+MSize(tss-&gt;st2);
+
+  tss-&gt;tr=CPU_TR_SELS+cpu_num*</span><span class="cBLUE">sizeof</span><span class="cBLACK">(GdtTabStruct);
+
+  d=sys_gdttab&gt;&lt;(</span><span class="cBLUE">U8</span><span class="cBLACK"> *)+tss-&gt;tr;
+  d1=d&gt;&lt;(</span><span class="cBLUE">U8</span><span class="cBLACK"> *)+4;
+  *d =0x0000FFFF;
+  *d1=0x008F8900;
+  d&gt;&lt;(</span><span class="cBLUE">U8</span><span class="cBLACK"> *)+=2;
+  *d|=tss &amp; 0x00FFFFFF;
+  *d1++|=tss &amp; 0xFF000000;
+  *d1++=0;
+  *d1=0;
+
+  </span><span class="cBLUE">return</span><span class="cBLACK"> tss;
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> MPCmdCtrlInit(MPCmdCtrl *ctrl)
+{
+  MemSet(ctrl,0,</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">MPCmdCtrl</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+  ctrl-&gt;next_waiting=ctrl-&gt;last_waiting=ctrl;
+  ctrl-&gt;next_done=ctrl-&gt;last_done=&amp;ctrl-&gt;next_done;
+}
+
+CPUStruct *CPUStructInit(</span><span class="cBLUE">U64</span><span class="cBLACK"> num,CPUStruct *c)
+{
+  MemSet(c,0,</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">CPUStruct</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+  c-&gt;address=c;
+  c-&gt;num=num;
+  c-&gt;idle_factor=0.01;
+  MPCmdCtrlInit(&amp;c-&gt;cmd_ctrl);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (num)
+    c-&gt;idle_task=Spawn(0,NULL,</span><span class="cBROWN">"Idle Task"</span><span class="cBLACK">,Fs,NULL,IDLE_STK,0);
+  </span><span class="cBLUE">else</span><span class="cBLACK">
+    c-&gt;timer_irq_chain=&amp;IntSimpleTimer;
+  </span><span class="cBLUE">return</span><span class="cBLACK"> c;
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> MPInt(</span><span class="cBLUE">U8</span><span class="cBLACK"> num,</span><span class="cBLUE">I64</span><span class="cBLACK"> cpu_num=1)
+{
+  </span><span class="cBLUE">U32</span><span class="cBLACK"> *dl=LAPIC_ICR_LOW,*dh=LAPIC_ICR_HIGH;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (cpu_num&gt;=mp_cnt) throw (EXCEPT_MULTICORE,0);
+  PushFD;
+  Cli; </span><span class="cGREEN">//multitasking safe because each core has a local apic and IRQ's are off</span><span class="cBLACK">
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (*dl&amp;0x1000)
+    Pause;
+  *dh=mp_apic_ids[cpu_num]&lt;&lt;24;
+  *dl=0x4000+num;
+  PopFD;
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> IntEOI()
+{
+  </span><span class="cBLUE">U32</span><span class="cBLACK"> *dd=LAPIC_EOI;
+  *dd=0;
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> MPIntAll(</span><span class="cBLUE">U8</span><span class="cBLACK"> num)
+{ </span><span class="cGREEN">//(All but self)</span><span class="cBLACK">
+  </span><span class="cBLUE">U32</span><span class="cBLACK"> *dl=LAPIC_ICR_LOW;
+  PushFD;
+  Cli; </span><span class="cGREEN">//multitasking safe because each core has a local apic and IRQ's are off</span><span class="cBLACK">
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (*dl&amp;0x1000)
+    Pause;
+  *dl=0xC4800+num;
+  PopFD;
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> MPNMInt()
+{
+  </span><span class="cBLUE">U32</span><span class="cBLACK"> *dl=LAPIC_ICR_LOW;
+  *dl=0xC4400;
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> MPHalt()
+{
+  mp_cnt=1;
+  MPNMInt; </span><span class="cGREEN">//Hlt All other processors</span><span class="cBLACK">
+  BusyWait(10000);
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> MPWake(</span><span class="cBLUE">U64</span><span class="cBLACK"> target_cpu_mask)
+{
+  </span><span class="cBLUE">I64</span><span class="cBLACK"> i;
+  target_cpu_mask&amp;=1&lt;&lt;mp_cnt-1;
+  Btr(&amp;target_cpu_mask,Gs-&gt;num);
+  PushFD;
+  Cli;
+  </span><span class="cBLUE">for</span><span class="cBLACK"> (i=Bsf</span><span class="cLTGRAY">(</span><span class="cBLACK">target_cpu_mask</span><span class="cLTGRAY">)</span><span class="cBLACK">;target_cpu_mask;i++)
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (Btr</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;target_cpu_mask,i</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (Bt</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;cpu_structs[i].cpu_flags,CPUf_SETH_SLEEP</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+        cpu_structs[i].seth_task-&gt;wake_jiffy=0;
+      MPInt(I_WAKE,i);
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (Bt</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;cpu_structs[i].cpu_flags,CPUf_SETH_SLEEP</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cGREEN">//In case went back to sleep</span><span class="cBLACK">
+        cpu_structs[i].seth_task-&gt;wake_jiffy=0;
+    </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  PopFD;
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> MPAPICInit()
+{ </span><span class="cGREEN">//Called by adam during start-up</span><span class="cBLACK">
+  </span><span class="cGREEN">//and other cores during initialization</span><span class="cBLACK">
+  </span><span class="cGREEN">//after </span><a href="/archive/code/MultiProc.html"><span class="cRED">MPStart</span></a><span class="cGREEN">().</span><span class="cBLACK">
+  </span><span class="cBLUE">U32</span><span class="cBLACK"> *d;
+
+  d=LAPIC_SVR;
+  *d|=LAPICF_APIC_ENABLED;
+  d=LAPIC_APIC_ID;
+  mp_apic_ids[Gs-&gt;num]=*d&gt;&gt;24;
+  d=LAPIC_LDR;
+  *d=mp_apic_ids[Gs-&gt;num]&lt;&lt;24;
+  d=LAPIC_DFR;
+  *d=0xF0000000;
+</span><span class="cGREEN">/*</span><span class="cBLACK">
+</span><span class="cGREEN">  MemSet(LAPIC_IRR,0,0x20);</span><span class="cBLACK">
+</span><span class="cGREEN">  MemSet(LAPIC_ISR,0,0x20);</span><span class="cBLACK">
+</span><span class="cGREEN">  MemSet(LAPIC_TMR,0,0x20);</span><span class="cBLACK">
+</span><span class="cGREEN">*/</span><span class="cBLACK">
+
+  SetRAX(Gs-&gt;tss-&gt;tr);
+  </span><span class="cBLUE">asm</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        </span><span class="cBLUE">LTR</span><span class="cBLACK">     </span><span class="cLTRED">AX</span><span class="cBLACK">
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (Gs-&gt;num)
+    IDTInit;
+}
+
+#</span><span class="cBLUE">assert</span><span class="cBLACK"> !</span><span class="cBLUE">offset</span><span class="cBLACK">(MPCmdCtrl.next_waiting)
+
+BoolI64 MPCmdCtrlDo(MPCmdCtrl *ctrl)
+{ </span><span class="cGREEN">//Called while locked</span><span class="cBLACK">
+  MPCmdStruct *tempm=ctrl-&gt;next_waiting;
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (tempm!=ctrl &amp;&amp; !Bt</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;tempm-&gt;target_cpu_mask,Gs-&gt;num</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+    tempm=tempm-&gt;next;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (tempm!=ctrl) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    RemQue(tempm);
+    LBts(&amp;tempm-&gt;flags,MPCf_DISPATCHED);
+    tempm-&gt;handler_cpu=Gs-&gt;num;
+    LBtr(&amp;ctrl-&gt;flags,MPCCf_LOCKED);
+    </span><span class="cBLUE">switch</span><span class="cBLACK"> (tempm-&gt;cmd_code) {
+      </span><span class="cBLUE">case</span><span class="cBLACK"> MPCT_CALL:
+        tempm-&gt;result=tempm-&gt;add(tempm-&gt;data);
+        Preempt(OFF);
+        Sti;
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">case</span><span class="cBLACK"> MPCT_SPAWN_TASK:
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (tempm-&gt;desc)
+          tempm-&gt;task=Spawn(tempm-&gt;add,tempm-&gt;data,tempm-&gt;desc);
+        </span><span class="cBLUE">else</span><span class="cBLACK">
+          tempm-&gt;task=Spawn(tempm-&gt;add,tempm-&gt;data,</span><span class="cBROWN">"MP Job"</span><span class="cBLACK">);
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+    }
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (Bt</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;tempm-&gt;flags,MPCf_FREE_ON_COMPLETE</span><span class="cLTGRAY">)</span><span class="cBLACK">) {
+      Free(tempm-&gt;desc);
+      Free(tempm);
+    } </span><span class="cBLUE">else</span><span class="cBLACK"> {
+      </span><span class="cBLUE">while</span><span class="cBLACK"> (LBts</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;ctrl-&gt;flags,MPCCf_LOCKED</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+        Yield;
+      InsQue(tempm,ctrl-&gt;last_done);
+      LBts(&amp;tempm-&gt;flags,MPCf_DONE);
+      LBtr(&amp;ctrl-&gt;flags,MPCCf_LOCKED);
+    }
+    </span><span class="cBLUE">return</span><span class="cBLACK"> TRUE;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    LBtr(&amp;ctrl-&gt;flags,MPCCf_LOCKED);
+    </span><span class="cBLUE">return</span><span class="cBLACK"> FALSE;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> MPSethServerTask()
+{
+  MPCmdCtrl *my_ctrl=&amp;Gs-&gt;cmd_ctrl;
+  Sti;
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (TRUE) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    TaskFinishOffDying;
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (!LBts</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;my_ctrl-&gt;flags,MPCCf_LOCKED</span><span class="cLTGRAY">)</span><span class="cBLACK"> &amp;&amp;
+        !MPCmdCtrlDo</span><span class="cLTGRAY">(</span><span class="cBLACK">my_ctrl</span><span class="cLTGRAY">)</span><span class="cBLACK"> &amp;&amp; </span><span class="cGREEN">//Jobs for this core are highest priority.</span><span class="cBLACK">
+        !LBts</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;mp_ctrl-&gt;flags,MPCCf_LOCKED</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+        MPCmdCtrlDo(mp_ctrl);
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (my_ctrl-&gt;next_waiting==my_ctrl &amp;&amp;
+        mp_ctrl-&gt;next_waiting==mp_ctrl) {
+      LBts(&amp;Gs-&gt;cpu_flags,CPUf_SETH_SLEEP);
+      Sleep(20); </span><span class="cGREEN">//We don't want this too long because of need for </span><a href="/archive/code/Task1a.html"><span class="cRED">TaskFinishOffDying</span></a><span class="cGREEN">().</span><span class="cBLACK">
+      LBtr(&amp;Gs-&gt;cpu_flags,CPUf_SETH_SLEEP);
+    }
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+}
+
+MPCmdStruct *MPQueueJob(</span><span class="cBLUE">I64</span><span class="cBLACK"> </span><span class="cLTGRAY">(</span><span class="cBLACK">*fp_add</span><span class="cLTGRAY">)(</span><span class="cBLUE">U0</span><span class="cBLACK"> *data</span><span class="cLTGRAY">)</span><span class="cBLACK">,</span><span class="cBLUE">U0</span><span class="cBLACK"> *data=NULL,
+       </span><span class="cBLUE">U8</span><span class="cBLACK"> *desc=NULL,
+       </span><span class="cBLUE">U64</span><span class="cBLACK"> flags=1&lt;&lt;MPCf_FREE_ON_COMPLETE,
+       BoolI8 spawn=FALSE,</span><span class="cBLUE">U64</span><span class="cBLACK"> target_cpu_mask=ALL_MASK)
+{
+  </span><span class="cBLUE">I64</span><span class="cBLACK"> i=Bsf(target_cpu_mask);
+  MPCmdCtrl *ctrl;
+  MPCmdStruct *tempm;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (mp_cnt&lt;2 || i&lt;0) throw(EXCEPT_MULTICORE,1);
+  tempm=ACAlloc(</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">MPCmdStruct</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (desc)
+    tempm-&gt;desc=AStrNew(desc);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (spawn)
+    tempm-&gt;cmd_code=MPCT_SPAWN_TASK;
+  </span><span class="cBLUE">else</span><span class="cBLACK">
+    tempm-&gt;cmd_code=MPCT_CALL;
+  tempm-&gt;add=fp_add;
+  tempm-&gt;data=data;
+  tempm-&gt;target_cpu_mask=target_cpu_mask;
+  tempm-&gt;flags=flags;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (i==Bsr</span><span class="cLTGRAY">(</span><span class="cBLACK">target_cpu_mask</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+    tempm-&gt;ctrl=ctrl=&amp;cpu_structs[i].cmd_ctrl;
+  </span><span class="cBLUE">else</span><span class="cBLACK">
+    tempm-&gt;ctrl=ctrl=mp_ctrl;
+  PushFD;
+  Cli;
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (LBts</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;ctrl-&gt;flags,MPCCf_LOCKED</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+    Yield;
+  InsQue(tempm,ctrl-&gt;last_waiting);
+  LBtr(&amp;ctrl-&gt;flags,MPCCf_LOCKED);
+  PopFD;
+  MPWake(target_cpu_mask);
+  </span><span class="cBLUE">return</span><span class="cBLACK"> tempm;
+}
+
+MPCmdStruct *MPJob(</span><span class="cBLUE">I64</span><span class="cBLACK"> </span><span class="cLTGRAY">(</span><span class="cBLACK">*fp_add</span><span class="cLTGRAY">)(</span><span class="cBLUE">U0</span><span class="cBLACK"> *data</span><span class="cLTGRAY">)</span><span class="cBLACK">,</span><span class="cBLUE">U0</span><span class="cBLACK"> *data=NULL,
+       </span><span class="cBLUE">U64</span><span class="cBLACK"> flags=1&lt;&lt;MPCf_FREE_ON_COMPLETE,
+       </span><span class="cBLUE">U64</span><span class="cBLACK"> target_cpu_mask=ALL_MASK)
+</span><span class="cGREEN">//Set flags to zero if you wish to</span><span class="cBLACK">
+</span><span class="cGREEN">//get the result.</span><span class="cBLACK">
+{
+  </span><span class="cBLUE">return</span><span class="cBLACK"> MPQueueJob(fp_add,data,NULL,flags,FALSE,target_cpu_mask);
+}
+
+</span><span class="cBLUE">I64</span><span class="cBLACK"> MPJobResult(MPCmdStruct *tempm)
+{
+  </span><span class="cBLUE">I64</span><span class="cBLACK"> result;
+  MPCmdCtrl *ctrl=tempm-&gt;ctrl;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (mp_cnt&lt;2) throw(EXCEPT_MULTICORE,2);
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (!Bt</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;tempm-&gt;flags,MPCf_DONE</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+    Yield;
+  PushFD;
+  Cli;
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (LBts</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;ctrl-&gt;flags,MPCCf_LOCKED</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+    Yield;
+  RemQue(tempm);
+  LBtr(&amp;ctrl-&gt;flags,MPCCf_LOCKED);
+  PopFD;
+  result=tempm-&gt;result;
+  Free(tempm-&gt;desc);
+  Free(tempm);
+  </span><span class="cBLUE">return</span><span class="cBLACK"> result;
+}
+
+TaskStruct *MPSpawn(</span><span class="cBLUE">U0</span><span class="cBLACK"> </span><span class="cLTGRAY">(</span><span class="cBLACK">*fp_add</span><span class="cLTGRAY">)(</span><span class="cBLUE">U0</span><span class="cBLACK"> *data</span><span class="cLTGRAY">)</span><span class="cBLACK">,</span><span class="cBLUE">U0</span><span class="cBLACK"> *data=NULL,</span><span class="cBLUE">U8</span><span class="cBLACK"> *name=NULL,</span><span class="cBLUE">U64</span><span class="cBLACK"> target_cpu=ALL_MASK)
+{
+  TaskStruct *result;
+  MPCmdStruct *tempm=MPQueueJob(fp_add,data,name,0,TRUE,target_cpu);
+  MPCmdCtrl *ctrl;
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (!Bt</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;tempm-&gt;flags,MPCf_DONE</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+    Yield;
+  result=tempm-&gt;task;
+  ctrl=tempm-&gt;ctrl;
+  PushFD;
+  Cli;
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (LBts</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;ctrl-&gt;flags,MPCCf_LOCKED</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+    Yield;
+  RemQue(tempm);
+  LBtr(&amp;ctrl-&gt;flags,MPCCf_LOCKED);
+  PopFD;
+  Free(tempm-&gt;desc);
+  Free(tempm);
+  </span><span class="cBLUE">return</span><span class="cBLACK"> result;
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> MPCPUTaskInit()
+{ </span><span class="cGREEN">//Called by multicore's seth task after </span><a href="/archive/code/MultiProc.html"><span class="cRED">MPStart</span></a><span class="cGREEN">()</span><span class="cBLACK">
+  </span><span class="cGREEN">//as the first thing a CPU does before waiting for jobs</span><span class="cBLACK">
+  MPAPICInit;
+  Fs-&gt;rip=&amp;MPSethServerTask;
+  Fs-&gt;time_slice_start=GetTimeStamp;
+  RestoreContext;
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> MPCmdQueDel(MPCmdStruct *root)
+{
+  MPCmdStruct *tempm=root-&gt;next,*tempm1;
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (tempm!=root) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    tempm1=tempm-&gt;next;
+    RemQue(tempm);
+    Free(tempm-&gt;desc);
+    Free(tempm);
+    tempm=tempm1;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> MPStart()
+{ </span><span class="cGREEN">//Called by adam during start-up</span><span class="cBLACK">
+  </span><span class="cGREEN">//and can be called again to reset multicores.</span><span class="cBLACK">
+  </span><span class="cGREEN">//Doesn't always work when resetting.  Kill all tasks, first.</span><span class="cBLACK">
+  </span><span class="cGREEN">//Must be called from core#0.</span><span class="cBLACK">
+  TaskStruct *task;
+  </span><span class="cBLUE">U8</span><span class="cBLACK"> buf[128];
+  </span><span class="cBLUE">U32</span><span class="cBLACK"> *d;
+  MPMainStruct *mp=MP_VECTOR_ADDRESS;
+  CPUStruct *c;
+  BlkPool *code_bp,*data_bp,*saved_code_bp,*saved_data_bp;
+  </span><span class="cBLUE">I64</span><span class="cBLACK"> shared_blks,i,old_mp_cnt;
+  RaxRbxRcxRdx ee;
+
+  CpuId(0x1,&amp;ee);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!Bt</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;ee.rdx,9</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+    </span><span class="cBLUE">return</span><span class="cBLACK">;
+
+  PushFD;
+  Cli;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (mp_cnt&gt;1) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    old_mp_cnt=mp_cnt;
+    MPHalt; </span><span class="cGREEN">//sets mp_cnt to 1</span><span class="cBLACK">
+
+    </span><span class="cBLUE">for</span><span class="cBLACK"> (i=1;i&lt;old_mp_cnt;i++) {
+      c=&amp;cpu_structs[i];
+      MPCmdQueDel(&amp;c-&gt;cmd_ctrl.next_waiting);
+      MPCmdQueDel(&amp;c-&gt;cmd_ctrl.next_done);
+
+      data_bp=c-&gt;data_bp;
+      code_bp=c-&gt;code_bp;
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (data_bp &amp;&amp; data_bp!=code_bp) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (sys_data_bp)
+          Free2MegMemBlks(data_bp,data_bp-&gt;size&gt;&gt;12,sys_data_bp);
+        </span><span class="cBLUE">else</span><span class="cBLACK">
+          Free2MegMemBlks(data_bp,data_bp-&gt;size&gt;&gt;12,sys_code_bp);
+      </span><span class="cLTGRAY">}</span><span class="cBLACK">
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (code_bp)
+        Free2MegMemBlks(code_bp,code_bp-&gt;size&gt;&gt;12,sys_code_bp);
+    }
+ 
+    MPCmdQueDel(&amp;mp_ctrl-&gt;next_waiting);
+    MPCmdQueDel(&amp;mp_ctrl-&gt;next_done);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  MemSet(&amp;cpu_structs[1],0,</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">CPUStruct</span><span class="cLTGRAY">)</span><span class="cBLACK">*</span><span class="cLTGRAY">(</span><span class="cBLACK">MP_MAX_PROCESSORS-1</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+
+</span><span class="cGREEN">//When you start-up other cores, they jump to an address</span><span class="cBLACK">
+</span><span class="cGREEN">//specified by a byte vector number, </span><a href="/archive/code/Adam1a.html"><span class="cRED">MPN_VECTOR</span></a><span class="cGREEN"> which corresponds</span><span class="cBLACK">
+</span><span class="cGREEN">//to a location 4096*vector number, </span><a href="/archive/code/Adam1a.html"><span class="cRED">MP_VECTOR_ADDRESS</span></a><span class="cGREEN">.  I use vector 0x0F.</span><span class="cBLACK">
+</span><span class="cGREEN">//This copies the start-up code downto 0x0F000.</span><span class="cBLACK">
+</span><span class="cGREEN">//OSMain is at 0x10000, so it's safe.</span><span class="cBLACK">
+  MemCpy(mp,SYS_MP_INIT_START,SYS_MP_INIT_END-SYS_MP_INIT_START);
+
+#</span><span class="cBLUE">assert</span><span class="cBLACK"> </span><span class="cBLUE">offset</span><span class="cBLACK">(MPMainStruct.sys_temp_ptr)==MP_SYS_TEMP_PTR
+  mp-&gt;sys_temp_ptr=MAXGDT*16-1+sys_gdttab&gt;&lt;(</span><span class="cBLUE">U8</span><span class="cBLACK"> *)&lt;&lt;16;
+  mp_cnt=1;
+  mp_cnt_lock=0;
+
+  d=LAPIC_LVT_ERR;
+  *d=*d&amp;0xFFFFFF00+MPN_VECTOR;
+  WbInvd;
+
+  d=LAPIC_ICR_LOW;
+  *d=0xC4500; </span><span class="cGREEN">//assert init IPI</span><span class="cBLACK">
+  BusyWait(10000);
+
+  *d=0xC4600+MPN_VECTOR; </span><span class="cGREEN">//start-up</span><span class="cBLACK">
+  BusyWait(200);
+  *d=0xC4600+MPN_VECTOR;
+
+  BusyWait(100000);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (mp_cnt&gt;MP_MAX_PROCESSORS)
+    mp_cnt=MP_MAX_PROCESSORS;
+
+  </span><span class="cBLUE">for</span><span class="cBLACK"> (i=1;i&lt;mp_cnt;i++) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    c =&amp;cpu_structs[i];
+    </span><span class="cGREEN">//SPrintF not available yet.</span><span class="cBLACK">
+    StrCpy(buf,</span><span class="cBROWN">"Seth Task CPU#0"</span><span class="cBLACK">);
+    buf[14]+=i;
+
+    shared_blks=MP_DATA_HEAP_SIZE/0x200000; </span><span class="cGREEN">//2Meg blks for core data heaps</span><span class="cBLACK">
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (sys_data_bp &amp;&amp; sys_data_bp!=sys_code_bp)
+      data_bp=Alloc2MegMemBlks(&amp;shared_blks,sys_data_bp);
+    </span><span class="cBLUE">else</span><span class="cBLACK">
+      data_bp=Alloc2MegMemBlks(&amp;shared_blks,sys_code_bp);
+    BlkPoolInit(data_bp,shared_blks&lt;&lt;12);
+
+    shared_blks=MP_CODE_HEAP_SIZE/0x200000; </span><span class="cGREEN">//2Meg blks for core code heaps</span><span class="cBLACK">
+    code_bp=Alloc2MegMemBlks(&amp;shared_blks,sys_code_bp);
+    BlkPoolInit(code_bp,shared_blks&lt;&lt;12);
+
+    saved_code_bp=Gs-&gt;code_bp;
+    saved_data_bp=Gs-&gt;data_bp;
+    Gs-&gt;code_bp=code_bp;
+    Gs-&gt;data_bp=data_bp;
+
+    task=Spawn(&amp;MPCPUTaskInit,NULL,buf,NULL,NULL,SETH_STK,0);
+    </span><span class="cGREEN">//</span><a href="/archive/code/Adam1a.html"><span class="cRED">TaskStruct</span></a><span class="cGREEN"> allocated off this core's seth_task's heap (Which is Adam)</span><span class="cBLACK">
+
+    task-&gt;task_in_queue_signature=TASK_IN_QUEUE_SIGNATURE_VAL;
+    CPUStructInit(i,c);
+    c-&gt;code_bp=code_bp;
+    c-&gt;data_bp=data_bp;
+    Gs-&gt;code_bp=saved_code_bp;
+    Gs-&gt;data_bp=saved_data_bp;
+    c-&gt;tss=TssNew(i);
+    c-&gt;seth_task=task;
+    WbInvd;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  PopFD;
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> MPInit()
+{ </span><span class="cGREEN">//Called by adam during start-up</span><span class="cBLACK">
+  RaxRbxRcxRdx ee;
+  CPUStruct *c;
+  CpuId(0x1,&amp;ee);
+
+  mp_cnt=1;
+  mp_cnt_lock=0;
+
+  mp_ctrl=AMAlloc(</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">MPCmdCtrl</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+  MPCmdCtrlInit(mp_ctrl);
+
+  mp_crash=ACAlloc(</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">MPCrashStruct</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+
+</span><span class="cGREEN">//Must be in code heap because init code uses 32 bit address of cpu_struct</span><span class="cBLACK">
+  c=cpu_structs=CAlloc(</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">CPUStruct</span><span class="cLTGRAY">)</span><span class="cBLACK">*MP_MAX_PROCESSORS,Fs-&gt;code_heap);
+  MemCpy(c,&amp;sys_temp_cpu0_struct,</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">CPUStruct</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+  c-&gt;address=cpu_structs;
+
+  SetGs(c);
+  adam_task-&gt;gs=c;
+  adam_task-&gt;time_slice_start=GetTimeStamp;
+  c-&gt;seth_task=adam_task;
+  c-&gt;code_bp=sys_code_bp;
+  c-&gt;data_bp=sys_data_bp;
+  c-&gt;tss=TssNew(0);
+
+  c-&gt;idle_task=Spawn(0,NULL,</span><span class="cBROWN">"Idle Task"</span><span class="cBLACK">,Fs,NULL,IDLE_STK,0);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (Bt</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;ee.rdx,9</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+</span><span class="cGREEN">//Unnecessary?</span><span class="cBLACK">
+</span><span class="cGREEN">//    SetMSR(IA32_LAPIC_BASE,LAPIC_BASE+0x900);</span><span class="cBLACK">
+    MPAPICInit;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> MPCrash()
+{ </span><span class="cGREEN">//Entering the debugger from another core causes an interrupt on core#0</span><span class="cBLACK">
+  </span><span class="cGREEN">//Which calls this routine.</span><span class="cBLACK">
+  IntEOI;
+  mp_cnt=1;
+  Raw(ON);
+  sys_dc_flags|=DCF_SHOW_DOLLAR;
+  </span><span class="cBLUE">coutln</span><span class="cBLACK"> </span><span class="cBROWN">"MP Crash CPU#"</span><span class="cBLACK">,mp_crash-&gt;cpu_num,</span><span class="cBROWN">" Task:"</span><span class="cBLACK">,mp_crash-&gt;task;
+  Dbg(mp_crash-&gt;msg,mp_crash-&gt;msg_num);
+}
+</span></pre><div class="archive-note">Historical capture: 2010-08-25. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

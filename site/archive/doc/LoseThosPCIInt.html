@@ -1,0 +1,94 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="description"/>
+<meta content="64-Bit, Operating System, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="keywords"/>
+<meta content="LoseThos V6.02" name="generator"/>
+<style type="text/css">
+.cBLACK{color:rgb(0,0,0);}
+.cBLUE{color:rgb(0,0,168);}
+.cGREEN{color:rgb(0,168,0);}
+.cCYAN{color:rgb(0,168,168);}
+.cRED{color:rgb(168,0,0);}
+.cPURPLE{color:rgb(168,0,168);}
+.cBROWN{color:rgb(168,84,0);}
+.cLTGRAY{color:rgb(168,168,168);}
+.cDKGRAY{color:rgb(84,84,84);}
+.cLTBLUE{color:rgb(84,84,252);}
+.cLTGREEN{color:rgb(84,252,84);}
+.cLTCYAN{color:rgb(84,252,252);}
+.cLTRED{color:rgb(252,84,84);}
+.cLTPURPLE{color:rgb(252,84,252);}
+.cYELLOW{color:rgb(252,252,84);}
+.cWHITE{color:rgb(252,252,252);}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cBLACK">                              </span><span class="cPURPLE">LoseThos Interrupts</span><span class="cBLACK">
+
+There are 16 ISA bus interrupts.  LoseThos assigns them to system vectors 
+0x20-0x2F.  See </span><a href="/archive/code/OSMain.html"><span class="cRED">IntsInit</span></a><span class="cBLACK">.  LoseThos uses timer#0, keyboard#1 and mouse#12.  Some 
+system's mice refuse to generate interrupts, so LoseThos falls-back on polling.  
+I, purposely, avoid interrupts for drives because they are a potential source of 
+incompatibility, and LoseThos must maintain its distinctive simpleness.
+
+There are 4 PCI interrupts per PCI bus, known as A,B,C and D.  LoseThos does not 
+support PCI devices except HD Audio, which it polls.  The 4 PCI bus interrupts 
+are shared by devices on a single PCI bus.  You must support all devices on a 
+bus, or none, it seems.  If you support one device, you can't be sure it's not 
+sharing an interrupt with another device.  If you have two devices with a shared 
+interrupt, one you support and one you don't, you'll have problems if you don't 
+acknowledge an interrupt from the device you don't support.  I hear they're 
+edge-triggered, though, so maybe not.  I'm not an expert.
+
+I think most computers have one of the Intel ICH chips, so I could probably have 
+pretty wide compatibility if I assumed people had an ICH chip in bus#0.  The ICH 
+chip versions differ, though, and I really don't want to get in the business of 
+having redundant drivers for all ICH chips.  I prefer limiting LoseThos to least 
+(greatest) common denominator hardware.  HD Audio is the only exception, but I 
+hope that becomes standard.
+
+PCI interrupts are shared between devices on ONE bus.  Therefore, since ICH 
+chips occupy a whole single bus, usually bus #0, my concern about shared 
+interrupts would involve only devices on an ICH chip and not all PCI devices on 
+other PCI busses on the machine.  I could manage to resolve sharing for a known 
+ICH device, but I'd still be forced to deal with all the different versions of 
+ICH chips.
+
+A keyboard or mouse only needs to be polled once every few milliseconds, if you 
+are not using interrupts.  That's just reading a port.  An audio device with a 
+big buffer, is similarly slow, so you can poll.  Disk access when you have 
+nothing better to do with the focus task on a home system is okay to poll.  It 
+is in the foreground.  Networks, however, must happen in the background and can 
+be high bandwidth.  If they have big buffers, you might poll.  In the age of 
+multicored CPU's, you could eliminate interrupts and DMA all together and 
+dedicate cores to various I/O tasks.  It's probably better doing it normally, 
+but I have compatibility to consider.
+
+LoseThos uses cooperative multitasking when polling during disk activity.  The 
+task swaps-in, reads the disk status port and yields to the next task.  Swapping 
+in and out takes half a microsecond, actually less time than the microsecond 
+needed for reading an ISA I/O port.  Other task CPU activity can take place 
+while this is happening, but not too many or the disk task will poll too slowly. 
+ If you notice multitasking issues when two tasks are accessing the disk, it's 
+because one locks the disk during big file operation.  It does not break disk 
+requests into pieces to share the drive.  See </span><a href="https://web.archive.org/web/20100212210731/http://www.losethos.com/code/Spinning.html"><span class="cRED">::/LT/Doc/Lectures/Spinning.CPZ</span></a><span class="cBLACK">.
+
+See </span><a href="/archive/code/Interrupts.html"><span class="cRED">::/LT/OSMain/Interrupts.CPZ</span></a><span class="cBLACK">.
+See </span><a href="/archive/code/PCIInterrupts.html"><span class="cRED">::/LT/Doc/Lectures/PCIInterrupts.CPZ</span></a><span class="cBLACK"> if you want to add PCI interrupt 
+support on your machine.
+
+See </span><a href="https://web.archive.org/web/20100212210731/http://www.losethos.com/code/USB.html"><span class="cRED">::/LT/Doc/Lectures/USB.CPZ</span></a><span class="cBLACK"> if you are interested in USB.
+
+See </span><span class="cRED">PCIRep</span><span class="cBLACK">() and </span><span class="cRED">PCI</span><span class="cBLACK">.
+
+See </span><a href="http://www.pcidatabase.com/reports.php?type=tab-delimeted"><span class="cRED">PCIDevice List File</span></a><span class="cBLACK"> if you want to be intimidated by just how many different 
+PCI devices there are.
+
+</span></pre><div class="archive-note">Historical capture: 2010-02-12. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

@@ -1,0 +1,234 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="description"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="keywords"/>
+<meta content="LoseThos V6.18" name="generator"/>
+<style type="text/css">
+.cBLACK{color:rgb(0,0,0);}
+.cBLUE{color:rgb(0,0,168);}
+.cGREEN{color:rgb(0,168,0);}
+.cCYAN{color:rgb(0,168,168);}
+.cRED{color:rgb(168,0,0);}
+.cPURPLE{color:rgb(168,0,168);}
+.cBROWN{color:rgb(168,84,0);}
+.cLTGRAY{color:rgb(168,168,168);}
+.cDKGRAY{color:rgb(84,84,84);}
+.cLTBLUE{color:rgb(84,84,252);}
+.cLTGREEN{color:rgb(84,252,84);}
+.cLTCYAN{color:rgb(84,252,252);}
+.cLTRED{color:rgb(252,84,84);}
+.cLTPURPLE{color:rgb(252,84,252);}
+.cYELLOW{color:rgb(252,252,84);}
+.cWHITE{color:rgb(252,252,252);}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cPURPLE">                               <a href="/archive/doc/TrivialSolutions.html">Trivial Solutions</a>
+                    <a href="/archive/index.html">The LoseThos 64-bit PC Operating System</a>
+File:/LT/Adam/Ltf/LtfBible.APZ
+This, and all LoseThos files, are public domain.  Do whatever you like.
+God is watching; God is just; God is never out-done in generosity.  He talks!
+
+LoseThos code compiles with the 64-bit LoseThos compiler/assembler I wrote.
+Boot the LoseThos CD and you can compile it.  Not in Kansas anymore!
+
+<a href="/archive/code/FixedPoint.html">Click here for preliminary compiler information you need.</a>
+
+</span><a name="l1"></a><span class="cBLACK">#</span><span class="cBLUE">help_index</span><span class="cBLACK"> </span><span class="cBROWN">"Ltf/Bible"</span><span class="cBLACK">
+<a name="l2"></a>DefineLoad(</span><span class="cBROWN">"ST_BIBLE_FILE"</span><span class="cBLACK">,</span><span class="cBROWN">"::/LT/Text/Bible.TXZ"</span><span class="cBLACK">);
+<a name="l3"></a>
+<a name="l4"></a>DefineListLoad(</span><span class="cBROWN">"ST_BIBLE_BOOKS"</span><span class="cBLACK">,
+<a name="l5"></a></span><span class="cBROWN">"Genesis\0"</span><span class="cBLACK">
+<a name="l6"></a></span><span class="cBROWN">"Exodus\0"</span><span class="cBLACK">
+<a name="l7"></a></span><span class="cBROWN">"Leviticus\0"</span><span class="cBLACK">
+<a name="l8"></a></span><span class="cBROWN">"Numbers\0"</span><span class="cBLACK">
+<a name="l9"></a></span><span class="cBROWN">"Deuteronomy\0"</span><span class="cBLACK">
+<a name="l10"></a></span><span class="cBROWN">"Joshua\0"</span><span class="cBLACK">
+<a name="l11"></a></span><span class="cBROWN">"Judges\0"</span><span class="cBLACK">
+<a name="l12"></a></span><span class="cBROWN">"Ruth\0"</span><span class="cBLACK">
+<a name="l13"></a></span><span class="cBROWN">"1 Samuel\0"</span><span class="cBLACK">
+<a name="l14"></a></span><span class="cBROWN">"2 Samuel\0"</span><span class="cBLACK">
+<a name="l15"></a></span><span class="cBROWN">"1 Kings\0"</span><span class="cBLACK">
+<a name="l16"></a></span><span class="cBROWN">"2 Kings\0"</span><span class="cBLACK">
+<a name="l17"></a></span><span class="cBROWN">"1 Chronicles\0"</span><span class="cBLACK">
+<a name="l18"></a></span><span class="cBROWN">"2 Chronicles\0"</span><span class="cBLACK">
+<a name="l19"></a></span><span class="cBROWN">"Ezra\0"</span><span class="cBLACK">
+<a name="l20"></a></span><span class="cBROWN">"Nehemiah\0"</span><span class="cBLACK">
+<a name="l21"></a></span><span class="cBROWN">"Tobit\0"</span><span class="cBLACK">
+<a name="l22"></a></span><span class="cBROWN">"Judith\0"</span><span class="cBLACK">
+<a name="l23"></a></span><span class="cBROWN">"Esther\0"</span><span class="cBLACK">
+<a name="l24"></a></span><span class="cBROWN">"1 Maccabees\0"</span><span class="cBLACK">
+<a name="l25"></a></span><span class="cBROWN">"2 Maccabees\0"</span><span class="cBLACK">
+<a name="l26"></a></span><span class="cBROWN">"Job\0"</span><span class="cBLACK">
+<a name="l27"></a></span><span class="cBROWN">"Psalms\0"</span><span class="cBLACK">
+<a name="l28"></a></span><span class="cBROWN">"Proverbs\0"</span><span class="cBLACK">
+<a name="l29"></a></span><span class="cBROWN">"Ecclesiastes\0"</span><span class="cBLACK">
+<a name="l30"></a></span><span class="cBROWN">"Song of Songs\0"</span><span class="cBLACK">
+<a name="l31"></a></span><span class="cBROWN">"Wisdom\0"</span><span class="cBLACK">
+<a name="l32"></a></span><span class="cBROWN">"Sirach\0"</span><span class="cBLACK">
+<a name="l33"></a></span><span class="cBROWN">"Isaiah\0"</span><span class="cBLACK">
+<a name="l34"></a></span><span class="cBROWN">"Jeremiah\0"</span><span class="cBLACK">
+<a name="l35"></a></span><span class="cBROWN">"Lamentations\0"</span><span class="cBLACK">
+<a name="l36"></a></span><span class="cBROWN">"Baruch\0"</span><span class="cBLACK">
+<a name="l37"></a></span><span class="cBROWN">"Ezekiel\0"</span><span class="cBLACK">
+<a name="l38"></a></span><span class="cBROWN">"Daniel\0"</span><span class="cBLACK">
+<a name="l39"></a></span><span class="cBROWN">"Hosea\0"</span><span class="cBLACK">
+<a name="l40"></a></span><span class="cBROWN">"Joel\0"</span><span class="cBLACK">
+<a name="l41"></a></span><span class="cBROWN">"Amos\0"</span><span class="cBLACK">
+<a name="l42"></a></span><span class="cBROWN">"Obadiah\0"</span><span class="cBLACK">
+<a name="l43"></a></span><span class="cBROWN">"Jonah\0"</span><span class="cBLACK">
+<a name="l44"></a></span><span class="cBROWN">"Micah\0"</span><span class="cBLACK">
+<a name="l45"></a></span><span class="cBROWN">"Nahum\0"</span><span class="cBLACK">
+<a name="l46"></a></span><span class="cBROWN">"Habakkuk\0"</span><span class="cBLACK">
+<a name="l47"></a></span><span class="cBROWN">"Zephaniah\0"</span><span class="cBLACK">
+<a name="l48"></a></span><span class="cBROWN">"Haggai\0"</span><span class="cBLACK">
+<a name="l49"></a></span><span class="cBROWN">"Zechariah\0"</span><span class="cBLACK">
+<a name="l50"></a></span><span class="cBROWN">"Malachi\0"</span><span class="cBLACK">
+<a name="l51"></a></span><span class="cBROWN">"Matthew\0"</span><span class="cBLACK">
+<a name="l52"></a></span><span class="cBROWN">"Mark\0"</span><span class="cBLACK">
+<a name="l53"></a></span><span class="cBROWN">"Luke\0"</span><span class="cBLACK">
+<a name="l54"></a></span><span class="cBROWN">"John\0"</span><span class="cBLACK">
+<a name="l55"></a></span><span class="cBROWN">"Acts\0"</span><span class="cBLACK">
+<a name="l56"></a></span><span class="cBROWN">"Romans\0"</span><span class="cBLACK">
+<a name="l57"></a></span><span class="cBROWN">"1 Corinthians\0"</span><span class="cBLACK">
+<a name="l58"></a></span><span class="cBROWN">"2 Corinthians\0"</span><span class="cBLACK">
+<a name="l59"></a></span><span class="cBROWN">"Galatians\0"</span><span class="cBLACK">
+<a name="l60"></a></span><span class="cBROWN">"Ephesians\0"</span><span class="cBLACK">
+<a name="l61"></a></span><span class="cBROWN">"Philippians\0"</span><span class="cBLACK">
+<a name="l62"></a></span><span class="cBROWN">"Colossians\0"</span><span class="cBLACK">
+<a name="l63"></a></span><span class="cBROWN">"1 Thessalonians\0"</span><span class="cBLACK">
+<a name="l64"></a></span><span class="cBROWN">"2 Thessalonians\0"</span><span class="cBLACK">
+<a name="l65"></a></span><span class="cBROWN">"1 Timothy\0"</span><span class="cBLACK">
+<a name="l66"></a></span><span class="cBROWN">"2 Timothy\0"</span><span class="cBLACK">
+<a name="l67"></a></span><span class="cBROWN">"Titus\0"</span><span class="cBLACK">
+<a name="l68"></a></span><span class="cBROWN">"Philemon\0"</span><span class="cBLACK">
+<a name="l69"></a></span><span class="cBROWN">"Hebrews\0"</span><span class="cBLACK">
+<a name="l70"></a></span><span class="cBROWN">"James\0"</span><span class="cBLACK">
+<a name="l71"></a></span><span class="cBROWN">"1 Peter\0"</span><span class="cBLACK">
+<a name="l72"></a></span><span class="cBROWN">"2 Peter\0"</span><span class="cBLACK">
+<a name="l73"></a></span><span class="cBROWN">"1 John\0"</span><span class="cBLACK">
+<a name="l74"></a></span><span class="cBROWN">"2 John\0"</span><span class="cBLACK">
+<a name="l75"></a></span><span class="cBROWN">"3 John\0"</span><span class="cBLACK">
+<a name="l76"></a></span><span class="cBROWN">"Jude\0"</span><span class="cBLACK">
+<a name="l77"></a></span><span class="cBROWN">"Revelation\0"</span><span class="cBLACK">
+<a name="l78"></a></span><span class="cBROWN">"\0"</span><span class="cBLACK">);
+<a name="l79"></a>
+<a name="l80"></a>DefineListLoad(</span><span class="cBROWN">"ST_BIBLE_BOOK_LINES"</span><span class="cBLACK">,
+<a name="l81"></a></span><span class="cBROWN">"297\0"</span><span class="cBLACK">
+<a name="l82"></a></span><span class="cBROWN">"5068\0"</span><span class="cBLACK">
+<a name="l83"></a></span><span class="cBROWN">"9123\0"</span><span class="cBLACK">
+<a name="l84"></a></span><span class="cBROWN">"12005\0"</span><span class="cBLACK">
+<a name="l85"></a></span><span class="cBROWN">"15977\0"</span><span class="cBLACK">
+<a name="l86"></a></span><span class="cBROWN">"19168\0"</span><span class="cBLACK">
+<a name="l87"></a></span><span class="cBROWN">"21329\0"</span><span class="cBLACK">
+<a name="l88"></a></span><span class="cBROWN">"23598\0"</span><span class="cBLACK">
+<a name="l89"></a></span><span class="cBROWN">"23902\0"</span><span class="cBLACK">
+<a name="l90"></a></span><span class="cBROWN">"26892\0"</span><span class="cBLACK">
+<a name="l91"></a></span><span class="cBROWN">"29345\0"</span><span class="cBLACK">
+<a name="l92"></a></span><span class="cBROWN">"32241\0"</span><span class="cBLACK">
+<a name="l93"></a></span><span class="cBROWN">"34961\0"</span><span class="cBLACK">
+<a name="l94"></a></span><span class="cBROWN">"37633\0"</span><span class="cBLACK">
+<a name="l95"></a></span><span class="cBROWN">"40756\0"</span><span class="cBLACK">
+<a name="l96"></a></span><span class="cBROWN">"41671\0"</span><span class="cBLACK">
+<a name="l97"></a></span><span class="cBROWN">"Tobit\0"</span><span class="cBLACK">
+<a name="l98"></a></span><span class="cBROWN">"Judith\0"</span><span class="cBLACK">
+<a name="l99"></a></span><span class="cBROWN">"42963\0"</span><span class="cBLACK">
+<a name="l100"></a></span><span class="cBROWN">"1 Maccabees\0"</span><span class="cBLACK">
+<a name="l101"></a></span><span class="cBROWN">"2 Maccabees\0"</span><span class="cBLACK">
+<a name="l102"></a></span><span class="cBROWN">"43605\0"</span><span class="cBLACK">
+<a name="l103"></a></span><span class="cBROWN">"46190\0"</span><span class="cBLACK">
+<a name="l104"></a></span><span class="cBROWN">"53793\0"</span><span class="cBLACK">
+<a name="l105"></a></span><span class="cBROWN">"56267\0"</span><span class="cBLACK">
+<a name="l106"></a></span><span class="cBROWN">"56966\0"</span><span class="cBLACK">
+<a name="l107"></a></span><span class="cBROWN">"Wisdom\0"</span><span class="cBLACK">
+<a name="l108"></a></span><span class="cBROWN">"Sirach\0"</span><span class="cBLACK">
+<a name="l109"></a></span><span class="cBROWN">"57332\0"</span><span class="cBLACK">
+<a name="l110"></a></span><span class="cBROWN">"61806\0"</span><span class="cBLACK">
+<a name="l111"></a></span><span class="cBROWN">"66736\0"</span><span class="cBLACK">
+<a name="l112"></a></span><span class="cBROWN">"Baruch\0"</span><span class="cBLACK">
+<a name="l113"></a></span><span class="cBROWN">"67217\0"</span><span class="cBLACK">
+<a name="l114"></a></span><span class="cBROWN">"71804\0"</span><span class="cBLACK">
+<a name="l115"></a></span><span class="cBROWN">"73189\0"</span><span class="cBLACK">
+<a name="l116"></a></span><span class="cBROWN">"73876\0"</span><span class="cBLACK">
+<a name="l117"></a></span><span class="cBROWN">"74130\0"</span><span class="cBLACK">
+<a name="l118"></a></span><span class="cBROWN">"74615\0"</span><span class="cBLACK">
+<a name="l119"></a></span><span class="cBROWN">"74697\0"</span><span class="cBLACK">
+<a name="l120"></a></span><span class="cBROWN">"74860\0"</span><span class="cBLACK">
+<a name="l121"></a></span><span class="cBROWN">"75241\0"</span><span class="cBLACK">
+<a name="l122"></a></span><span class="cBROWN">"75416\0"</span><span class="cBLACK">
+<a name="l123"></a></span><span class="cBROWN">"75604\0"</span><span class="cBLACK">
+<a name="l124"></a></span><span class="cBROWN">"75806\0"</span><span class="cBLACK">
+<a name="l125"></a></span><span class="cBROWN">"75932\0"</span><span class="cBLACK">
+<a name="l126"></a></span><span class="cBROWN">"76684\0"</span><span class="cBLACK">
+<a name="l127"></a></span><span class="cBROWN">"76908\0"</span><span class="cBLACK">
+<a name="l128"></a></span><span class="cBROWN">"79970\0"</span><span class="cBLACK">
+<a name="l129"></a></span><span class="cBROWN">"81941\0"</span><span class="cBLACK">
+<a name="l130"></a></span><span class="cBROWN">"85266\0"</span><span class="cBLACK">
+<a name="l131"></a></span><span class="cBROWN">"87803\0"</span><span class="cBLACK">
+<a name="l132"></a></span><span class="cBROWN">"90914\0"</span><span class="cBLACK">
+<a name="l133"></a></span><span class="cBROWN">"92110\0"</span><span class="cBLACK">
+<a name="l134"></a></span><span class="cBROWN">"93323\0"</span><span class="cBLACK">
+<a name="l135"></a></span><span class="cBROWN">"94088\0"</span><span class="cBLACK">
+<a name="l136"></a></span><span class="cBROWN">"94514\0"</span><span class="cBLACK">
+<a name="l137"></a></span><span class="cBROWN">"94869\0"</span><span class="cBLACK">
+<a name="l138"></a></span><span class="cBROWN">"95153\0"</span><span class="cBLACK">
+<a name="l139"></a></span><span class="cBROWN">"95402\0"</span><span class="cBLACK">
+<a name="l140"></a></span><span class="cBROWN">"95647\0"</span><span class="cBLACK">
+<a name="l141"></a></span><span class="cBROWN">"95772\0"</span><span class="cBLACK">
+<a name="l142"></a></span><span class="cBROWN">"96090\0"</span><span class="cBLACK">
+<a name="l143"></a></span><span class="cBROWN">"96320\0"</span><span class="cBLACK">
+<a name="l144"></a></span><span class="cBROWN">"96440\0"</span><span class="cBLACK">
+<a name="l145"></a></span><span class="cBROWN">"96500\0"</span><span class="cBLACK">
+<a name="l146"></a></span><span class="cBROWN">"97370\0"</span><span class="cBLACK">
+<a name="l147"></a></span><span class="cBROWN">"97687\0"</span><span class="cBLACK">
+<a name="l148"></a></span><span class="cBROWN">"97976\0"</span><span class="cBLACK">
+<a name="l149"></a></span><span class="cBROWN">"98163\0"</span><span class="cBLACK">
+<a name="l150"></a></span><span class="cBROWN">"98506\0"</span><span class="cBLACK">
+<a name="l151"></a></span><span class="cBROWN">"98552\0"</span><span class="cBLACK">
+<a name="l152"></a></span><span class="cBROWN">"98597\0"</span><span class="cBLACK">
+<a name="l153"></a></span><span class="cBROWN">"98684\0"</span><span class="cBLACK">
+<a name="l154"></a></span><span class="cBROWN">"\0"</span><span class="cBLACK">);
+<a name="l155"></a>
+<a name="l156"></a>
+<a name="l157"></a></span><span class="cBLUE">public</span><span class="cBLACK"> </span><span class="cBLUE">U0</span><span class="cBLACK"> PutBibleVerse(</span><span class="cBLUE">U8</span><span class="cBLACK"> *verse,</span><span class="cBLUE">I64</span><span class="cBLACK"> lines)
+<a name="l158"></a>{
+<a name="l159"></a>  </span><span class="cBLUE">I64</span><span class="cBLACK"> i;
+<a name="l160"></a>  Ltf *l;
+<a name="l161"></a>  LtfEntry *cl;
+<a name="l162"></a>  </span><span class="cBLUE">U8</span><span class="cBLACK"> *st=StrNew(verse),
+<a name="l163"></a>      *st2=StrNew(verse);
+<a name="l164"></a>  </span><span class="cBLUE">if</span><span class="cBLACK"> (StrOcc</span><span class="cLTGRAY">(</span><span class="cBLACK">st,</span><span class="cBROWN">','</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+<a name="l165"></a>    StrLastRem(st,</span><span class="cBROWN">","</span><span class="cBLACK">,st2);
+<a name="l166"></a>  </span><span class="cBLUE">else</span><span class="cBLACK">
+<a name="l167"></a>    *st2=0;
+<a name="l168"></a>
+<a name="l169"></a>  i=A2I(DefineSub</span><span class="cLTGRAY">(</span><span class="cBLACK">DefineMatch(st,</span><span class="cBROWN">"ST_BIBLE_BOOKS"</span><span class="cBLACK">,LEF_IGNORE_CASE),
+<a name="l170"></a>      </span><span class="cBROWN">"ST_BIBLE_BOOK_LINES"</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+<a name="l171"></a>  l=LtfRead(Define</span><span class="cLTGRAY">(</span><span class="cBROWN">"ST_BIBLE_FILE"</span><span class="cLTGRAY">)</span><span class="cBLACK">,LTFF_PLAIN_TEXT);
+<a name="l172"></a>  LtfGoToLineNum(l,i); </span><span class="cGREEN">//one based</span><span class="cBLACK">
+<a name="l173"></a>  </span><span class="cBLUE">if</span><span class="cBLACK"> (*st2) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+<a name="l174"></a>    StrCpy(l-&gt;find_replace-&gt;find_text,st2);
+<a name="l175"></a>    EdFindNext(l);
+<a name="l176"></a>  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+<a name="l177"></a>  cl=l-&gt;cur_entry;
+<a name="l178"></a>  </span><span class="cBLUE">while</span><span class="cBLACK"> (lines) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+<a name="l179"></a>    </span><span class="cBLUE">if</span><span class="cBLACK"> (cl-&gt;btype==LTFT_TEXT)
+<a name="l180"></a>      </span><span class="cBLUE">cout</span><span class="cBLACK"> cl-&gt;tag;
+<a name="l181"></a>    </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cBLUE">if</span><span class="cBLACK"> (cl-&gt;btype==LTFT_CR) {
+<a name="l182"></a>      CrLf;
+<a name="l183"></a>      lines--;
+<a name="l184"></a>    }
+<a name="l185"></a>    cl=cl-&gt;next;
+<a name="l186"></a>  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+<a name="l187"></a>  LtfDel(l);
+<a name="l188"></a>  Free(st);
+<a name="l189"></a>  Free(st2);
+<a name="l190"></a>}
+</span></pre><div class="archive-note">Historical capture: 2010-11-16. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

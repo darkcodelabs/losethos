@@ -1,0 +1,152 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="description"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="keywords"/>
+<meta content="LoseThos V7.03" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cF5">                               <a href="/archive/doc/TrivialSolutions.html">Trivial Solutions</a>
+                    <a href="/archive/index.html">The LoseThos 64-bit PC Operating System</a>
+File:/LT/Opt/Boot/BootMHD.SPZ
+This, and all LoseThos files, are public domain.  Do whatever you like.
+God is watching; God is just; God is never out-done in generosity.  He talks!
+
+LoseThos code compiles with the 64-bit LoseThos compiler/assembler I wrote.
+Boot the LoseThos CD and you can compile it.  Not in Kansas anymore!
+
+<a href="/archive/code/FixedPoint.html">Click here for preliminary compiler information you need.</a>
+
+</span><a name="l1"></a><span class="cF1">asm</span><span class="cF0"> {
+<a name="l2"></a>#</span><span class="cF1">include</span><span class="cF0"> </span><span class="cF6">"/LT/OSMain/BootDefs.HPZ"</span><span class="cF0">
+<a name="l3"></a>
+<a name="l4"></a>#</span><span class="cF1">define</span><span class="cF0"> MODULE_SIZE             1*BLK_SIZE
+<a name="l5"></a>#</span><span class="cF1">define</span><span class="cF0"> BOOT_HIGH_LOC   (</span><span class="cF7">(</span><span class="cF0">BOOT_RAM_LIMIT-(BOOT_STK_SIZE+MODULE_SIZE)</span><span class="cF7">)</span><span class="cF0">&gt;&gt;4)
+<a name="l6"></a></span><span class="cF1">USE16</span><span class="cF0">
+<a name="l7"></a>BMHD_START::
+<a name="l8"></a>BMHD_CODE::
+<a name="l9"></a>        </span><span class="cF1">CLD</span><span class="cF0">
+<a name="l10"></a>
+<a name="l11"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">AX</span><span class="cF0">,BOOT_HIGH_LOC
+<a name="l12"></a>
+<a name="l13"></a>        </span><span class="cF1">CLI</span><span class="cF0">
+<a name="l14"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">SS</span><span class="cF0">,</span><span class="cFC">AX</span><span class="cF0">
+<a name="l15"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">SP</span><span class="cF0">,BOOT_STK_SIZE+MODULE_SIZE
+<a name="l16"></a>        </span><span class="cF1">STI</span><span class="cF0">
+<a name="l17"></a>
+<a name="l18"></a>        </span><span class="cF1">PUSHFW</span><span class="cF0">
+<a name="l19"></a>        </span><span class="cF1">PUSH</span><span class="cF0">    </span><span class="cFC">DS</span><span class="cF0">
+<a name="l20"></a>        </span><span class="cF1">PUSH</span><span class="cF0">    </span><span class="cFC">ES</span><span class="cF0">
+<a name="l21"></a>        </span><span class="cF1">PUSH</span><span class="cF0">    </span><span class="cFC">FS</span><span class="cF0">
+<a name="l22"></a>        </span><span class="cF1">PUSH</span><span class="cF0">    </span><span class="cFC">GS</span><span class="cF0">
+<a name="l23"></a>        </span><span class="cF1">PUSH</span><span class="cF0">    </span><span class="cFC">ECX</span><span class="cF0">
+<a name="l24"></a>        </span><span class="cF1">PUSH</span><span class="cF0">    </span><span class="cFC">EBX</span><span class="cF0">
+<a name="l25"></a>        </span><span class="cF1">PUSH</span><span class="cF0">    </span><span class="cFC">EDX</span><span class="cF0">
+<a name="l26"></a>        </span><span class="cF1">PUSH</span><span class="cF0">    </span><span class="cFC">EBP</span><span class="cF0">
+<a name="l27"></a>
+<a name="l28"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">ES</span><span class="cF0">,</span><span class="cFC">AX</span><span class="cF0">
+<a name="l29"></a>
+<a name="l30"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">AX</span><span class="cF0">,VGA_TEXT_MEM_BASE/16
+<a name="l31"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">FS</span><span class="cF0">,</span><span class="cFC">AX</span><span class="cF0">
+<a name="l32"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cF1">U32</span><span class="cF0"> </span><span class="cFC">FS</span><span class="cF0">:[0],</span><span class="cF6">'B'</span><span class="cF0">+0x2000+(</span><span class="cF6">'1'</span><span class="cF0">+0x2000)&lt;&lt;16
+<a name="l33"></a>        </span><span class="cF1">CALL</span><span class="cF0">    GET_IP
+<a name="l34"></a>GET_IP:
+<a name="l35"></a>        </span><span class="cF1">POP</span><span class="cF0">     </span><span class="cFC">BX</span><span class="cF0">
+<a name="l36"></a>        </span><span class="cF1">SUB</span><span class="cF0">     </span><span class="cFC">BX</span><span class="cF0">,GET_IP
+<a name="l37"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">CX</span><span class="cF0">,</span><span class="cFC">BX</span><span class="cF0">
+<a name="l38"></a>        </span><span class="cF1">SHR</span><span class="cF0">     </span><span class="cFC">BX</span><span class="cF0">,4
+<a name="l39"></a></span><span class="cF2">//Copy this bootloader code to just under 0x80000</span><span class="cF0">
+<a name="l40"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">AX</span><span class="cF0">,</span><span class="cFC">CS</span><span class="cF0">
+<a name="l41"></a>        </span><span class="cF1">PUSH</span><span class="cF0">    </span><span class="cFC">AX</span><span class="cF0">
+<a name="l42"></a>        </span><span class="cF1">ADD</span><span class="cF0">     </span><span class="cFC">AX</span><span class="cF0">,</span><span class="cFC">BX</span><span class="cF0">
+<a name="l43"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">DS</span><span class="cF0">,</span><span class="cFC">AX</span><span class="cF0">
+<a name="l44"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cF1">U16</span><span class="cF0"> [BMHD_OLD_CS_IP],</span><span class="cFC">CX</span><span class="cF0">
+<a name="l45"></a>        </span><span class="cF1">POP</span><span class="cF0">     </span><span class="cF1">U16</span><span class="cF0"> [BMHD_OLD_CS_IP+2]
+<a name="l46"></a>
+<a name="l47"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">CX</span><span class="cF0">,MODULE_SIZE
+<a name="l48"></a>        </span><span class="cF1">XOR</span><span class="cF0">     </span><span class="cFC">SI</span><span class="cF0">,</span><span class="cFC">SI</span><span class="cF0">
+<a name="l49"></a>        </span><span class="cF1">XOR</span><span class="cF0">     </span><span class="cFC">DI</span><span class="cF0">,</span><span class="cFC">DI</span><span class="cF0">
+<a name="l50"></a>        </span><span class="cF1">REP_MOVSB</span><span class="cF0">
+<a name="l51"></a>
+<a name="l52"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">AX</span><span class="cF0">,BOOT_HIGH_LOC
+<a name="l53"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">DS</span><span class="cF0">,</span><span class="cFC">AX</span><span class="cF0">
+<a name="l54"></a>
+<a name="l55"></a></span><span class="cF2">//My assembler doesn't support 16-bit very well.</span><span class="cF0">
+<a name="l56"></a>        </span><span class="cF1">DU8</span><span class="cF0">     0xEA;   </span><span class="cF2">//JMP BOOT_HIGH_LOC:BMHD_HISTART</span><span class="cF0">
+<a name="l57"></a>        </span><span class="cF1">DU16</span><span class="cF0">    BMHD_HISTART,BOOT_HIGH_LOC;
+<a name="l58"></a>
+<a name="l59"></a>BMHD_BIOS_DRV_NUM:      </span><span class="cF1">DU8</span><span class="cF0">     0;
+<a name="l60"></a>BMHD_OLD_CS_IP:         </span><span class="cF1">DU16</span><span class="cF0">    0,0;
+<a name="l61"></a></span><span class="cF2">//Gets patched by </span><a href="/archive/code/InsBoot.html#l184"><span class="cF4">InstallBoot</span></a><span class="cF2">().</span><span class="cF0">
+<a name="l62"></a>BMHD_BLK_CNT::          </span><span class="cF1">DU16</span><span class="cF0">    0;
+<a name="l63"></a>
+<a name="l64"></a>BMHD_DAP:               </span><span class="cF1">DU8</span><span class="cF0">     16,0,1,0; </span><span class="cF2">//One blk at a time</span><span class="cF0">
+<a name="l65"></a>BMHD_DAP_BUF:           </span><span class="cF1">DU16</span><span class="cF0">    0,0;
+<a name="l66"></a></span><span class="cF2">//Gets patched by </span><a href="/archive/code/InsBoot.html#l184"><span class="cF4">InstallBoot</span></a><span class="cF2">().</span><span class="cF0">
+<a name="l67"></a>BMHD_DAP_BLK::  </span><span class="cF2">//64-bit</span><span class="cF0">
+<a name="l68"></a>BMHD_DAP_BLK_LO:        </span><span class="cF1">DU32</span><span class="cF0">    0;
+<a name="l69"></a>BMHD_DAP_BLK_HI:        </span><span class="cF1">DU32</span><span class="cF0">    0;
+<a name="l70"></a>
+<a name="l71"></a>BMHD_HISTART:
+<a name="l72"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cF1">U8</span><span class="cF0"> [BMHD_BIOS_DRV_NUM],</span><span class="cFC">DL</span><span class="cF0"> </span><span class="cF2">//Passed in by BIOS</span><span class="cF0">
+<a name="l73"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">AX</span><span class="cF0">,BOOT_RAM_BASE/16
+<a name="l74"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">ES</span><span class="cF0">,</span><span class="cFC">AX</span><span class="cF0">
+<a name="l75"></a>        </span><span class="cF1">XOR</span><span class="cF0">     </span><span class="cFC">ECX</span><span class="cF0">,</span><span class="cFC">ECX</span><span class="cF0">
+<a name="l76"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">CX</span><span class="cF0">,</span><span class="cF1">U16</span><span class="cF0"> [BMHD_BLK_CNT]
+<a name="l77"></a>
+<a name="l78"></a>@@05:   </span><span class="cF1">PUSH</span><span class="cF0">    </span><span class="cFC">CX</span><span class="cF0">      </span><span class="cF2">//Blk cnt</span><span class="cF0">
+<a name="l79"></a>
+<a name="l80"></a></span><span class="cF2">//READ BLK</span><span class="cF0">
+<a name="l81"></a>        </span><span class="cF1">PUSH</span><span class="cF0">    </span><span class="cFC">ES</span><span class="cF0">      </span><span class="cF2">//Buf seg</span><span class="cF0">
+<a name="l82"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">AX</span><span class="cF0">,</span><span class="cFC">ES</span><span class="cF0">
+<a name="l83"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cF1">U16</span><span class="cF0"> [BMHD_DAP_BUF+2],</span><span class="cFC">AX</span><span class="cF0"> </span><span class="cF2">//ES:0000</span><span class="cF0">
+<a name="l84"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">SI</span><span class="cF0">,BMHD_DAP </span><span class="cF2">//DS:SI=DAP</span><span class="cF0">
+<a name="l85"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">AH</span><span class="cF0">,0x42
+<a name="l86"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">DL</span><span class="cF0">,</span><span class="cF1">U8</span><span class="cF0"> [BMHD_BIOS_DRV_NUM]
+<a name="l87"></a>        </span><span class="cF1">INT</span><span class="cF0">     0x13
+<a name="l88"></a>
+<a name="l89"></a>        </span><span class="cF1">POP</span><span class="cF0">     </span><span class="cFC">AX</span><span class="cF0">      </span><span class="cF2">//ES</span><span class="cF0">
+<a name="l90"></a>        </span><span class="cF1">ADD</span><span class="cF0">     </span><span class="cFC">AX</span><span class="cF0">,BLK_SIZE/16
+<a name="l91"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">ES</span><span class="cF0">,</span><span class="cFC">AX</span><span class="cF0">
+<a name="l92"></a>        </span><span class="cF1">INC</span><span class="cF0">     </span><span class="cF1">U32</span><span class="cF0"> [BMHD_DAP_BLK_LO]
+<a name="l93"></a>        </span><span class="cF1">JNZ</span><span class="cF0">     @@10
+<a name="l94"></a>        </span><span class="cF1">INC</span><span class="cF0">     </span><span class="cF1">U32</span><span class="cF0"> [BMHD_DAP_BLK_HI]
+<a name="l95"></a>
+<a name="l96"></a>@@10:   </span><span class="cF1">POP</span><span class="cF0">     </span><span class="cFC">CX</span><span class="cF0">
+<a name="l97"></a>        </span><span class="cF1">LOOP</span><span class="cF0">    @@05
+<a name="l98"></a>
+<a name="l99"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">DL</span><span class="cF0">,</span><span class="cF1">U8</span><span class="cF0"> [BMHD_BIOS_DRV_NUM]
+<a name="l100"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">EBX</span><span class="cF0">,</span><span class="cF1">U32</span><span class="cF0"> [BMHD_OLD_CS_IP]
+<a name="l101"></a></span><span class="cF2">//My assembler doesn't support 16-bit very well.</span><span class="cF0">
+<a name="l102"></a>        </span><span class="cF1">DU8</span><span class="cF0">     0xEA;   </span><span class="cF2">//JMP BOOT_RAM_BASE:0000</span><span class="cF0">
+<a name="l103"></a>        </span><span class="cF1">DU16</span><span class="cF0">    0,BOOT_RAM_BASE/16;
+<a name="l104"></a></span><span class="cF2">//Continues here </span><a href="/archive/code/BootMHD2.html#l8"><span class="cF4">BMHD2_START</span></a><span class="cF0">
+<a name="l105"></a>BMHD_END::
+<a name="l106"></a>        </span><span class="cF1">END</span><span class="cF0">
+<a name="l107"></a>#</span><span class="cF1">assert</span><span class="cF0"> $&lt;=440
+<a name="l108"></a>}
+</span></pre><div class="archive-note">Historical capture: 2011-04-07. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

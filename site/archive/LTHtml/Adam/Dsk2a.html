@@ -1,0 +1,430 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>Dsk2a</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V8.00" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cF5">                               <a href="/archive/LTHtml/Doc/TrivialSolutions.html">Trivial Solutions</a>
+                    <a href="/archive/index.html">The LoseThos 64-bit PC Operating System</a>
+File:/LT/Adam/Dsk2a.APZ
+This, and all LoseThos files, are public domain.  Do whatever you like.
+God is watching; God is just; God is never out-done in generosity.  He talks!
+
+LoseThos code compiles with the 64-bit LoseThos compiler/assembler I wrote.
+Boot the LoseThos CD and you can compile it.  Not in Kansas anymore!
+
+<a href="/archive/LTHtml/Demo/Lectures/FixedPoint.html">Click here for preliminary compiler information you need.</a>
+
+</span><a name="l1"></a><span class="cF0">#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"File/Program Routines"</span><span class="cF0">
+<a name="l2"></a>
+<a name="l3"></a></span><span class="cF1">U0</span><span class="cF0"> OFFlatten(LTDirEntry *tempm,LTDirEntry **a,</span><span class="cF1">I64</span><span class="cF0"> *i)
+<a name="l4"></a>{
+<a name="l5"></a>  LTDirEntry *tempm1;
+<a name="l6"></a>  </span><span class="cF1">while</span><span class="cF0"> (tempm) </span><span class="cF7">{</span><span class="cF0">
+<a name="l7"></a>    tempm1=tempm-&gt;next;
+<a name="l8"></a>    </span><span class="cF1">if</span><span class="cF0"> (tempm-&gt;attr&amp;LT_ATTR_DIR) {
+<a name="l9"></a>      OFFlatten(tempm-&gt;sub,a,i);
+<a name="l10"></a>      LTDirEntryDel(tempm);
+<a name="l11"></a>    } </span><span class="cF1">else</span><span class="cF0"> {
+<a name="l12"></a>      a[*i]=tempm;
+<a name="l13"></a>      *i=*i+1;
+<a name="l14"></a>    }
+<a name="l15"></a>    tempm=tempm1;
+<a name="l16"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l17"></a>}
+<a name="l18"></a>
+<a name="l19"></a>
+<a name="l20"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">I64</span><span class="cF0"> LTFileCnt(LTDirEntry *tempm)
+<a name="l21"></a>{
+<a name="l22"></a>  </span><span class="cF1">I64</span><span class="cF0"> cnt=0;
+<a name="l23"></a>  </span><span class="cF1">while</span><span class="cF0"> (tempm) </span><span class="cF7">{</span><span class="cF0">
+<a name="l24"></a>    </span><span class="cF1">if</span><span class="cF0"> (tempm-&gt;attr&amp;LT_ATTR_DIR)
+<a name="l25"></a>      cnt+=LTFileCnt(tempm-&gt;sub);
+<a name="l26"></a>    </span><span class="cF1">else</span><span class="cF0">
+<a name="l27"></a>      cnt++;
+<a name="l28"></a>    tempm=tempm-&gt;next;
+<a name="l29"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l30"></a>  </span><span class="cF1">return</span><span class="cF0"> cnt;
+<a name="l31"></a>}
+<a name="l32"></a>
+<a name="l33"></a></span><span class="cF1">I64</span><span class="cF0"> OFCompare(LTDirEntry *e1,LTDirEntry *e2)
+<a name="l34"></a>{
+<a name="l35"></a>  </span><span class="cF1">return</span><span class="cF0"> e1-&gt;cluster-e2-&gt;cluster;
+<a name="l36"></a>}
+<a name="l37"></a>
+<a name="l38"></a></span><span class="cF1">public</span><span class="cF0"> LTDirEntry **FilesOrder(LTDirEntry *tempm,</span><span class="cF1">I64</span><span class="cF0"> *_cnt=NULL)
+<a name="l39"></a>{ </span><span class="cF2">//See </span><a href="https://web.archive.org/web/20120303011909/http://www.losethos.com/LTHtml/Demo/Dsk/OrderedIO.html"><span class="cF4">::/LT/Demo/Dsk/OrderedIO.CPZ</span></a><span class="cF2">.</span><span class="cF0">
+<a name="l40"></a>  </span><span class="cF1">I64</span><span class="cF0"> cnt=LTFileCnt(tempm),i=0;
+<a name="l41"></a>  LTDirEntry **a=MAlloc(</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF0">LTDirEntry *</span><span class="cF7">)</span><span class="cF0">*cnt);
+<a name="l42"></a>  OFFlatten(tempm,a,&amp;i);
+<a name="l43"></a>  QSortU64(a,cnt,&amp;OFCompare);
+<a name="l44"></a>  </span><span class="cF1">if</span><span class="cF0"> (_cnt) *_cnt=cnt;
+<a name="l45"></a>  </span><span class="cF1">return</span><span class="cF0"> a;
+<a name="l46"></a>}
+<a name="l47"></a>
+<a name="l48"></a>
+<a name="l49"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"File/Cmd Line (Typically);Cmd Line (Typically)"</span><span class="cF0">
+<a name="l50"></a>
+<a name="l51"></a></span><span class="cF1">public</span><span class="cF0"> BoolI64 Copy(</span><span class="cF1">U8</span><span class="cF0"> *src_files_find_mask,</span><span class="cF1">U8</span><span class="cF0"> *dst_files_find_mask=</span><span class="cF6">"."</span><span class="cF0">)
+<a name="l52"></a>{
+<a name="l53"></a>  BoolI8 result=TRUE;
+<a name="l54"></a>  LTFileAccess *fa;
+<a name="l55"></a>  LTDirEntry *tempm,*tempm1;
+<a name="l56"></a>  </span><span class="cF1">U8</span><span class="cF0"> *st;
+<a name="l57"></a>  </span><span class="cF1">if</span><span class="cF0"> (!</span><span class="cF7">(</span><span class="cF0">tempm=FilesFind(src_files_find_mask)</span><span class="cF7">)</span><span class="cF0">)
+<a name="l58"></a>    </span><span class="cF1">return</span><span class="cF0"> FALSE;
+<a name="l59"></a>  </span><span class="cF1">if</span><span class="cF0"> (IsDir</span><span class="cF7">(</span><span class="cF0">dst_files_find_mask</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF7">{</span><span class="cF0">
+<a name="l60"></a>    fa=LTFileAccessNew(dst_files_find_mask,TRUE);
+<a name="l61"></a>    </span><span class="cF1">if</span><span class="cF0"> (fa) {
+<a name="l62"></a>      </span><span class="cF1">while</span><span class="cF0"> (tempm) </span><span class="cF7">{</span><span class="cF0">
+<a name="l63"></a>        tempm1=tempm-&gt;next;
+<a name="l64"></a>        </span><span class="cF1">if</span><span class="cF0"> (!</span><span class="cF7">(</span><span class="cF0">tempm-&gt;attr &amp; LT_ATTR_DIR</span><span class="cF7">)</span><span class="cF0">) {
+<a name="l65"></a>          st=FileNameAbs(tempm-&gt;name);
+<a name="l66"></a>          </span><span class="cF1">if</span><span class="cF0"> (!CopySingle</span><span class="cF7">(</span><span class="cF0">tempm-&gt;full_name,st</span><span class="cF7">)</span><span class="cF0">)
+<a name="l67"></a>            result=FALSE;
+<a name="l68"></a>          Free(st);
+<a name="l69"></a>        }
+<a name="l70"></a>        LTDirEntryDel(tempm);
+<a name="l71"></a>        tempm=tempm1;
+<a name="l72"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l73"></a>      LTFileAccessDel(fa);
+<a name="l74"></a>    }
+<a name="l75"></a>    </span><span class="cF1">return</span><span class="cF0"> result;
+<a name="l76"></a>  </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0">
+<a name="l77"></a>    </span><span class="cF1">return</span><span class="cF0"> CopySingle(src_files_find_mask,dst_files_find_mask);
+<a name="l78"></a>}
+<a name="l79"></a>
+<a name="l80"></a></span><span class="cF1">public</span><span class="cF0"> BoolI64 Move(</span><span class="cF1">U8</span><span class="cF0"> *f1,</span><span class="cF1">U8</span><span class="cF0"> *f2)
+<a name="l81"></a>{
+<a name="l82"></a>  </span><span class="cF1">if</span><span class="cF0"> (Copy</span><span class="cF7">(</span><span class="cF0">f1,f2</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF7">{</span><span class="cF0">
+<a name="l83"></a>    Del(f1);
+<a name="l84"></a>    </span><span class="cF1">return</span><span class="cF0"> TRUE;
+<a name="l85"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l86"></a>  </span><span class="cF1">return</span><span class="cF0"> FALSE;
+<a name="l87"></a>}
+<a name="l88"></a>
+<a name="l89"></a></span><span class="cF1">U64</span><span class="cF0"> PutCopyTree(LTDirEntry *tempm,</span><span class="cF1">U64</span><span class="cF0"> src_dir_len,</span><span class="cF1">U64</span><span class="cF0"> dst_dir_len,</span><span class="cF1">U8</span><span class="cF0"> *dst_dir)
+<a name="l90"></a>{
+<a name="l91"></a>  </span><span class="cF1">U64</span><span class="cF0"> result=1;
+<a name="l92"></a>  </span><span class="cF1">U8</span><span class="cF0"> *st;
+<a name="l93"></a>  </span><span class="cF1">while</span><span class="cF0"> (tempm) </span><span class="cF7">{</span><span class="cF0">
+<a name="l94"></a>    st=MAlloc(StrLen</span><span class="cF7">(</span><span class="cF0">tempm-&gt;full_name</span><span class="cF7">)</span><span class="cF0">+dst_dir_len+2);
+<a name="l95"></a>    MemCpy(st,dst_dir,dst_dir_len);
+<a name="l96"></a>    StrCpy(st+dst_dir_len,tempm-&gt;full_name+src_dir_len);
+<a name="l97"></a>    </span><span class="cF1">if</span><span class="cF0"> (tempm-&gt;attr &amp; LT_ATTR_DIR) {
+<a name="l98"></a>      MkDir(st);
+<a name="l99"></a>      result+=PutCopyTree(tempm-&gt;sub,src_dir_len,dst_dir_len,dst_dir);
+<a name="l100"></a>    } </span><span class="cF1">else</span><span class="cF0">
+<a name="l101"></a>      </span><span class="cF1">if</span><span class="cF0"> (CopySingle</span><span class="cF7">(</span><span class="cF0">tempm-&gt;full_name,st</span><span class="cF7">)</span><span class="cF0">)
+<a name="l102"></a>        result++;
+<a name="l103"></a>    Free(st);
+<a name="l104"></a>    tempm=tempm-&gt;next;
+<a name="l105"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l106"></a>  </span><span class="cF1">return</span><span class="cF0"> result;
+<a name="l107"></a>}
+<a name="l108"></a>
+<a name="l109"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">U64</span><span class="cF0"> CopyTree(</span><span class="cF1">U8</span><span class="cF0"> *src_files_find_mask,</span><span class="cF1">U8</span><span class="cF0"> *dst_files_find_mask)
+<a name="l110"></a>{  </span><span class="cF2">//returns count of copied files (not dirs)</span><span class="cF0">
+<a name="l111"></a>  LTFileAccess *fa;
+<a name="l112"></a>  LTDirEntry *tempm=NULL;
+<a name="l113"></a>  </span><span class="cF1">U64</span><span class="cF0"> result=0,i1,i2;
+<a name="l114"></a>  </span><span class="cF1">U8</span><span class="cF0"> *st1,*st2;
+<a name="l115"></a>
+<a name="l116"></a>  st1=DirNameAbs(src_files_find_mask);
+<a name="l117"></a>  st2=DirNameAbs(dst_files_find_mask);
+<a name="l118"></a>  i1=StrLen(st1);
+<a name="l119"></a>  </span><span class="cF1">if</span><span class="cF0"> (!StrNCmp</span><span class="cF7">(</span><span class="cF0">st1,st2,i1</span><span class="cF7">)</span><span class="cF0"> &amp;&amp; </span><span class="cF7">(</span><span class="cF0">st2[i1]==</span><span class="cF6">'/'</span><span class="cF0"> || !st2[i1]</span><span class="cF7">)</span><span class="cF0"> ) </span><span class="cF7">{</span><span class="cF0">
+<a name="l120"></a>    Free(st1);
+<a name="l121"></a>    Free(st2);
+<a name="l122"></a>    </span><span class="cF1">return</span><span class="cF0"> 0;
+<a name="l123"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l124"></a>  Free(st1);
+<a name="l125"></a>  Free(st2);
+<a name="l126"></a>
+<a name="l127"></a>  fa=LTFileAccessNew(src_files_find_mask,TRUE);
+<a name="l128"></a>  </span><span class="cF1">if</span><span class="cF0"> (fa) </span><span class="cF7">{</span><span class="cF0">
+<a name="l129"></a>    tempm=SysFilesFind(fa-&gt;mask,1&lt;&lt;FUf_RECURSE);
+<a name="l130"></a>    st1=CurDir;
+<a name="l131"></a>    LTFileAccessDel(fa);
+<a name="l132"></a>    i1=StrLen(st1);
+<a name="l133"></a>    </span><span class="cF1">if</span><span class="cF0"> (i1==3) i1--;
+<a name="l134"></a>
+<a name="l135"></a>    fa=LTFileAccessNew(dst_files_find_mask,TRUE,TRUE);
+<a name="l136"></a>    </span><span class="cF1">if</span><span class="cF0"> (fa) {
+<a name="l137"></a>      st2=CurDir;
+<a name="l138"></a>      i2=StrLen(st2);
+<a name="l139"></a>      </span><span class="cF1">if</span><span class="cF0"> (i2==3) i2--;
+<a name="l140"></a>      result=PutCopyTree(tempm,i1,i2,st2);
+<a name="l141"></a>      LTFileAccessDel(fa);
+<a name="l142"></a>      Free(st2);
+<a name="l143"></a>    }
+<a name="l144"></a>    LTDirListDel(tempm);
+<a name="l145"></a>    Free(st1);
+<a name="l146"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l147"></a>  </span><span class="cF1">return</span><span class="cF0"> result;
+<a name="l148"></a>}
+<a name="l149"></a>
+<a name="l150"></a></span><span class="cF1">U0</span><span class="cF0"> DelTreeDirs(LTDirEntry *tempm1)
+<a name="l151"></a>{
+<a name="l152"></a>  LTDirEntry *tempm2;
+<a name="l153"></a>  </span><span class="cF1">while</span><span class="cF0"> (tempm1) </span><span class="cF7">{</span><span class="cF0">
+<a name="l154"></a>    tempm2=tempm1-&gt;next;
+<a name="l155"></a>    </span><span class="cF1">if</span><span class="cF0"> (tempm1-&gt;attr &amp; LT_ATTR_DIR) {
+<a name="l156"></a>      </span><span class="cF1">if</span><span class="cF0"> (tempm1-&gt;sub)
+<a name="l157"></a>        DelTreeDirs(tempm1-&gt;sub);
+<a name="l158"></a>      SysDel(tempm1-&gt;full_name,TRUE);
+<a name="l159"></a>    }
+<a name="l160"></a>    LTDirEntryDel(tempm1);
+<a name="l161"></a>    tempm1=tempm2;
+<a name="l162"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l163"></a>}
+<a name="l164"></a>
+<a name="l165"></a></span><span class="cF1">U0</span><span class="cF0"> DelTreeFiles(LTDirEntry *tempm1)
+<a name="l166"></a>{
+<a name="l167"></a>  LTDirEntry *tempm2;
+<a name="l168"></a>  </span><span class="cF1">while</span><span class="cF0"> (tempm1) </span><span class="cF7">{</span><span class="cF0">
+<a name="l169"></a>    tempm2=tempm1-&gt;next;
+<a name="l170"></a>    </span><span class="cF1">if</span><span class="cF0"> (tempm1-&gt;attr &amp; LT_ATTR_DIR) {
+<a name="l171"></a>      </span><span class="cF1">if</span><span class="cF0"> (tempm1-&gt;sub)
+<a name="l172"></a>        DelTreeFiles(tempm1-&gt;sub);
+<a name="l173"></a>    } </span><span class="cF1">else</span><span class="cF0">
+<a name="l174"></a>      SysDel(tempm1-&gt;full_name,FALSE);
+<a name="l175"></a>    LTDirEntryDel(tempm1);
+<a name="l176"></a>    tempm1=tempm2;
+<a name="l177"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l178"></a>}
+<a name="l179"></a>
+<a name="l180"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">U0</span><span class="cF0"> DelTree(</span><span class="cF1">U8</span><span class="cF0"> *files_find_mask,</span><span class="cF1">U8</span><span class="cF0"> *fu_flags=NULL)
+<a name="l181"></a>{
+<a name="l182"></a>  </span><span class="cF1">U64</span><span class="cF0"> fuf_flags=0;
+<a name="l183"></a>  GetFFlags(&amp;fuf_flags,Define</span><span class="cF7">(</span><span class="cF6">"ST_FILE_UTIL_FLAGS"</span><span class="cF7">)</span><span class="cF0">,</span><span class="cF6">"+r"</span><span class="cF0">);
+<a name="l184"></a>  GetFFlags(&amp;fuf_flags,Define</span><span class="cF7">(</span><span class="cF6">"ST_FILE_UTIL_FLAGS"</span><span class="cF7">)</span><span class="cF0">,fu_flags);
+<a name="l185"></a>  </span><span class="cF1">if</span><span class="cF0"> (IsDir</span><span class="cF7">(</span><span class="cF0">files_find_mask</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF7">{</span><span class="cF0">
+<a name="l186"></a>    DelTreeDirs(FilesFind</span><span class="cF7">(</span><span class="cF0">files_find_mask,fuf_flags</span><span class="cF7">)</span><span class="cF0">);
+<a name="l187"></a>    SysDel(files_find_mask,TRUE);
+<a name="l188"></a>    SysDel(files_find_mask,FALSE);
+<a name="l189"></a>  </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0">
+<a name="l190"></a>    DelTreeFiles(FilesFind</span><span class="cF7">(</span><span class="cF0">files_find_mask,fuf_flags</span><span class="cF7">)</span><span class="cF0">);
+<a name="l191"></a>}
+<a name="l192"></a>
+<a name="l193"></a></span><span class="cF1">U0</span><span class="cF0"> TouchFile(</span><span class="cF1">U8</span><span class="cF0"> *filename,</span><span class="cF1">U8</span><span class="cF0"> *attr,LTDate dt=0) </span><span class="cF2">//Just one file</span><span class="cF0">
+<a name="l194"></a>{
+<a name="l195"></a>  </span><span class="cF1">U8</span><span class="cF0"> *cur_dir=StrNew(filename);
+<a name="l196"></a>  LTPrt *p=Drv2Prt(*filename);
+<a name="l197"></a>  LTDirEntry de;
+<a name="l198"></a>  </span><span class="cF1">U8</span><span class="cF0"> buf[64];
+<a name="l199"></a>  </span><span class="cF1">if</span><span class="cF0"> (FileFind</span><span class="cF7">(</span><span class="cF0">filename,&amp;de,FALSE,TRUE</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF7">{</span><span class="cF0">
+<a name="l200"></a>    </span><span class="cF1">if</span><span class="cF0"> (!StrCmp</span><span class="cF7">(</span><span class="cF0">attr,</span><span class="cF6">"+?"</span><span class="cF7">)</span><span class="cF0">)
+<a name="l201"></a>      </span><span class="cF6">"%-32ts %s\n"</span><span class="cF0">,filename,SPrintFFlags(buf,Define</span><span class="cF7">(</span><span class="cF6">"ST_FILE_ATTRS"</span><span class="cF7">)</span><span class="cF0">,de.attr);
+<a name="l202"></a>    </span><span class="cF1">else</span><span class="cF0"> {
+<a name="l203"></a>      StrFirstRem(cur_dir,</span><span class="cF6">":"</span><span class="cF0">);
+<a name="l204"></a>      StrLastRem(cur_dir,</span><span class="cF6">"/"</span><span class="cF0">);
+<a name="l205"></a>      </span><span class="cF1">if</span><span class="cF0"> (!*cur_dir)
+<a name="l206"></a>        StrCpy(cur_dir,</span><span class="cF6">"/"</span><span class="cF0">);
+<a name="l207"></a>      GetFFlags(&amp;de.attr,Define</span><span class="cF7">(</span><span class="cF6">"ST_FILE_ATTRS"</span><span class="cF7">)</span><span class="cF0">,attr);
+<a name="l208"></a>      </span><span class="cF1">if</span><span class="cF0"> (dt)
+<a name="l209"></a>        de.datetime=dt;
+<a name="l210"></a>      </span><span class="cF1">else</span><span class="cF0">
+<a name="l211"></a>        de.datetime=GetCurTimeLTDate;
+<a name="l212"></a>      LTDirEntryNew(p,cur_dir,&amp;de,FALSE);
+<a name="l213"></a>    }
+<a name="l214"></a>  </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0"> PutDefineErr(</span><span class="cF6">"ST_FILE_NOT_FOUND"</span><span class="cF0">);
+<a name="l215"></a>}
+<a name="l216"></a>
+<a name="l217"></a></span><span class="cF1">U0</span><span class="cF0"> TouchList(LTDirEntry *tempm1,</span><span class="cF1">U8</span><span class="cF0"> *attr,LTDate dt=0)
+<a name="l218"></a>{
+<a name="l219"></a>  LTDirEntry *tempm2;
+<a name="l220"></a>  </span><span class="cF1">while</span><span class="cF0"> (tempm1) </span><span class="cF7">{</span><span class="cF0">
+<a name="l221"></a>    tempm2=tempm1-&gt;next;
+<a name="l222"></a>    </span><span class="cF1">if</span><span class="cF0"> (tempm1-&gt;attr &amp; LT_ATTR_DIR) {
+<a name="l223"></a>      </span><span class="cF1">if</span><span class="cF0"> (tempm1-&gt;sub) </span><span class="cF7">{</span><span class="cF0">
+<a name="l224"></a>        </span><span class="cF6">"%S%s\n"</span><span class="cF0">,</span><span class="cF6">"ST_SCANNING_DIR"</span><span class="cF0">,tempm1-&gt;full_name;
+<a name="l225"></a>        TouchList(tempm1-&gt;sub,attr,dt);
+<a name="l226"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l227"></a>    } </span><span class="cF1">else</span><span class="cF0">
+<a name="l228"></a>      TouchFile(tempm1-&gt;full_name,attr,dt);
+<a name="l229"></a>    LTDirEntryDel(tempm1);
+<a name="l230"></a>    tempm1=tempm2;
+<a name="l231"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l232"></a>}
+<a name="l233"></a>
+<a name="l234"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">U0</span><span class="cF0"> Touch(</span><span class="cF1">U8</span><span class="cF0"> *files_find_mask,</span><span class="cF1">U8</span><span class="cF0"> *attr=</span><span class="cF6">"+?"</span><span class="cF0">,</span><span class="cF1">U8</span><span class="cF0"> *fu_flags=NULL,LTDate dt=0)
+<a name="l235"></a>{
+<a name="l236"></a></span><span class="cF2">//Attr "+?" =show</span><span class="cF0">
+<a name="l237"></a></span><span class="cF2">//     "+T" =resident</span><span class="cF0">
+<a name="l238"></a>  </span><span class="cF1">U64</span><span class="cF0"> fuf_flags=0;
+<a name="l239"></a>  GetFFlags(&amp;fuf_flags,Define</span><span class="cF7">(</span><span class="cF6">"ST_FILE_UTIL_FLAGS"</span><span class="cF7">)</span><span class="cF0">,fu_flags);
+<a name="l240"></a>  TouchList(FilesFind</span><span class="cF7">(</span><span class="cF0">files_find_mask,fuf_flags</span><span class="cF7">)</span><span class="cF0">,attr,dt);
+<a name="l241"></a>}
+<a name="l242"></a>
+<a name="l243"></a></span><span class="cF1">U64</span><span class="cF0"> FFList(LTDirEntry *tempm1)
+<a name="l244"></a>{
+<a name="l245"></a>  </span><span class="cF1">U64</span><span class="cF0"> cnt=0;
+<a name="l246"></a>  LTDirEntry *tempm2;
+<a name="l247"></a>
+<a name="l248"></a>  </span><span class="cF1">while</span><span class="cF0"> (tempm1) </span><span class="cF7">{</span><span class="cF0">
+<a name="l249"></a>    tempm2=tempm1-&gt;next;
+<a name="l250"></a>    </span><span class="cF1">if</span><span class="cF0"> (tempm1-&gt;attr &amp; LT_ATTR_DIR) {
+<a name="l251"></a>      </span><span class="cF1">if</span><span class="cF0"> (tempm1-&gt;sub)
+<a name="l252"></a>        cnt+=FFList(tempm1-&gt;sub);
+<a name="l253"></a>    } </span><span class="cF1">else</span><span class="cF0"> {
+<a name="l254"></a>      PutFileLink(tempm1-&gt;full_name);
+<a name="l255"></a>      NewLine;
+<a name="l256"></a>      cnt++;
+<a name="l257"></a>    }
+<a name="l258"></a>    LTDirEntryDel(tempm1);
+<a name="l259"></a>    tempm1=tempm2;
+<a name="l260"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l261"></a>  </span><span class="cF1">return</span><span class="cF0"> cnt;
+<a name="l262"></a>}
+<a name="l263"></a>
+<a name="l264"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">U64</span><span class="cF0"> FF(</span><span class="cF1">U8</span><span class="cF0"> *files_find_mask,</span><span class="cF1">U8</span><span class="cF0"> *fu_flags=NULL)
+<a name="l265"></a></span><span class="cF2">//Files Find</span><span class="cF0">
+<a name="l266"></a>{
+<a name="l267"></a>  </span><span class="cF1">U64</span><span class="cF0"> cnt=0,fuf_flags=0;
+<a name="l268"></a>  GetFFlags(&amp;fuf_flags,Define</span><span class="cF7">(</span><span class="cF6">"ST_FILE_UTIL_FLAGS"</span><span class="cF7">)</span><span class="cF0">,</span><span class="cF6">"+r"</span><span class="cF0">);
+<a name="l269"></a>  GetFFlags(&amp;fuf_flags,Define</span><span class="cF7">(</span><span class="cF6">"ST_FILE_UTIL_FLAGS"</span><span class="cF7">)</span><span class="cF0">,fu_flags);
+<a name="l270"></a>  cnt+=FFList(FilesFind</span><span class="cF7">(</span><span class="cF0">files_find_mask,fuf_flags</span><span class="cF7">)</span><span class="cF0">);
+<a name="l271"></a>  </span><span class="cF1">return</span><span class="cF0"> cnt;
+<a name="l272"></a>}
+<a name="l273"></a>
+<a name="l274"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">U0</span><span class="cF0"> SetDrvTextAttr(</span><span class="cF1">U8</span><span class="cF0"> drv_let,</span><span class="cF1">U8</span><span class="cF0"> attr)
+<a name="l275"></a>{ </span><span class="cF2">//This is to color the border text according to the current drive</span><span class="cF0">
+<a name="l276"></a>  LTPrt *p;
+<a name="l277"></a>  </span><span class="cF1">try</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l278"></a>    p=Drv2Prt(drv_let);
+<a name="l279"></a>    p-&gt;text_attr=attr;
+<a name="l280"></a>  </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">catch</span><span class="cF0">
+<a name="l281"></a>    Fs-&gt;catch_except=TRUE;
+<a name="l282"></a>}
+<a name="l283"></a>
+<a name="l284"></a></span><span class="cF1">U0</span><span class="cF0"> PrintFDrvTextAttr(</span><span class="cF1">U8</span><span class="cF0"> drv_let=0)
+<a name="l285"></a>{
+<a name="l286"></a>  LTPrt *p=Drv2Prt(drv_let);
+<a name="l287"></a>  </span><span class="cF1">U8</span><span class="cF0"> fg=p-&gt;text_attr&amp;0xF,bg=p-&gt;text_attr&gt;&gt;4;
+<a name="l288"></a>  </span><span class="cF1">if</span><span class="cF0"> (fg!=bg)
+<a name="l289"></a>    </span><span class="cF6">"$FG,%d$$BG,%d$"</span><span class="cF0">,fg,bg;
+<a name="l290"></a>}
+<a name="l291"></a>
+<a name="l292"></a></span><span class="cF1">I64</span><span class="cF0"> LTFSUnusedDrvSpace(</span><span class="cF1">U8</span><span class="cF0"> drv_let=0)
+<a name="l293"></a>{
+<a name="l294"></a>  LTPrt *p=Drv2Prt(drv_let);
+<a name="l295"></a>  </span><span class="cF1">U64</span><span class="cF0"> result=0,i,l;
+<a name="l296"></a>  </span><span class="cF1">U8</span><span class="cF0"> *bitmap;
+<a name="l297"></a>  </span><span class="cF1">try</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l298"></a>    l=(p-&gt;size+p-&gt;spc-1)/p-&gt;spc;
+<a name="l299"></a>    i=(</span><span class="cF7">(</span><span class="cF0">l+7</span><span class="cF7">)</span><span class="cF0">&gt;&gt;3+BLK_SIZE-1)&gt;&gt;BLK_SIZE_BITS;
+<a name="l300"></a>    bitmap=MAlloc(i&lt;&lt;BLK_SIZE_BITS);
+<a name="l301"></a>    RBlks(p,bitmap,p-&gt;map1,i);
+<a name="l302"></a>    </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;l;i++)
+<a name="l303"></a>      </span><span class="cF1">if</span><span class="cF0"> (!Bt</span><span class="cF7">(</span><span class="cF0">bitmap,i</span><span class="cF7">)</span><span class="cF0">)
+<a name="l304"></a>        result++;
+<a name="l305"></a>    Free(bitmap);
+<a name="l306"></a>  </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">catch</span><span class="cF0">
+<a name="l307"></a>    PrtUnlock(p);
+<a name="l308"></a>  </span><span class="cF1">return</span><span class="cF0"> result*BLK_SIZE*p-&gt;spc;
+<a name="l309"></a>}
+<a name="l310"></a>
+<a name="l311"></a></span><span class="cF1">I64</span><span class="cF0"> FAT32UnusedDrvSpace(</span><span class="cF1">U8</span><span class="cF0"> drv_let=0)
+<a name="l312"></a>{
+<a name="l313"></a>  LTPrt *p=Drv2Prt(drv_let);
+<a name="l314"></a>  </span><span class="cF1">U64</span><span class="cF0"> result=0,i,l;
+<a name="l315"></a>  </span><span class="cF1">U32</span><span class="cF0"> *bitmap;
+<a name="l316"></a>  </span><span class="cF1">try</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l317"></a>    l=(p-&gt;size+p-&gt;spc-1)/p-&gt;spc;
+<a name="l318"></a>    i=(l*4+BLK_SIZE-1)&gt;&gt;BLK_SIZE_BITS;
+<a name="l319"></a>    bitmap=MAlloc(i&lt;&lt;BLK_SIZE_BITS);
+<a name="l320"></a>    RBlks(p,bitmap,p-&gt;map1,i);
+<a name="l321"></a>    </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;l;i++)
+<a name="l322"></a>      </span><span class="cF1">if</span><span class="cF0"> (!bitmap[i])
+<a name="l323"></a>        result++;
+<a name="l324"></a>    Free(bitmap);
+<a name="l325"></a>  </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">catch</span><span class="cF0">
+<a name="l326"></a>    PrtUnlock(p);
+<a name="l327"></a>  </span><span class="cF1">return</span><span class="cF0"> result*BLK_SIZE*p-&gt;spc;
+<a name="l328"></a>}
+<a name="l329"></a>
+<a name="l330"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">I64</span><span class="cF0"> UnusedDrvSpace(</span><span class="cF1">U8</span><span class="cF0"> drv_let=0)
+<a name="l331"></a>{ </span><span class="cF2">//returns size in bytes</span><span class="cF0">
+<a name="l332"></a>  </span><span class="cF1">I64</span><span class="cF0"> result=0;
+<a name="l333"></a>  LTPrt *p=Drv2Prt(drv_let),*p_old=Fs-&gt;cur_prt;
+<a name="l334"></a>  </span><span class="cF1">U8</span><span class="cF0"> *old_dir=StrNew(Fs-&gt;cur_dir);
+<a name="l335"></a>  Drv(drv_let);
+<a name="l336"></a>  </span><span class="cF1">switch</span><span class="cF0"> (p-&gt;type) </span><span class="cF7">{</span><span class="cF0">
+<a name="l337"></a>    </span><span class="cF1">case</span><span class="cF0"> PT_LT:
+<a name="l338"></a>      result=LTFSUnusedDrvSpace(drv_let);
+<a name="l339"></a>      </span><span class="cF1">break</span><span class="cF0">;
+<a name="l340"></a>    </span><span class="cF1">case</span><span class="cF0"> PT_FAT32:
+<a name="l341"></a>      result=FAT32UnusedDrvSpace(drv_let);
+<a name="l342"></a>      </span><span class="cF1">break</span><span class="cF0">;
+<a name="l343"></a>    </span><span class="cF1">default</span><span class="cF0">:
+<a name="l344"></a>      PutDefineErr(</span><span class="cF6">"ST_UNSUPPORTED_FILE_SYSTEM"</span><span class="cF0">);
+<a name="l345"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l346"></a>  Drv(Prt2Drv</span><span class="cF7">(</span><span class="cF0">p_old</span><span class="cF7">)</span><span class="cF0">);
+<a name="l347"></a>  Cd(old_dir);
+<a name="l348"></a>  Free(old_dir);
+<a name="l349"></a>  </span><span class="cF1">return</span><span class="cF0"> result;
+<a name="l350"></a>}
+<a name="l351"></a>
+<a name="l352"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"File/Program Routines"</span><span class="cF0">
+<a name="l353"></a>
+<a name="l354"></a></span><span class="cF1">U64</span><span class="cF0"> TreeSizeFiles(LTDirEntry *tempm,</span><span class="cF1">I64</span><span class="cF0"> round_to)
+<a name="l355"></a>{
+<a name="l356"></a>  </span><span class="cF1">U64</span><span class="cF0"> result=0,i;
+<a name="l357"></a>  </span><span class="cF1">while</span><span class="cF0"> (tempm) </span><span class="cF7">{</span><span class="cF0">
+<a name="l358"></a>    </span><span class="cF1">if</span><span class="cF0"> (round_to)
+<a name="l359"></a>      i=CeilU64(tempm-&gt;size,round_to);
+<a name="l360"></a>    </span><span class="cF1">else</span><span class="cF0">
+<a name="l361"></a>      i=tempm-&gt;size;
+<a name="l362"></a>    </span><span class="cF1">if</span><span class="cF0"> (tempm-&gt;attr&amp;LT_ATTR_DIR)
+<a name="l363"></a>      i+=TreeSizeFiles(tempm-&gt;sub,round_to);
+<a name="l364"></a>    tempm-&gt;user_data=i;
+<a name="l365"></a>    result+=i;
+<a name="l366"></a>    tempm=tempm-&gt;next;
+<a name="l367"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l368"></a>  </span><span class="cF1">return</span><span class="cF0"> result;
+<a name="l369"></a>}
+<a name="l370"></a>
+<a name="l371"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">U64</span><span class="cF0"> TreeSize(</span><span class="cF1">U8</span><span class="cF0"> *files_find_mask=</span><span class="cF6">"/LT/*"</span><span class="cF0">,</span><span class="cF1">U8</span><span class="cF0"> *fu_flags=NULL,</span><span class="cF1">I64</span><span class="cF0"> round_to=0)
+<a name="l372"></a>{
+<a name="l373"></a></span><span class="cF2">//Does not include directory size of base directory, but</span><span class="cF0">
+<a name="l374"></a></span><span class="cF2">//does include size of sub directories.</span><span class="cF0">
+<a name="l375"></a>  </span><span class="cF1">U64</span><span class="cF0"> fuf_flags=0,result=0;
+<a name="l376"></a>  LTDirEntry *tempm1=NULL;
+<a name="l377"></a>  GetFFlags(&amp;fuf_flags,Define</span><span class="cF7">(</span><span class="cF6">"ST_FILE_UTIL_FLAGS"</span><span class="cF7">)</span><span class="cF0">,</span><span class="cF6">"+r"</span><span class="cF0">);
+<a name="l378"></a>  GetFFlags(&amp;fuf_flags,Define</span><span class="cF7">(</span><span class="cF6">"ST_FILE_UTIL_FLAGS"</span><span class="cF7">)</span><span class="cF0">,fu_flags);
+<a name="l379"></a>  </span><span class="cF1">if</span><span class="cF0"> (tempm1=FilesFind</span><span class="cF7">(</span><span class="cF0">files_find_mask,fuf_flags</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF7">{</span><span class="cF0">
+<a name="l380"></a>    result=TreeSizeFiles(tempm1,round_to);
+<a name="l381"></a>    LTDirListDel(tempm1);
+<a name="l382"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l383"></a>  </span><span class="cF1">return</span><span class="cF0"> result;
+<a name="l384"></a>}
+<a name="l385"></a>
+<a name="l386"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">""</span><span class="cF0">
+</span></pre><div class="archive-note">Historical capture: 2012-03-03. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

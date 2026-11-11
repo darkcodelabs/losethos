@@ -1,0 +1,370 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V7.07" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cF5">                               <a href="/archive/doc/TrivialSolutions.html">Trivial Solutions</a>
+                    <a href="/archive/index.html">The LoseThos 64-bit PC Operating System</a>
+File:/LT/Demo/Graphics/Camp.CPZ
+This, and all LoseThos files, are public domain.  Do whatever you like.
+God is watching; God is just; God is never out-done in generosity.  He talks!
+
+LoseThos code compiles with the 64-bit LoseThos compiler/assembler I wrote.
+Boot the LoseThos CD and you can compile it.  Not in Kansas anymore!
+
+<a href="/archive/code/FixedPoint.html">Click here for preliminary compiler information you need.</a>
+
+</span><a name="l1"></a><span class="cF2">//This uses </span><a href="/archive/code/FixedPoint.html#l1"><span class="cF4">fixed-point</span></a><span class="cF2">.</span><span class="cF0">
+<a name="l2"></a>
+<a name="l3"></a>#</span><span class="cF1">define</span><span class="cF0"> CO_PERSON       1
+<a name="l4"></a>#</span><span class="cF1">define</span><span class="cF0"> CO_TENT 2
+<a name="l5"></a>
+<a name="l6"></a></span><span class="cF1">class</span><span class="cF0"> CObj
+<a name="l7"></a>{
+<a name="l8"></a>  </span><span class="cF1">I64</span><span class="cF0"> x,y,z;
+<a name="l9"></a>  </span><span class="cF1">I64</span><span class="cF0"> dx,dy,dz;
+<a name="l10"></a>  </span><span class="cF1">I64</span><span class="cF0"> type;
+<a name="l11"></a>};
+<a name="l12"></a>
+<a name="l13"></a>
+<a name="l14"></a>#</span><span class="cF1">define</span><span class="cF0"> MAX_PEOPLE      1024
+<a name="l15"></a>#</span><span class="cF1">define</span><span class="cF0"> TENT_RATIO      40
+<a name="l16"></a>#</span><span class="cF1">define</span><span class="cF0"> MAX_TENTS       (MAX_PEOPLE/TENT_RATIO+1)
+<a name="l17"></a>
+<a name="l18"></a>
+<a name="l19"></a>
+<a name="l20"></a>
+<a name="l21"></a>
+<a name="l22"></a>
+<a name="l23"></a>  </span><span class="cF3">&lt;1&gt;</span><span class="cF2">/* Graphics Not Rendered in HTML */</span><span class="cF0">
+<a name="l24"></a>
+<a name="l25"></a>
+<a name="l26"></a>
+<a name="l27"></a>
+<a name="l28"></a>
+<a name="l29"></a>  </span><span class="cF3">&lt;2&gt;</span><span class="cF2">/* Graphics Not Rendered in HTML */</span><span class="cF0">
+<a name="l30"></a>
+<a name="l31"></a>
+<a name="l32"></a>
+<a name="l33"></a>
+<a name="l34"></a>
+<a name="l35"></a>
+<a name="l36"></a>  </span><span class="cF3">&lt;3&gt;</span><span class="cF2">/* Graphics Not Rendered in HTML */</span><span class="cF0">
+<a name="l37"></a>
+<a name="l38"></a>
+<a name="l39"></a>
+<a name="l40"></a></span><span class="cF1">U8</span><span class="cF0"> *people_img[4]={</span><span class="cF3">&lt;2&gt;</span><span class="cF0">,</span><span class="cF3">&lt;1&gt;</span><span class="cF0">,</span><span class="cF3">&lt;3&gt;</span><span class="cF0">,</span><span class="cF3">&lt;1&gt;</span><span class="cF0">};
+<a name="l41"></a>
+<a name="l42"></a>
+<a name="l43"></a>
+<a name="l44"></a>
+<a name="l45"></a>
+<a name="l46"></a>
+<a name="l47"></a>
+<a name="l48"></a>
+<a name="l49"></a>
+<a name="l50"></a>
+<a name="l51"></a>
+<a name="l52"></a>
+<a name="l53"></a>
+<a name="l54"></a>
+<a name="l55"></a>
+<a name="l56"></a>            </span><span class="cF3">&lt;4&gt;</span><span class="cF2">/* Graphics Not Rendered in HTML */</span><span class="cF0">
+<a name="l57"></a>
+<a name="l58"></a></span><span class="cF1">U8</span><span class="cF0"> *tent_img=</span><span class="cF3">&lt;4&gt;</span><span class="cF0">;
+<a name="l59"></a>
+<a name="l60"></a>
+<a name="l61"></a>
+<a name="l62"></a>
+<a name="l63"></a>
+<a name="l64"></a>
+<a name="l65"></a>
+<a name="l66"></a></span><span class="cF3">&lt;5&gt;</span><span class="cF2">/* Graphics Not Rendered in HTML */</span><span class="cF0">
+<a name="l67"></a>
+<a name="l68"></a>
+<a name="l69"></a>
+<a name="l70"></a>
+<a name="l71"></a>
+<a name="l72"></a></span><span class="cF1">I64</span><span class="cF0"> num_objs;
+<a name="l73"></a>CObj objs[MAX_PEOPLE+MAX_TENTS];
+<a name="l74"></a>CObj camp_view_point;
+<a name="l75"></a>
+<a name="l76"></a>#</span><span class="cF1">define</span><span class="cF0"> CAMP_WIDTH      600
+<a name="l77"></a>#</span><span class="cF1">define</span><span class="cF0"> CAMP_SCALE      300
+<a name="l78"></a>#</span><span class="cF1">define</span><span class="cF0"> CAMP_Z_CLIP     10
+<a name="l79"></a>
+<a name="l80"></a></span><span class="cF1">U0</span><span class="cF0"> CTransform(GrBitMap *base,</span><span class="cF1">I64</span><span class="cF0"> *x,</span><span class="cF1">I64</span><span class="cF0"> *y,</span><span class="cF1">I64</span><span class="cF0"> *z)
+<a name="l81"></a>{
+<a name="l82"></a>  *x-=camp_view_point.x;
+<a name="l83"></a>  *y-=camp_view_point.y;
+<a name="l84"></a>  *z-=camp_view_point.z;
+<a name="l85"></a>
+<a name="l86"></a>  GrRot(base-&gt;r,x,y,z);
+<a name="l87"></a>
+<a name="l88"></a>  *x = *x *-CAMP_SCALE/ *z;
+<a name="l89"></a>  *y = *y *-CAMP_SCALE/ *z;
+<a name="l90"></a>
+<a name="l91"></a>  *x=base-&gt;x+*x;
+<a name="l92"></a>  *y=base-&gt;y-*y;
+<a name="l93"></a>  *z=base-&gt;z-*z;
+<a name="l94"></a>}
+<a name="l95"></a>
+<a name="l96"></a></span><span class="cF1">I64</span><span class="cF0"> mp_done_flags;
+<a name="l97"></a></span><span class="cF1">I64</span><span class="cF0"> cx,cy,*r1; </span><span class="cF2">//could put these in a record and pass in</span><span class="cF0">
+<a name="l98"></a></span><span class="cF1">F64</span><span class="cF0"> frame;
+<a name="l99"></a></span><span class="cF1">I32</span><span class="cF0"> *depth_buf;
+<a name="l100"></a></span><span class="cF1">U0</span><span class="cF0"> MPDrawMeeting(TaskStruct *task)
+<a name="l101"></a>{
+<a name="l102"></a>  GrBitMap *base=GrAlias(gr_refreshed_base,task);
+<a name="l103"></a>  </span><span class="cF1">F64</span><span class="cF0"> s;
+<a name="l104"></a>  </span><span class="cF1">U8</span><span class="cF0"> *img,*img1,*img2;
+<a name="l105"></a>  </span><span class="cF1">I64</span><span class="cF0"> i,x,y,z,*r2,*old_r=base-&gt;r,
+<a name="l106"></a>     lo= Gs-&gt;num   *num_objs/mp_cnt,
+<a name="l107"></a>     hi=(Gs-&gt;num+1)*num_objs/mp_cnt;
+<a name="l108"></a>  base-&gt;flags|=BMF_TRANSFORMATION;
+<a name="l109"></a>  base-&gt;depth_buf=depth_buf;
+<a name="l110"></a>  base-&gt;x=cx;
+<a name="l111"></a>  base-&gt;y=cy;
+<a name="l112"></a>  base-&gt;z=0;
+<a name="l113"></a>  base-&gt;transform=&amp;GrTransform;
+<a name="l114"></a>  </span><span class="cF1">for</span><span class="cF0"> (i=lo;i&lt;hi;i++) </span><span class="cF7">{</span><span class="cF0">
+<a name="l115"></a>    GrSetRotMat(base,r1);
+<a name="l116"></a>    base-&gt;x=cx;
+<a name="l117"></a>    base-&gt;y=cy;
+<a name="l118"></a>    base-&gt;z=0;
+<a name="l119"></a>    x=objs[i].x.i32[1];
+<a name="l120"></a>    y=objs[i].y.i32[1];
+<a name="l121"></a>    z=objs[i].z.i32[1];
+<a name="l122"></a>    CTransform(base,&amp;x,&amp;y,&amp;z);
+<a name="l123"></a>    </span><span class="cF1">if</span><span class="cF0"> (z&gt;CAMP_Z_CLIP) {
+<a name="l124"></a>      s=0.5*ToF64(CAMP_SCALE)/z;
+<a name="l125"></a>      </span><span class="cF1">if</span><span class="cF0"> (objs[i].type==CO_PERSON) </span><span class="cF7">{</span><span class="cF0">
+<a name="l126"></a>        img1=people_img[(i+ToI64</span><span class="cF7">(</span><span class="cF0">frame</span><span class="cF7">)</span><span class="cF0">)&amp;3];
+<a name="l127"></a>        img2=people_img[(i+ToI64</span><span class="cF7">(</span><span class="cF0">frame</span><span class="cF7">)</span><span class="cF0">+1)&amp;3];
+<a name="l128"></a>        img=GrElemsInterpolate(img1,img2,frame%1.0);
+<a name="l129"></a>      </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0">
+<a name="l130"></a>        img=tent_img;
+<a name="l131"></a>
+<a name="l132"></a>      r2=GrScaleMat(old_r,s);
+<a name="l133"></a>      GrSetRotMat(base,r2);
+<a name="l134"></a>      GrElemsPlot3b(base,x,y,z,img);
+<a name="l135"></a>      Free(r2);
+<a name="l136"></a>      </span><span class="cF1">if</span><span class="cF0"> (objs[i].type==CO_PERSON)
+<a name="l137"></a>        Free(img);
+<a name="l138"></a>    }
+<a name="l139"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l140"></a>  base-&gt;r=old_r;
+<a name="l141"></a>  base-&gt;depth_buf=NULL;
+<a name="l142"></a>  GrDel(base);
+<a name="l143"></a>  LBts(&amp;mp_done_flags,Gs-&gt;num);
+<a name="l144"></a>}
+<a name="l145"></a>
+<a name="l146"></a></span><span class="cF1">U0</span><span class="cF0"> DrawMeeting(TaskStruct *task)
+<a name="l147"></a>{
+<a name="l148"></a>  GrBitMap *base=GrAlias(gr_refreshed_base,task);
+<a name="l149"></a>  </span><span class="cF1">static</span><span class="cF0"> BoolI8 calf=FALSE,determined=FALSE;
+<a name="l150"></a>
+<a name="l151"></a></span><span class="cF2">//"tP" is a function holding time since boot, less pauses.</span><span class="cF0">
+<a name="l152"></a>  </span><span class="cF1">I64</span><span class="cF0"> i,x,y,z,*r2,*old_r;
+<a name="l153"></a>  </span><span class="cF1">F64</span><span class="cF0"> s;
+<a name="l154"></a>
+<a name="l155"></a>  frame=4.0*Saw(tP</span><span class="cF7">(</span><span class="cF0">task</span><span class="cF7">)</span><span class="cF0">,0.5);
+<a name="l156"></a>  cx=task-&gt;win_pixel_width/2;
+<a name="l157"></a>  cy=task-&gt;win_pixel_height/2;
+<a name="l158"></a>
+<a name="l159"></a>  camp_view_point.x=0;
+<a name="l160"></a>  camp_view_point.y=200-100*Sin(tP</span><span class="cF7">(</span><span class="cF0">task</span><span class="cF7">)</span><span class="cF0">);
+<a name="l161"></a>  camp_view_point.z=20+100*Cos(tP</span><span class="cF7">(</span><span class="cF0">task</span><span class="cF7">)</span><span class="cF0">);
+<a name="l162"></a>
+<a name="l163"></a>  GrAllocDepthBuf(base);
+<a name="l164"></a>  depth_buf=base-&gt;depth_buf;
+<a name="l165"></a>  base-&gt;flags|=BMF_TRANSFORMATION;
+<a name="l166"></a>  r1=GrRotX(30.0*pi/180.0,task);
+<a name="l167"></a>  old_r=base-&gt;r;
+<a name="l168"></a>
+<a name="l169"></a>  base-&gt;pen_width=2;
+<a name="l170"></a>  base-&gt;transform=&amp;CTransform;
+<a name="l171"></a>  base-&gt;x=cx;
+<a name="l172"></a>  base-&gt;y=cy;
+<a name="l173"></a>  base-&gt;z=0;
+<a name="l174"></a>  GrSetRotMat(base,r1);
+<a name="l175"></a>
+<a name="l176"></a>  x=0;y=0;z=-16*CAMP_WIDTH;
+<a name="l177"></a>  base-&gt;transform(base,&amp;x,&amp;y,&amp;z);
+<a name="l178"></a>  base-&gt;color=LTCYAN;
+<a name="l179"></a>  GrRect(base,0,0,task-&gt;win_pixel_width,y);
+<a name="l180"></a>
+<a name="l181"></a>  base-&gt;color=BLACK;
+<a name="l182"></a>  GrLine3(base,-32*CAMP_WIDTH,0,-16*CAMP_WIDTH,32*CAMP_WIDTH,0,-16*CAMP_WIDTH);
+<a name="l183"></a>
+<a name="l184"></a>  GrLine3(base,-CAMP_WIDTH/2,0,0          ,CAMP_WIDTH/2,0,0);
+<a name="l185"></a>  GrLine3(base,-CAMP_WIDTH/2,0,-CAMP_WIDTH,CAMP_WIDTH/2,0,-CAMP_WIDTH);
+<a name="l186"></a>  GrLine3(base,-CAMP_WIDTH/2,0,0,-CAMP_WIDTH/2,0,-CAMP_WIDTH);
+<a name="l187"></a>  GrLine3(base, CAMP_WIDTH/2,0,0, CAMP_WIDTH/2,0,-CAMP_WIDTH);
+<a name="l188"></a>
+<a name="l189"></a>  base-&gt;transform=&amp;GrTransform;
+<a name="l190"></a>
+<a name="l191"></a>  </span><span class="cF1">if</span><span class="cF0"> (tP</span><span class="cF7">(</span><span class="cF0">task</span><span class="cF7">)</span><span class="cF0">%10&lt;5) </span><span class="cF7">{</span><span class="cF0">
+<a name="l192"></a>    calf=FALSE;
+<a name="l193"></a>    determined=FALSE;
+<a name="l194"></a>  </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l195"></a>    </span><span class="cF1">if</span><span class="cF0"> (!determined) {
+<a name="l196"></a>      determined=TRUE;
+<a name="l197"></a>      </span><span class="cF1">if</span><span class="cF0"> (RandU16&lt;MAX_U16/2)
+<a name="l198"></a>        calf=TRUE;
+<a name="l199"></a>    }
+<a name="l200"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l201"></a> 
+<a name="l202"></a>  </span><span class="cF1">if</span><span class="cF0"> (calf) </span><span class="cF7">{</span><span class="cF0">
+<a name="l203"></a>    x=0;
+<a name="l204"></a>    y=0;
+<a name="l205"></a>    z=-CAMP_WIDTH/2;
+<a name="l206"></a>    CTransform(base,&amp;x,&amp;y,&amp;z);
+<a name="l207"></a>    s=0.5*ToF64(CAMP_SCALE)/z;
+<a name="l208"></a>    r2=GrScaleMat(old_r,s,task);
+<a name="l209"></a>    GrSetRotMat(base,r2);
+<a name="l210"></a>    GrElemsPlot3b(base,x,y,z,</span><span class="cF3">&lt;5&gt;</span><span class="cF0">);
+<a name="l211"></a>    Free(r2);
+<a name="l212"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l213"></a>
+<a name="l214"></a>  mp_done_flags=0;
+<a name="l215"></a>  </span><span class="cF1">for</span><span class="cF0"> (i=1;i&lt;mp_cnt;i++)
+<a name="l216"></a>    MPJob(&amp;MPDrawMeeting,task,1&lt;&lt;MPCf_FREE_ON_COMPLETE,1&lt;&lt;i);
+<a name="l217"></a>  MPDrawMeeting(task);
+<a name="l218"></a>
+<a name="l219"></a>  GrSetRotMat(base,old_r);
+<a name="l220"></a>  </span><span class="cF1">if</span><span class="cF0"> (calf &amp;&amp; Blink</span><span class="cF7">(</span><span class="cF0">4.0,tP(task)</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF7">{</span><span class="cF0">
+<a name="l221"></a>    base-&gt;color=YELLOW;
+<a name="l222"></a>    GrPutS(base,cx-</span><span class="cF7">(</span><span class="cF0">15*FONT_WIDTH</span><span class="cF7">)</span><span class="cF0">/2,cy-3*FONT_HEIGHT,</span><span class="cF6">"!!Golden Calf!!"</span><span class="cF0">);
+<a name="l223"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l224"></a> 
+<a name="l225"></a>  </span><span class="cF1">while</span><span class="cF0"> (mp_done_flags!=1&lt;&lt;mp_cnt-1)
+<a name="l226"></a>    Yield;
+<a name="l227"></a>  GrDel(base);
+<a name="l228"></a>  Free(r1);
+<a name="l229"></a>}
+<a name="l230"></a>
+<a name="l231"></a>#</span><span class="cF1">define</span><span class="cF0"> MAX_SPEED       2&lt;&lt;32
+<a name="l232"></a>
+<a name="l233"></a></span><span class="cF1">U0</span><span class="cF0"> AnimateTask(</span><span class="cF1">U64</span><span class="cF0"> dummy=0)
+<a name="l234"></a>{
+<a name="l235"></a>  </span><span class="cF1">nounusedwarn</span><span class="cF0"> dummy;
+<a name="l236"></a>  </span><span class="cF1">I64</span><span class="cF0"> i,x,z,dx,dz;
+<a name="l237"></a>  </span><span class="cF1">F64</span><span class="cF0"> d;
+<a name="l238"></a>  </span><span class="cF1">while</span><span class="cF0"> (TRUE) </span><span class="cF7">{</span><span class="cF0">
+<a name="l239"></a>    WinSync;
+<a name="l240"></a>    </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;num_objs;i++)
+<a name="l241"></a>      </span><span class="cF1">if</span><span class="cF0"> (objs[i].type==CO_PERSON) {
+<a name="l242"></a>        </span><span class="cF1">if</span><span class="cF0"> (tP</span><span class="cF7">(</span><span class="cF0">Fs-&gt;parent_task</span><span class="cF7">)</span><span class="cF0">%10&lt;5) </span><span class="cF7">{</span><span class="cF0">
+<a name="l243"></a>          objs[i].dx+=RandI32;
+<a name="l244"></a>          objs[i].dz+=RandI32;
+<a name="l245"></a>        </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0"> </span><span class="cF2">//Form circle</span><span class="cF0">
+<a name="l246"></a>          x=CAMP_WIDTH/4*Cos(</span><span class="cF7">(</span><span class="cF0">1.0+1.0/TENT_RATIO</span><span class="cF7">)</span><span class="cF0">*i*pi*2/num_objs);
+<a name="l247"></a>          z=CAMP_WIDTH/4*Sin(</span><span class="cF7">(</span><span class="cF0">1.0+1.0/TENT_RATIO</span><span class="cF7">)</span><span class="cF0">*i*pi*2/num_objs)-CAMP_WIDTH/2;
+<a name="l248"></a>          dx=x-objs[i].x.i32[1];
+<a name="l249"></a>          dz=z-objs[i].z.i32[1];
+<a name="l250"></a>          d=Sqrt(SqrI64</span><span class="cF7">(</span><span class="cF0">dx</span><span class="cF7">)</span><span class="cF0">+SqrI64</span><span class="cF7">(</span><span class="cF0">dz</span><span class="cF7">)</span><span class="cF0">);
+<a name="l251"></a>          objs[i].dx=MAX_SPEED*(dx/d);
+<a name="l252"></a>          objs[i].dz=MAX_SPEED*(dz/d);
+<a name="l253"></a>        </span><span class="cF7">}</span><span class="cF0">
+<a name="l254"></a>        objs[i].dx=LimitI64(objs[i].dx,-MAX_SPEED,MAX_SPEED);
+<a name="l255"></a>        objs[i].dy=LimitI64(objs[i].dy,-MAX_SPEED,MAX_SPEED);
+<a name="l256"></a>        objs[i].dz=LimitI64(objs[i].dz,-MAX_SPEED,MAX_SPEED);
+<a name="l257"></a>        objs[i].x+=objs[i].dx;
+<a name="l258"></a>        objs[i].y+=objs[i].dy;
+<a name="l259"></a>        objs[i].z+=objs[i].dz;
+<a name="l260"></a>        </span><span class="cF1">if</span><span class="cF0"> (objs[i].x.i32[1]&lt;-CAMP_WIDTH&gt;&gt;1) </span><span class="cF7">{</span><span class="cF0">
+<a name="l261"></a>          objs[i].x=-CAMP_WIDTH&gt;&gt;1&lt;&lt;32;
+<a name="l262"></a>          objs[i].dx=-objs[i].dx;
+<a name="l263"></a>        </span><span class="cF7">}</span><span class="cF0">
+<a name="l264"></a>        </span><span class="cF1">if</span><span class="cF0"> (objs[i].x.i32[1]&gt;CAMP_WIDTH&gt;&gt;1) </span><span class="cF7">{</span><span class="cF0">
+<a name="l265"></a>          objs[i].x=CAMP_WIDTH&gt;&gt;1&lt;&lt;32;
+<a name="l266"></a>          objs[i].dx=-objs[i].dx;
+<a name="l267"></a>        </span><span class="cF7">}</span><span class="cF0">
+<a name="l268"></a>        </span><span class="cF1">if</span><span class="cF0"> (objs[i].z.i32[1]&lt;-CAMP_WIDTH) </span><span class="cF7">{</span><span class="cF0">
+<a name="l269"></a>          objs[i].z=-CAMP_WIDTH&lt;&lt;32;
+<a name="l270"></a>          objs[i].dz=-objs[i].dz;
+<a name="l271"></a>        </span><span class="cF7">}</span><span class="cF0">
+<a name="l272"></a>        </span><span class="cF1">if</span><span class="cF0"> (objs[i].z.i32[1]&gt;0) </span><span class="cF7">{</span><span class="cF0">
+<a name="l273"></a>          objs[i].z=0;
+<a name="l274"></a>          objs[i].dz=-objs[i].dz;
+<a name="l275"></a>        </span><span class="cF7">}</span><span class="cF0">
+<a name="l276"></a>      }
+<a name="l277"></a>    Sleep(20);
+<a name="l278"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l279"></a>}
+<a name="l280"></a>
+<a name="l281"></a></span><span class="cF1">U0</span><span class="cF0"> Camp(</span><span class="cF1">I64</span><span class="cF0"> num_people=100)
+<a name="l282"></a>{
+<a name="l283"></a>  </span><span class="cF1">I64</span><span class="cF0"> i,j=0,num_tents;
+<a name="l284"></a>
+<a name="l285"></a>  </span><span class="cF1">if</span><span class="cF0"> (num_people&gt;MAX_PEOPLE)
+<a name="l286"></a>    num_people=MAX_PEOPLE;
+<a name="l287"></a>
+<a name="l288"></a>  MemSet(objs,0,</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF0">objs</span><span class="cF7">)</span><span class="cF0">);
+<a name="l289"></a>  </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;num_people;i++) </span><span class="cF7">{</span><span class="cF0">
+<a name="l290"></a>    objs[j].x=(RandU32%CAMP_WIDTH-CAMP_WIDTH&gt;&gt;1)&lt;&lt;32;
+<a name="l291"></a>    objs[j].y=0;
+<a name="l292"></a>    objs[j].z=-(RandU32%CAMP_WIDTH)&lt;&lt;32;
+<a name="l293"></a>    objs[j].type=CO_PERSON;
+<a name="l294"></a>    j++;
+<a name="l295"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l296"></a>  num_tents=(num_people+TENT_RATIO-1)/TENT_RATIO;
+<a name="l297"></a>  </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;num_tents;i++) </span><span class="cF7">{</span><span class="cF0">
+<a name="l298"></a>    objs[j].x=(RandU32%CAMP_WIDTH-CAMP_WIDTH&gt;&gt;1)&lt;&lt;32;
+<a name="l299"></a>    objs[j].y=0;
+<a name="l300"></a>    objs[j].z=-(RandU32%CAMP_WIDTH)&lt;&lt;32;
+<a name="l301"></a>    objs[j].type=CO_TENT;
+<a name="l302"></a>    j++;
+<a name="l303"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l304"></a>  num_objs=j;
+<a name="l305"></a>
+<a name="l306"></a>  LtfBottom; LtfClear;
+<a name="l307"></a>
+<a name="l308"></a>  SettingsPush(Fs,TSF_SAME_SONG); </span><span class="cF2">//See </span><a href="/archive/code/TaskSettings.html#l3"><span class="cF4">SettingsPush</span></a><span class="cF0">
+<a name="l309"></a>  </span><span class="cF1">try</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l310"></a>    WordStat(OFF);
+<a name="l311"></a>    Fs-&gt;animate_task=Spawn(&amp;AnimateTask,NULL,</span><span class="cF6">"Animate"</span><span class="cF0">,Fs);
+<a name="l312"></a>    Fs-&gt;update_win=&amp;DrawMeeting;
+<a name="l313"></a>    WinSync; </span><span class="cF2">//The old update clobbers text_attr</span><span class="cF0">
+<a name="l314"></a>    Fs-&gt;text_attr=LTGREEN&lt;&lt;4+WHITE; </span><span class="cF2">//bk/fg</span><span class="cF0">
+<a name="l315"></a>
+<a name="l316"></a>    GetChar;
+<a name="l317"></a>  </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">catch</span><span class="cF0">
+<a name="l318"></a>    CatchAll;
+<a name="l319"></a>  SettingsPop(Fs,TSF_SAME_SONG);
+<a name="l320"></a>}
+<a name="l321"></a>
+<a name="l322"></a></span><span class="cF2">//This is so I can use this file stand alone</span><span class="cF0">
+<a name="l323"></a></span><span class="cF2">//or as a component of a program.</span><span class="cF0">
+<a name="l324"></a>#</span><span class="cF1">if</span><span class="cF0"> IncludeDepth&lt;2
+<a name="l325"></a>Camp;
+<a name="l326"></a>#</span><span class="cF1">endif</span><span class="cF0">
+</span></pre><div class="archive-note">Historical capture: 2011-10-22. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

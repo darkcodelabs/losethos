@@ -1,0 +1,348 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>Adam1b</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V8.00" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cF5">                               <a href="/archive/LTHtml/Doc/TrivialSolutions.html">Trivial Solutions</a>
+                    <a href="/archive/index.html">The LoseThos 64-bit PC Operating System</a>
+File:/LT/OSMain/Adam1b.HPZ
+This, and all LoseThos files, are public domain.  Do whatever you like.
+God is watching; God is just; God is never out-done in generosity.  He talks!
+
+LoseThos code compiles with the 64-bit LoseThos compiler/assembler I wrote.
+Boot the LoseThos CD and you can compile it.  Not in Kansas anymore!
+
+<a href="/archive/LTHtml/Demo/Lectures/FixedPoint.html">Click here for preliminary compiler information you need.</a>
+
+</span><a name="l1"></a><span class="cF2">/*</span><span class="cF0">
+<a name="l2"></a></span><span class="cF2">In this file, syms defined OSMain assembly</span><span class="cF0">
+<a name="l3"></a></span><span class="cF2">files are given C+ definitions.  This file</span><span class="cF0">
+<a name="l4"></a></span><span class="cF2">is included when you compile the kernel, after</span><span class="cF0">
+<a name="l5"></a></span><span class="cF2">the assembly files have been assembled, making</span><span class="cF0">
+<a name="l6"></a></span><span class="cF2">the C+ definitions available for the C+ OSMain</span><span class="cF0">
+<a name="l7"></a></span><span class="cF2">files.</span><span class="cF0">  </span><span class="cF2">It is also included as part of booting.</span><span class="cF0">
+<a name="l8"></a>
+<a name="l9"></a></span><span class="cF2">The assembly global labels are stored as HTT_EXPORT_SYS_SYM</span><span class="cF0">
+<a name="l10"></a></span><span class="cF2">entries in the hash table.  These symols are placed</span><span class="cF0">
+<a name="l11"></a></span><span class="cF2">into the OSMain binary module and added to the</span><span class="cF0">
+<a name="l12"></a></span><span class="cF2">sym hash table at boot before this file</span><span class="cF0">
+<a name="l13"></a></span><span class="cF2">gets #included during boot.</span><span class="cF0">
+<a name="l14"></a>
+<a name="l15"></a></span><span class="cF2">See</span><span class="cF0">
+<a name="l16"></a></span><a href="https://web.archive.org/web/20120302175626/http://www.losethos.com/LTHtml/OSMain/OS.html#l20"><span class="cF4">Adam1b</span></a><span class="cF2"> for where it is included during compiling the kernel.</span><span class="cF0">
+<a name="l17"></a></span><a href="/archive/LTHtml/OSMain/Adam1.html#l8"><span class="cF4">Adam1b</span></a><span class="cF2"> for where it is included during boots.</span><span class="cF0">
+<a name="l18"></a></span><a href="/archive/LTHtml/OSMain/OSMain.html#l216"><span class="cF4">LoadOSMain</span></a><span class="cF2"> for where the OSMain syms are added to the hash tables.</span><span class="cF0">
+<a name="l19"></a>
+<a name="l20"></a></span><span class="cF2">*/</span><span class="cF0">
+<a name="l21"></a>
+<a name="l22"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Misc;Messages"</span><span class="cF0">
+<a name="l23"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_FOCUS_TASK TaskStruct *sys_focus_task;
+<a name="l24"></a>
+<a name="l25"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Graphics/Screen"</span><span class="cF0">
+<a name="l26"></a></span><span class="cF2">//This is the INT 0x10 mode number.</span><span class="cF0">
+<a name="l27"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_BIOS_GR_MODE </span><span class="cF1">U16</span><span class="cF0"> bios_gr_mode;
+<a name="l28"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"PCI"</span><span class="cF0">
+<a name="l29"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_PCI_BUSSES </span><span class="cF1">U16</span><span class="cF0"> sys_pci_busses;
+<a name="l30"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Misc"</span><span class="cF0">
+<a name="l31"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_CTRL_ALT_FLAGS </span><span class="cF1">U64</span><span class="cF0"> sys_ctrl_alt_flags[1];
+<a name="l32"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_COMPILE_TIME LTDate sys_compile_time;
+<a name="l33"></a>
+<a name="l34"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Boot"</span><span class="cF0">
+<a name="l35"></a></span><span class="cF1">LTextern</span><span class="cF0"> SYS_BOOT_BASE </span><span class="cF1">U32</span><span class="cF0"> sys_boot_base;
+<a name="l36"></a></span><span class="cF1">LTextern</span><span class="cF0"> SYS_BOOT_CODE </span><span class="cF1">U32</span><span class="cF0"> sys_boot_code;
+<a name="l37"></a></span><span class="cF1">LTextern</span><span class="cF0"> SYS_RUN_LEVEL </span><span class="cF1">U32</span><span class="cF0"> sys_run_level;
+<a name="l38"></a></span><span class="cF1">LTextern</span><span class="cF0"> SYS_BOOT_PATCH_TABLE_BASE </span><span class="cF1">U32</span><span class="cF0"> sys_boot_patch_table_base;
+<a name="l39"></a>
+<a name="l40"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Misc/Progress Bars"</span><span class="cF0">
+<a name="l41"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_PROGRESSES ProgressStruct sys_progresses[NUM_PROGRESS_BARS];
+<a name="l42"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_PROGRESS1      </span><span class="cF1">U64</span><span class="cF0"> progress1;
+<a name="l43"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_PROGRESS1_MAX  </span><span class="cF1">U64</span><span class="cF0"> progress1_max;
+<a name="l44"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_PROGRESS1_DESC </span><span class="cF1">U8</span><span class="cF0">  progress1_desc[PROGRESS_DESC_LEN+1];
+<a name="l45"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_PROGRESS2      </span><span class="cF1">U64</span><span class="cF0"> progress2;
+<a name="l46"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_PROGRESS2_MAX  </span><span class="cF1">U64</span><span class="cF0"> progress2_max;
+<a name="l47"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_PROGRESS2_DESC </span><span class="cF1">U8</span><span class="cF0">  progress2_desc[PROGRESS_DESC_LEN+1];
+<a name="l48"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_PROGRESS3      </span><span class="cF1">U64</span><span class="cF0"> progress3;
+<a name="l49"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_PROGRESS3_MAX  </span><span class="cF1">U64</span><span class="cF0"> progress3_max;
+<a name="l50"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_PROGRESS3_DESC </span><span class="cF1">U8</span><span class="cF0">  progress3_desc[PROGRESS_DESC_LEN+1];
+<a name="l51"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_PROGRESS4      </span><span class="cF1">U64</span><span class="cF0"> progress4;
+<a name="l52"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_PROGRESS4_MAX  </span><span class="cF1">U64</span><span class="cF0"> progress4_max;
+<a name="l53"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_PROGRESS4_DESC </span><span class="cF1">U8</span><span class="cF0">  progress4_desc[PROGRESS_DESC_LEN+1];
+<a name="l54"></a> 
+<a name="l55"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Bit"</span><span class="cF0">
+<a name="l56"></a>#</span><span class="cF1">help_file</span><span class="cF0"> </span><span class="cF6">"::/LT/Doc/Bit.TXZ"</span><span class="cF0">
+<a name="l57"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_BT BoolI64 Bt(</span><span class="cF1">U0</span><span class="cF0"> *bit_field,</span><span class="cF1">U64</span><span class="cF0"> bit);
+<a name="l58"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_BTS BoolI64 Bts(</span><span class="cF1">U0</span><span class="cF0"> *bit_field,</span><span class="cF1">U64</span><span class="cF0"> bit);
+<a name="l59"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_BTR BoolI64 Btr(</span><span class="cF1">U0</span><span class="cF0"> *bit_field,</span><span class="cF1">U64</span><span class="cF0"> bit);
+<a name="l60"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_BTC BoolI64 Btc(</span><span class="cF1">U0</span><span class="cF0"> *bit_field,</span><span class="cF1">U64</span><span class="cF0"> bit);
+<a name="l61"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_BEQU BoolI64 BEqu(</span><span class="cF1">U0</span><span class="cF0"> *bit_field,</span><span class="cF1">U64</span><span class="cF0"> bit,BoolI8 val);
+<a name="l62"></a>
+<a name="l63"></a></span><span class="cF2">//Locked for (for multitple CPU's)</span><span class="cF0">
+<a name="l64"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_LBTS BoolI64 LBts(</span><span class="cF1">U0</span><span class="cF0"> *bit_field,</span><span class="cF1">U64</span><span class="cF0"> bit);
+<a name="l65"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_LBTR BoolI64 LBtr(</span><span class="cF1">U0</span><span class="cF0"> *bit_field,</span><span class="cF1">U64</span><span class="cF0"> bit);
+<a name="l66"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_LBTC BoolI64 LBtc(</span><span class="cF1">U0</span><span class="cF0"> *bit_field,</span><span class="cF1">U64</span><span class="cF0"> bit);
+<a name="l67"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_LBEQU BoolI64 LBEqu(</span><span class="cF1">U0</span><span class="cF0"> *bit_field,</span><span class="cF1">U64</span><span class="cF0"> bit,BoolI8 val);
+<a name="l68"></a>
+<a name="l69"></a></span><span class="cF2">//Scan U64 sized item forward for first set bit, starting at lowest.</span><span class="cF0">
+<a name="l70"></a></span><span class="cF2">//Return -1 if not found.</span><span class="cF0">
+<a name="l71"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_BSF </span><span class="cF1">I64</span><span class="cF0"> Bsf(</span><span class="cF1">U64</span><span class="cF0"> bit_field_val);
+<a name="l72"></a>
+<a name="l73"></a></span><span class="cF2">//Scan U64 sized item reverse for first set bit, starting at highest.</span><span class="cF0">
+<a name="l74"></a></span><span class="cF2">//Return -1 if not found.</span><span class="cF0">
+<a name="l75"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_BSR </span><span class="cF1">I64</span><span class="cF0"> Bsr(</span><span class="cF1">U64</span><span class="cF0"> bit_field_val);
+<a name="l76"></a>
+<a name="l77"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _BIT_FIELD_OR_U32 </span><span class="cF1">U0</span><span class="cF0"> BFieldOrU32(
+<a name="l78"></a>         </span><span class="cF1">U0</span><span class="cF0"> *bit_field,</span><span class="cF1">U64</span><span class="cF0"> bit,</span><span class="cF1">U32</span><span class="cF0"> pattern);
+<a name="l79"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _BIT_FIELD_EXTRACT_U32 </span><span class="cF1">U32</span><span class="cF0"> BFieldExtU32(
+<a name="l80"></a>         </span><span class="cF1">U0</span><span class="cF0"> *bit_field,</span><span class="cF1">U64</span><span class="cF0"> bit,</span><span class="cF1">U64</span><span class="cF0"> size);
+<a name="l81"></a>
+<a name="l82"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Circular Queue"</span><span class="cF0">
+<a name="l83"></a>#</span><span class="cF1">help_file</span><span class="cF0"> </span><span class="cF6">"::/LT/Doc/Queue.TXZ"</span><span class="cF0">
+<a name="l84"></a>
+<a name="l85"></a></span><span class="cF2">//Insert item into queue after predicessor.</span><span class="cF0">
+<a name="l86"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_INSQUE </span><span class="cF1">U0</span><span class="cF0"> InsQue(</span><span class="cF1">U0</span><span class="cF0"> *entry,</span><span class="cF1">U0</span><span class="cF0"> *pred);
+<a name="l87"></a></span><span class="cF2">//Reversed insert into queue.  Insert</span><span class="cF0">
+<a name="l88"></a></span><span class="cF2">//item into queue before successor.</span><span class="cF0">
+<a name="l89"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_INSQUE_REV </span><span class="cF1">U0</span><span class="cF0"> InsQueRev(</span><span class="cF1">U0</span><span class="cF0"> *entry,</span><span class="cF1">U0</span><span class="cF0"> *succ);
+<a name="l90"></a></span><span class="cF2">//Remove item from queue.</span><span class="cF0">
+<a name="l91"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_REMQUE </span><span class="cF1">U0</span><span class="cF0"> RemQue(</span><span class="cF1">U0</span><span class="cF0"> *entry);
+<a name="l92"></a>
+<a name="l93"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Task"</span><span class="cF0">
+<a name="l94"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_PREEMPT BoolI64 Preempt(BoolI8 val);
+<a name="l95"></a>
+<a name="l96"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"I/O;Processor/IO Port"</span><span class="cF0">
+<a name="l97"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_INU8  </span><span class="cF1">U64</span><span class="cF0"> InU8(</span><span class="cF1">U64</span><span class="cF0"> port);
+<a name="l98"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_INU16 </span><span class="cF1">U64</span><span class="cF0"> InU16(</span><span class="cF1">U64</span><span class="cF0"> port);
+<a name="l99"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_INU32 </span><span class="cF1">U64</span><span class="cF0"> InU32(</span><span class="cF1">U64</span><span class="cF0"> port);
+<a name="l100"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_OUTU8  </span><span class="cF1">U0</span><span class="cF0"> OutU8(</span><span class="cF1">U64</span><span class="cF0"> port, </span><span class="cF1">U64</span><span class="cF0"> val);
+<a name="l101"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_OUTU16 </span><span class="cF1">U0</span><span class="cF0"> OutU16(</span><span class="cF1">U64</span><span class="cF0"> port, </span><span class="cF1">U64</span><span class="cF0"> val);
+<a name="l102"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_OUTU32 </span><span class="cF1">U0</span><span class="cF0"> OutU32(</span><span class="cF1">U64</span><span class="cF0"> port, </span><span class="cF1">U64</span><span class="cF0"> val);
+<a name="l103"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _REP_IN_U8  </span><span class="cF1">U0</span><span class="cF0"> RepInU8(</span><span class="cF1">U0</span><span class="cF0"> *buf,</span><span class="cF1">U64</span><span class="cF0"> cnt,</span><span class="cF1">U64</span><span class="cF0"> port);
+<a name="l104"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _REP_IN_U16 </span><span class="cF1">U0</span><span class="cF0"> RepInU16(</span><span class="cF1">U0</span><span class="cF0"> *buf,</span><span class="cF1">U64</span><span class="cF0"> cnt,</span><span class="cF1">U64</span><span class="cF0"> port);
+<a name="l105"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _REP_IN_U32 </span><span class="cF1">U0</span><span class="cF0"> RepInU32(</span><span class="cF1">U0</span><span class="cF0"> *buf,</span><span class="cF1">U64</span><span class="cF0"> cnt,</span><span class="cF1">U64</span><span class="cF0"> port);
+<a name="l106"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _REP_OUT_U8  </span><span class="cF1">U0</span><span class="cF0"> RepOutU8(</span><span class="cF1">U0</span><span class="cF0"> *buf,</span><span class="cF1">U64</span><span class="cF0"> cnt,</span><span class="cF1">U64</span><span class="cF0"> port);
+<a name="l107"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _REP_OUT_U16 </span><span class="cF1">U0</span><span class="cF0"> RepOutU16(</span><span class="cF1">U0</span><span class="cF0"> *buf,</span><span class="cF1">U64</span><span class="cF0"> cnt,</span><span class="cF1">U64</span><span class="cF0"> port);
+<a name="l108"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _REP_OUT_U32 </span><span class="cF1">U0</span><span class="cF0"> RepOutU32(</span><span class="cF1">U0</span><span class="cF0"> *buf,</span><span class="cF1">U64</span><span class="cF0"> cnt,</span><span class="cF1">U64</span><span class="cF0"> port);
+<a name="l109"></a>
+<a name="l110"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Memory"</span><span class="cF0">
+<a name="l111"></a>
+<a name="l112"></a></span><span class="cF2">//Only goes forward.</span><span class="cF0">
+<a name="l113"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_MEMCPY    </span><span class="cF1">U0</span><span class="cF0">  MemCpy(</span><span class="cF1">U0</span><span class="cF0"> *dst,</span><span class="cF1">U0</span><span class="cF0"> *src,</span><span class="cF1">U64</span><span class="cF0"> cnt);
+<a name="l114"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_MEMSET    </span><span class="cF1">U8</span><span class="cF0"> *MemSet(</span><span class="cF1">U0</span><span class="cF0"> *dst,</span><span class="cF1">U8</span><span class="cF0"> val,</span><span class="cF1">U64</span><span class="cF0"> cnt);
+<a name="l115"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_MEMSET    </span><span class="cF1">U8</span><span class="cF0"> *MemSetU8(</span><span class="cF1">U0</span><span class="cF0"> *dst,</span><span class="cF1">U8</span><span class="cF0"> val,</span><span class="cF1">U64</span><span class="cF0"> U8cnt);
+<a name="l116"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_MEMSET_U16 </span><span class="cF1">U16</span><span class="cF0"> *MemSetU16(</span><span class="cF1">U0</span><span class="cF0"> *dst,</span><span class="cF1">U8</span><span class="cF0"> val,</span><span class="cF1">U64</span><span class="cF0"> U16cnt);
+<a name="l117"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_MEMSET_U32 </span><span class="cF1">U32</span><span class="cF0"> *MemSetU32(</span><span class="cF1">U0</span><span class="cF0"> *dst,</span><span class="cF1">U8</span><span class="cF0"> val,</span><span class="cF1">U64</span><span class="cF0"> U32cnt);
+<a name="l118"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_MEMSET_U64 </span><span class="cF1">U64</span><span class="cF0"> *MemSetU64(</span><span class="cF1">U0</span><span class="cF0"> *dst,</span><span class="cF1">U8</span><span class="cF0"> val,</span><span class="cF1">U64</span><span class="cF0"> U64cnt);
+<a name="l119"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_CODE_BP BlkPool *sys_code_bp;
+<a name="l120"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_DATA_BP BlkPool *sys_data_bp;
+<a name="l121"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_HEAP_BASE </span><span class="cF1">U32</span><span class="cF0"> sys_heap_base;
+<a name="l122"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_HEAP_LIMIT </span><span class="cF1">U32</span><span class="cF0"> sys_heap_limit;
+<a name="l123"></a>
+<a name="l124"></a></span><span class="cF1">LTextern</span><span class="cF0"> SYS_HEAP_INIT_FLAG     </span><span class="cF1">U8</span><span class="cF0"> sys_heap_init_flag;
+<a name="l125"></a></span><span class="cF1">LTextern</span><span class="cF0"> SYS_HEAP_INIT_VAL      </span><span class="cF1">U8</span><span class="cF0"> sys_heap_init_val;
+<a name="l126"></a></span><span class="cF1">LTextern</span><span class="cF0"> SYS_MEM_INIT_FLAG      </span><span class="cF1">U8</span><span class="cF0"> sys_mem_init_flag;
+<a name="l127"></a></span><span class="cF1">LTextern</span><span class="cF0"> SYS_MEM_INIT_VAL       </span><span class="cF1">U8</span><span class="cF0"> sys_mem_init_val;
+<a name="l128"></a></span><span class="cF1">LTextern</span><span class="cF0"> SYS_VAR_INIT_FLAG      </span><span class="cF1">U8</span><span class="cF0"> sys_var_init_flag;
+<a name="l129"></a></span><span class="cF1">LTextern</span><span class="cF0"> SYS_VAR_INIT_VAL       </span><span class="cF1">U8</span><span class="cF0"> sys_var_init_val;
+<a name="l130"></a></span><span class="cF1">LTextern</span><span class="cF0"> SYS_HEAP_DBG_FLAG      </span><span class="cF1">U8</span><span class="cF0"> sys_heap_dbg;
+<a name="l131"></a>
+<a name="l132"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Char/Conversion"</span><span class="cF0">
+<a name="l133"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_TOUPPER </span><span class="cF1">I64</span><span class="cF0"> ToUpper(</span><span class="cF1">U8</span><span class="cF0"> ch);
+<a name="l134"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Char/Operations"</span><span class="cF0">
+<a name="l135"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_STRLEN </span><span class="cF1">U64</span><span class="cF0"> StrLen(</span><span class="cF1">U8</span><span class="cF0"> *st);
+<a name="l136"></a>
+<a name="l137"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Processor"</span><span class="cF0">
+<a name="l138"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _CPUID </span><span class="cF1">U0</span><span class="cF0"> CpuId(</span><span class="cF1">U32</span><span class="cF0"> rax,RaxRbxRcxRdx *result);
+<a name="l139"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_SET_RAX </span><span class="cF1">U0</span><span class="cF0"> SetRAX(</span><span class="cF1">U64</span><span class="cF0"> d);
+<a name="l140"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_GET_RAX </span><span class="cF1">U64</span><span class="cF0"> GetRAX();
+<a name="l141"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_CLI </span><span class="cF1">U0</span><span class="cF0"> Cli();
+<a name="l142"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_STI </span><span class="cF1">U0</span><span class="cF0"> Sti();
+<a name="l143"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_PUSHFD </span><span class="cF1">U0</span><span class="cF0"> PushFD();
+<a name="l144"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_POPFD </span><span class="cF1">U0</span><span class="cF0"> PopFD();
+<a name="l145"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_HLT </span><span class="cF1">U0</span><span class="cF0"> Hlt();
+<a name="l146"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _SYS_HLT </span><span class="cF1">U0</span><span class="cF0"> SysHlt(); </span><span class="cF2">//Loops</span><span class="cF0">
+<a name="l147"></a>
+<a name="l148"></a></span><span class="cF2">//This instruction hints to the processor</span><span class="cF0">
+<a name="l149"></a></span><span class="cF2">//that a spin-loop is taking place.</span><span class="cF0">
+<a name="l150"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_PAUSE </span><span class="cF1">U0</span><span class="cF0"> Pause();
+<a name="l151"></a>
+<a name="l152"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_POP </span><span class="cF1">U64</span><span class="cF0"> Pop();
+<a name="l153"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_PUSH </span><span class="cF1">U0</span><span class="cF0"> Push(</span><span class="cF1">U64</span><span class="cF0"> d);
+<a name="l154"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_CLD </span><span class="cF1">U0</span><span class="cF0"> Cld();
+<a name="l155"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_STD </span><span class="cF1">U0</span><span class="cF0"> Std();
+<a name="l156"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_GET_FLAGS </span><span class="cF1">U64</span><span class="cF0"> GetFlags();
+<a name="l157"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_SET_FLAGS </span><span class="cF1">U0</span><span class="cF0"> SetFlags(</span><span class="cF1">U64</span><span class="cF0"> d);
+<a name="l158"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_GET_STK_PTR </span><span class="cF1">U0</span><span class="cF0"> *GetStkPtr();
+<a name="l159"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_SET_STK_PTR </span><span class="cF1">U0</span><span class="cF0"> SetStkPtr(</span><span class="cF1">U0</span><span class="cF0"> *d);
+<a name="l160"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_GET_BASE_PTR </span><span class="cF1">U0</span><span class="cF0"> *GetBasePtr();
+<a name="l161"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_SET_BASE_PTR </span><span class="cF1">U0</span><span class="cF0"> SetBasePtr(</span><span class="cF1">U0</span><span class="cF0"> *d);
+<a name="l162"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_CACHE_LINE_WIDTH </span><span class="cF1">U64</span><span class="cF0"> sys_cache_line_width;
+<a name="l163"></a></span><span class="cF1">LTextern</span><span class="cF0"> SYS_GDTTAB GdtTabStruct sys_gdttab[MAXGDT];
+<a name="l164"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _XCHG_U64 </span><span class="cF1">U64</span><span class="cF0"> XchgU64(</span><span class="cF1">U64</span><span class="cF0"> *dst,</span><span class="cF1">U64</span><span class="cF0"> d);
+<a name="l165"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _XCHG_U32 </span><span class="cF1">U64</span><span class="cF0"> XchgU32(</span><span class="cF1">U32</span><span class="cF0"> *dst,</span><span class="cF1">U32</span><span class="cF0"> d);
+<a name="l166"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _XCHG_U16 </span><span class="cF1">U64</span><span class="cF0"> XchgU16(</span><span class="cF1">U16</span><span class="cF0"> *dst,</span><span class="cF1">U16</span><span class="cF0"> d);
+<a name="l167"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _XCHG_U8  </span><span class="cF1">U64</span><span class="cF0"> XchgU8(</span><span class="cF1">U8</span><span class="cF0"> *dst,</span><span class="cF1">U8</span><span class="cF0"> d);
+<a name="l168"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _LXCHG_U64 </span><span class="cF1">U64</span><span class="cF0"> LXchgU64(</span><span class="cF1">U64</span><span class="cF0"> *dst,</span><span class="cF1">U64</span><span class="cF0"> d);
+<a name="l169"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _LXCHG_U32 </span><span class="cF1">U64</span><span class="cF0"> LXchgU32(</span><span class="cF1">U32</span><span class="cF0"> *dst,</span><span class="cF1">U32</span><span class="cF0"> d);
+<a name="l170"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _LXCHG_U16 </span><span class="cF1">U64</span><span class="cF0"> LXchgU16(</span><span class="cF1">U16</span><span class="cF0"> *dst,</span><span class="cF1">U16</span><span class="cF0"> d);
+<a name="l171"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _LXCHG_U8  </span><span class="cF1">U64</span><span class="cF0"> LXchgU8(</span><span class="cF1">U8</span><span class="cF0"> *dst,</span><span class="cF1">U8</span><span class="cF0"> d);
+<a name="l172"></a>
+<a name="l173"></a></span><span class="cF2">//Model Specific REgisters</span><span class="cF0">
+<a name="l174"></a></span><span class="cF2">//See </span><a href="/archive/LTHtml/OSMain/Adam1a.html#l436"><span class="cF4">MSRs</span></a><span class="cF0">
+<a name="l175"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _SET_MSR </span><span class="cF1">U0</span><span class="cF0"> SetMSR(</span><span class="cF1">U64</span><span class="cF0"> model_specific_reg,</span><span class="cF1">U64</span><span class="cF0"> val);
+<a name="l176"></a>
+<a name="l177"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Processor/Cache;Memory/Cache"</span><span class="cF0">
+<a name="l178"></a></span><span class="cF2">//Invalidate cache</span><span class="cF0">
+<a name="l179"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_INVD </span><span class="cF1">U0</span><span class="cF0"> Invd();
+<a name="l180"></a></span><span class="cF2">//Write back and invalidate cache.</span><span class="cF0">
+<a name="l181"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_WBINVD </span><span class="cF1">U0</span><span class="cF0"> WbInvd();
+<a name="l182"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_INVLPG </span><span class="cF1">U0</span><span class="cF0"> InvlPg(</span><span class="cF1">U0</span><span class="cF0"> *a);
+<a name="l183"></a></span><span class="cF2">//Flush cache line.</span><span class="cF0">
+<a name="l184"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_CLFLUSH </span><span class="cF1">U0</span><span class="cF0"> CLFlush(</span><span class="cF1">U0</span><span class="cF0"> *a);
+<a name="l185"></a>
+<a name="l186"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"MultiCore"</span><span class="cF0">
+<a name="l187"></a>#</span><span class="cF1">help_file</span><span class="cF0"> </span><span class="cF6">"::/LT/Doc/MultiCore.TXZ"</span><span class="cF0">
+<a name="l188"></a></span><span class="cF1">LTextern</span><span class="cF0"> _SET_GS_BASE </span><span class="cF1">U0</span><span class="cF0"> SetGs(CPUStruct *c);
+<a name="l189"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_MP_CNT </span><span class="cF1">U64</span><span class="cF0"> mp_cnt;
+<a name="l190"></a></span><span class="cF1">LTextern</span><span class="cF0"> SYS_MP_CNT_INITIAL </span><span class="cF1">U64</span><span class="cF0"> mp_cnt_initial; </span><span class="cF2">//only used during </span><a href="https://web.archive.org/web/20120302175626/http://www.losethos.com/LTHtml/OSMain/MultiProc.html#l414"><span class="cF4">MPStart</span></a><span class="cF0">
+<a name="l191"></a></span><span class="cF1">LTextern</span><span class="cF0"> SYS_MP_CNT_LOCK </span><span class="cF1">U64</span><span class="cF0"> mp_cnt_lock;
+<a name="l192"></a></span><span class="cF1">LTextern</span><span class="cF0"> SYS_TEMP_CPU0_STRUCT CPUStruct sys_temp_cpu0_struct;
+<a name="l193"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_CPU_STRUCTS  CPUStruct *cpu_structs;
+<a name="l194"></a></span><span class="cF1">LTextern</span><span class="cF0"> SYS_SEMAS Sema sys_semas[NUM_SYS_SEMAS];
+<a name="l195"></a>
+<a name="l196"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"MultiCore;Processor"</span><span class="cF0">
+<a name="l197"></a></span><span class="cF2">//This points to the current CPU structure.</span><span class="cF0">
+<a name="l198"></a></span><span class="cF2">//It returns the val in the GS segment register.</span><span class="cF0">
+<a name="l199"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_GS CPUStruct *Gs();
+<a name="l200"></a>
+<a name="l201"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Time/CPU Cycles"</span><span class="cF0">
+<a name="l202"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_RDTSC </span><span class="cF1">U64</span><span class="cF0"> GetTimeStamp();
+<a name="l203"></a>
+<a name="l204"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Time/HPET"</span><span class="cF0">
+<a name="l205"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_HPET </span><span class="cF1">U64</span><span class="cF0"> HPET();
+<a name="l206"></a>
+<a name="l207"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Time/Jiffies"</span><span class="cF0">
+<a name="l208"></a>#</span><span class="cF1">help_file</span><span class="cF0"> </span><span class="cF6">"::/LT/Doc/TimeJiffy"</span><span class="cF0">
+<a name="l209"></a></span><span class="cF1">LTextern</span><span class="cF0"> SYS_TIMER </span><span class="cF1">U64</span><span class="cF0"> sys_timer;
+<a name="l210"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_JIFFIES </span><span class="cF1">U64</span><span class="cF0"> sys_jiffies;
+<a name="l211"></a>
+<a name="l212"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Math"</span><span class="cF0">
+<a name="l213"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_TO_I64 </span><span class="cF1">I64</span><span class="cF0"> ToI64(</span><span class="cF1">F64</span><span class="cF0"> d);  </span><span class="cF2">//This truncates</span><span class="cF0">
+<a name="l214"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_TO_F64 </span><span class="cF1">F64</span><span class="cF0"> ToF64(</span><span class="cF1">I64</span><span class="cF0"> i);
+<a name="l215"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_TO_BOOL BoolI64 ToBool(</span><span class="cF1">I64</span><span class="cF0"> i);
+<a name="l216"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_ABS_I64 </span><span class="cF1">I64</span><span class="cF0"> AbsI64(</span><span class="cF1">I64</span><span class="cF0"> i);
+<a name="l217"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_LIMIT_I64 </span><span class="cF1">I64</span><span class="cF0"> LimitI64(</span><span class="cF1">I64</span><span class="cF0"> p,</span><span class="cF1">I64</span><span class="cF0"> lo,</span><span class="cF1">I64</span><span class="cF0"> hi);
+<a name="l218"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_LIMIT_U64 </span><span class="cF1">U64</span><span class="cF0"> LimitU64(</span><span class="cF1">U64</span><span class="cF0"> p,</span><span class="cF1">U64</span><span class="cF0"> lo,</span><span class="cF1">U64</span><span class="cF0"> hi);
+<a name="l219"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_SIGN_I64 </span><span class="cF1">I64</span><span class="cF0"> SignI64(</span><span class="cF1">I64</span><span class="cF0"> i);
+<a name="l220"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_SQR_I64  </span><span class="cF1">I64</span><span class="cF0"> SqrI64(</span><span class="cF1">I64</span><span class="cF0"> i);
+<a name="l221"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_SQR_U64  </span><span class="cF1">I64</span><span class="cF0"> SqrU64(</span><span class="cF1">U64</span><span class="cF0"> i);
+<a name="l222"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_SWAP_U8  </span><span class="cF1">U0</span><span class="cF0"> SwapU8(</span><span class="cF1">U8</span><span class="cF0"> *n1,</span><span class="cF1">U8</span><span class="cF0"> *n2);
+<a name="l223"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_SWAP_U16 </span><span class="cF1">U0</span><span class="cF0"> SwapU16(</span><span class="cF1">U16</span><span class="cF0"> *n1,</span><span class="cF1">U16</span><span class="cF0"> *n2);
+<a name="l224"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_SWAP_U32 </span><span class="cF1">U0</span><span class="cF0"> SwapU32(</span><span class="cF1">U32</span><span class="cF0"> *n1,</span><span class="cF1">U32</span><span class="cF0"> *n2);
+<a name="l225"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_SWAP_U64 </span><span class="cF1">U0</span><span class="cF0"> SwapU64(</span><span class="cF1">U64</span><span class="cF0"> *n1,</span><span class="cF1">U64</span><span class="cF0"> *n2);
+<a name="l226"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_MIN_I64 </span><span class="cF1">I64</span><span class="cF0"> MinI64(</span><span class="cF1">I64</span><span class="cF0"> n1,</span><span class="cF1">I64</span><span class="cF0"> n2);
+<a name="l227"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_MAX_I64 </span><span class="cF1">I64</span><span class="cF0"> MaxI64(</span><span class="cF1">I64</span><span class="cF0"> n1,</span><span class="cF1">I64</span><span class="cF0"> n2);
+<a name="l228"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_MIN_U64 </span><span class="cF1">U64</span><span class="cF0"> MinU64(</span><span class="cF1">U64</span><span class="cF0"> n1,</span><span class="cF1">U64</span><span class="cF0"> n2);
+<a name="l229"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_MAX_U64 </span><span class="cF1">U64</span><span class="cF0"> MaxU64(</span><span class="cF1">U64</span><span class="cF0"> n1,</span><span class="cF1">U64</span><span class="cF0"> n2);
+<a name="l230"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_MOD_U64 </span><span class="cF1">U64</span><span class="cF0"> ModU64(</span><span class="cF1">U64</span><span class="cF0"> *q,</span><span class="cF1">U64</span><span class="cF0"> d);
+<a name="l231"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _FSQRT </span><span class="cF1">F64</span><span class="cF0"> Sqrt(</span><span class="cF1">F64</span><span class="cF0"> d);
+<a name="l232"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _FABS </span><span class="cF1">F64</span><span class="cF0"> Abs(</span><span class="cF1">F64</span><span class="cF0"> d);
+<a name="l233"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _SIGN </span><span class="cF1">F64</span><span class="cF0"> Sign(</span><span class="cF1">F64</span><span class="cF0"> d);
+<a name="l234"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _SQR  </span><span class="cF1">F64</span><span class="cF0"> Sqr(</span><span class="cF1">F64</span><span class="cF0"> d);
+<a name="l235"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _FSIN </span><span class="cF1">F64</span><span class="cF0"> Sin(</span><span class="cF1">F64</span><span class="cF0"> d);
+<a name="l236"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _FCOS </span><span class="cF1">F64</span><span class="cF0"> Cos(</span><span class="cF1">F64</span><span class="cF0"> d);
+<a name="l237"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _FTAN </span><span class="cF1">F64</span><span class="cF0"> Tan(</span><span class="cF1">F64</span><span class="cF0"> d);
+<a name="l238"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _ARG  </span><span class="cF1">F64</span><span class="cF0"> Arg(</span><span class="cF1">F64</span><span class="cF0"> x,</span><span class="cF1">F64</span><span class="cF0"> y);
+<a name="l239"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _FATAN </span><span class="cF1">F64</span><span class="cF0"> ATan(</span><span class="cF1">F64</span><span class="cF0"> d);
+<a name="l240"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _ROUND </span><span class="cF1">F64</span><span class="cF0"> Round(</span><span class="cF1">F64</span><span class="cF0"> d);
+<a name="l241"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _TRUNC </span><span class="cF1">F64</span><span class="cF0"> Trunc(</span><span class="cF1">F64</span><span class="cF0"> d);
+<a name="l242"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _FLOOR </span><span class="cF1">F64</span><span class="cF0"> Floor(</span><span class="cF1">F64</span><span class="cF0"> d);
+<a name="l243"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _CEIL  </span><span class="cF1">F64</span><span class="cF0"> Ceil(</span><span class="cF1">F64</span><span class="cF0"> d);
+<a name="l244"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _POW </span><span class="cF1">F64</span><span class="cF0"> Pow(</span><span class="cF1">F64</span><span class="cF0"> base,</span><span class="cF1">F64</span><span class="cF0"> power);
+<a name="l245"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _POW10 </span><span class="cF1">F64</span><span class="cF0"> Pow10(</span><span class="cF1">F64</span><span class="cF0"> d);
+<a name="l246"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _LOG2  </span><span class="cF1">F64</span><span class="cF0"> Log2(</span><span class="cF1">F64</span><span class="cF0"> d);
+<a name="l247"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _LOG10 </span><span class="cF1">F64</span><span class="cF0"> Log10(</span><span class="cF1">F64</span><span class="cF0"> d);
+<a name="l248"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _LN  </span><span class="cF1">F64</span><span class="cF0"> Ln(</span><span class="cF1">F64</span><span class="cF0"> d);
+<a name="l249"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _EXP </span><span class="cF1">F64</span><span class="cF0"> Exp(</span><span class="cF1">F64</span><span class="cF0"> d);
+<a name="l250"></a></span><span class="cF1">LTextern</span><span class="cF0"> _FLDCW </span><span class="cF1">U0</span><span class="cF0"> Fldcw(</span><span class="cF1">U16</span><span class="cF0"> w);
+<a name="l251"></a></span><span class="cF1">LTextern</span><span class="cF0"> _FCLEX </span><span class="cF1">U0</span><span class="cF0"> Fclex();
+<a name="l252"></a></span><span class="cF1">LTextern</span><span class="cF0"> _FSTCW </span><span class="cF1">U16</span><span class="cF0"> Fstcw();
+<a name="l253"></a></span><span class="cF1">LTextern</span><span class="cF0"> _FSTSW </span><span class="cF1">U16</span><span class="cF0"> Fstsw();
+<a name="l254"></a></span><span class="cF1">LTextern</span><span class="cF0"> _FXSAVE  </span><span class="cF1">U0</span><span class="cF0"> Fxsave(FPUState *fpu_mmx);
+<a name="l255"></a></span><span class="cF1">LTextern</span><span class="cF0"> _FXRSTOR </span><span class="cF1">U0</span><span class="cF0"> Fxrstor(FPUState *fpu_mmx);
+<a name="l256"></a></span><span class="cF1">LTextern</span><span class="cF0"> SYS_INIT_FPU_MMX FPUState sys_init_fpu_mmx;
+<a name="l257"></a>
+<a name="l258"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Math/D3;Ode/D3"</span><span class="cF0">
+<a name="l259"></a>#</span><span class="cF1">help_file</span><span class="cF0"> </span><span class="cF6">"::/LT/Doc/D3.TXZ"</span><span class="cF0">
+<a name="l260"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _D3_EQU D3 *D3Equ(D3 *dst,</span><span class="cF1">F64</span><span class="cF0"> x,</span><span class="cF1">F64</span><span class="cF0"> y,</span><span class="cF1">F64</span><span class="cF0"> z);
+<a name="l261"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _D3_ZERO D3 *D3Zero(D3 *dst);
+<a name="l262"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _D3_COPY D3 *D3Copy(D3 *dst,D3 *src);
+<a name="l263"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _D3_NORM </span><span class="cF1">F64</span><span class="cF0"> D3Norm(D3 *d);
+<a name="l264"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _D3_SQR_NORM </span><span class="cF1">F64</span><span class="cF0"> D3SqrNorm(D3 *d);
+<a name="l265"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _D3_ADD D3 *D3Add(D3 *d1,D3 *d2,D3 *sum);
+<a name="l266"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _D3_SUB D3 *D3Sub(D3 *d1,D3 *d2,D3 *diff);
+<a name="l267"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _D3_MUL D3 *D3Mul(</span><span class="cF1">F64</span><span class="cF0"> c,D3 *d,D3 *prod);
+<a name="l268"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _D3_DIV D3 *D3Div(</span><span class="cF1">F64</span><span class="cF0"> c,D3 *d,D3 *quot);
+<a name="l269"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _D3_ADD_EQU D3 *D3AddEqu(D3 *sum,D3 *d);
+<a name="l270"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _D3_SUB_EQU D3 *D3SubEqu(D3 *diff,D3 *d);
+<a name="l271"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _D3_MUL_EQU D3 *D3MulEqu(D3 *prod,</span><span class="cF1">F64</span><span class="cF0"> c);
+<a name="l272"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _D3_DIV_EQU D3 *D3DivEqu(D3 *quot,</span><span class="cF1">F64</span><span class="cF0"> c);
+<a name="l273"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _D3_DIST </span><span class="cF1">F64</span><span class="cF0"> D3Dist(D3 *d1,D3 *d2);
+<a name="l274"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _D3_SQR_DIST </span><span class="cF1">F64</span><span class="cF0"> D3SqrDist(D3 *d1,D3 *d2);
+<a name="l275"></a></span><span class="cF2">//Dot Product</span><span class="cF0">
+<a name="l276"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _D3_DOT </span><span class="cF1">F64</span><span class="cF0"> D3Dot(D3 *d1,D3 *d2);
+<a name="l277"></a></span><span class="cF2">//Cross Product</span><span class="cF0">
+<a name="l278"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _D3_CROSS D3 *D3Cross(D3 *d1,D3 *d2,D3 *prod);
+<a name="l279"></a></span><span class="cF2">//Convert to unit vect</span><span class="cF0">
+<a name="l280"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _D3_UNIT D3 *D3Unit(D3 *d);
+<a name="l281"></a>
+<a name="l282"></a>
+<a name="l283"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Task;Processor"</span><span class="cF0">
+<a name="l284"></a></span><span class="cF2">//This points to the current task record.</span><span class="cF0">
+<a name="l285"></a></span><span class="cF2">//It returns the val in the FS segment register.</span><span class="cF0">
+<a name="l286"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTintern</span><span class="cF0"> EC_FS TaskStruct *Fs();
+<a name="l287"></a>
+<a name="l288"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Call"</span><span class="cF0">
+<a name="l289"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _CALL </span><span class="cF1">I64</span><span class="cF0"> Call(</span><span class="cF1">U0</span><span class="cF0"> *s);
+<a name="l290"></a>
+<a name="l291"></a></span><span class="cF2">//fp_add can have any fixed number of arguments.</span><span class="cF0">
+<a name="l292"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _CALLIND </span><span class="cF1">I64</span><span class="cF0"> CallInd(</span><span class="cF2">/*argpop*/</span><span class="cF1">I64</span><span class="cF0"> </span><span class="cF7">(</span><span class="cF0">*fp_add</span><span class="cF7">)(</span><span class="cF0">...</span><span class="cF7">)</span><span class="cF0">,...);
+<a name="l293"></a>
+<a name="l294"></a></span><span class="cF2">//This is just an array of ptrs to funs.</span><span class="cF0">
+<a name="l295"></a></span><span class="cF2">//See </span><a href="/archive/LTHtml/OSMain/Adam1a.html#l507"><span class="cF4">Extern Num Definitions</span></a><span class="cF0">
+<a name="l296"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> SYS_EXTERN_TABLE </span><span class="cF2">/*argpop*/</span><span class="cF0"> </span><span class="cF1">I64</span><span class="cF0"> (**ext)(...);
+<a name="l297"></a></span><span class="cF2">//Can have any fixed number of arguments.</span><span class="cF0">
+<a name="l298"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _CALLEXTNUM </span><span class="cF1">I64</span><span class="cF0"> CallExtNum(</span><span class="cF1">U64</span><span class="cF0"> num,...);
+<a name="l299"></a>
+<a name="l300"></a></span><span class="cF2">//Search sym table for fun name and pass it args.</span><span class="cF0">
+<a name="l301"></a></span><span class="cF2">//Can have any fixed number of arguments.</span><span class="cF0">
+<a name="l302"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">LTextern</span><span class="cF0"> _CALLEXTSTR </span><span class="cF1">I64</span><span class="cF0"> CallExtStr(</span><span class="cF2">/*argpop*/</span><span class="cF0"> </span><span class="cF1">U8</span><span class="cF0"> *name,...);
+<a name="l303"></a>
+<a name="l304"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">""</span><span class="cF0">
+</span></pre><div class="archive-note">Historical capture: 2012-03-02. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

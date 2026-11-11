@@ -1,0 +1,169 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>TaskSettings</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V8.00" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cF5">                               <a href="/archive/LTHtml/Doc/TrivialSolutions.html">Trivial Solutions</a>
+                    <a href="/archive/index.html">The LoseThos 64-bit PC Operating System</a>
+File:/LT/Adam/TaskSettings.APZ
+This, and all LoseThos files, are public domain.  Do whatever you like.
+God is watching; God is just; God is never out-done in generosity.  He talks!
+
+LoseThos code compiles with the 64-bit LoseThos compiler/assembler I wrote.
+Boot the LoseThos CD and you can compile it.  Not in Kansas anymore!
+
+<a href="/archive/LTHtml/Demo/Lectures/FixedPoint.html">Click here for preliminary compiler information you need.</a>
+
+</span><a name="l1"></a><span class="cF0">#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">"Task/Settings"</span><span class="cF0">
+<a name="l2"></a>
+<a name="l3"></a></span><span class="cF1">public</span><span class="cF0"> TaskSettings *SettingsPush(TaskStruct *task=NULL,</span><span class="cF1">U64</span><span class="cF0"> flags=0)
+<a name="l4"></a>{ </span><span class="cF2">//This is typically used at the start of an application.</span><span class="cF0">
+<a name="l5"></a>  </span><span class="cF2">//It saves many settings so they can be restored</span><span class="cF0">
+<a name="l6"></a>  </span><span class="cF2">//at the end of the application with </span><a href="/archive/LTHtml/Adam/TaskSettings.html#l68"><span class="cF4">SettingsPop</span></a><span class="cF2">().</span><span class="cF0">
+<a name="l7"></a>
+<a name="l8"></a>  </span><span class="cF2">//See </span><a href="https://web.archive.org/web/20120312044408/http://www.losethos.com/LTHtml/Demo/Ltf/Quirk1.html"><span class="cF4">::/LT/Demo/Ltf/Quirk1.CPZ</span></a><span class="cF2"> for</span><span class="cF0">
+<a name="l9"></a>  </span><span class="cF2">//an issue you will surely have to</span><span class="cF0">
+<a name="l10"></a>  </span><span class="cF2">//addr relating to the </span><a href="/archive/LTHtml/OSMain/Adam1a.html#l1306"><span class="cF4">Ltf</span></a><span class="cF2"> under</span><span class="cF0">
+<a name="l11"></a>  </span><span class="cF2">//the graphics you display.</span><span class="cF0">
+<a name="l12"></a>  TaskSettings *tempse;
+<a name="l13"></a>  Ltf *l;
+<a name="l14"></a>  </span><span class="cF1">if</span><span class="cF0"> (!task) task=Fs;
+<a name="l15"></a>  </span><span class="cF1">if</span><span class="cF0"> (!TaskValidate</span><span class="cF7">(</span><span class="cF0">task</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF1">return</span><span class="cF0"> NULL;
+<a name="l16"></a>  tempse=CAlloc(</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF0">TaskSettings</span><span class="cF7">)</span><span class="cF0">,task);
+<a name="l17"></a>  tempse-&gt;update_win=task-&gt;update_win;
+<a name="l18"></a>  tempse-&gt;draw_it=task-&gt;draw_it;
+<a name="l19"></a>  GetVGAPalette4(tempse-&gt;palette4);
+<a name="l20"></a>  tempse-&gt;task_end_cb=task-&gt;task_end_cb;
+<a name="l21"></a>
+<a name="l22"></a>  </span><span class="cF1">if</span><span class="cF0"> (!</span><span class="cF7">(</span><span class="cF0">flags&amp;TSF_SAME_SONG</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF7">{</span><span class="cF0">
+<a name="l23"></a>    </span><span class="cF1">if</span><span class="cF0"> (tempse-&gt;song_task=task-&gt;song_task) {
+<a name="l24"></a>      LBts(&amp;task-&gt;song_task-&gt;task_flags,TASKf_SUSPENDED);
+<a name="l25"></a>      Snd(0);
+<a name="l26"></a>    }
+<a name="l27"></a>    task-&gt;song_task=NULL;
+<a name="l28"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l29"></a>
+<a name="l30"></a>  </span><span class="cF1">if</span><span class="cF0"> (tempse-&gt;animate_task=task-&gt;animate_task)
+<a name="l31"></a>    LBts(&amp;task-&gt;animate_task-&gt;task_flags,TASKf_SUSPENDED);
+<a name="l32"></a>  task-&gt;animate_task=NULL;
+<a name="l33"></a>
+<a name="l34"></a>  </span><span class="cF1">if</span><span class="cF0"> (l=LtfCur</span><span class="cF7">(</span><span class="cF0">task</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF7">{</span><span class="cF0">
+<a name="l35"></a>    tempse-&gt;cursor=!Bt(&amp;l-&gt;flags,LTFf_HIDE_CURSOR);
+<a name="l36"></a>    tempse-&gt;ltf_cur_attr=l-&gt;start_text_attr;
+<a name="l37"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l38"></a>  </span><span class="cF1">if</span><span class="cF0"> (l=LtfAux</span><span class="cF7">(</span><span class="cF0">task</span><span class="cF7">)</span><span class="cF0">)
+<a name="l39"></a>    tempse-&gt;ltf_aux_attr=l-&gt;start_text_attr;
+<a name="l40"></a>
+<a name="l41"></a>  tempse-&gt;left=task-&gt;win_left;
+<a name="l42"></a>  tempse-&gt;right=task-&gt;win_right;
+<a name="l43"></a>  tempse-&gt;top=task-&gt;win_top;
+<a name="l44"></a>  tempse-&gt;bottom=task-&gt;win_bottom;
+<a name="l45"></a>
+<a name="l46"></a>  tempse-&gt;scroll_x=task-&gt;win_scroll_x;
+<a name="l47"></a>  tempse-&gt;scroll_y=task-&gt;win_scroll_y;
+<a name="l48"></a>  tempse-&gt;scroll_z=task-&gt;win_scroll_z;
+<a name="l49"></a>
+<a name="l50"></a>  tempse-&gt;win_inhibit=task-&gt;win_inhibit;
+<a name="l51"></a>  MemCpy(&amp;tempse-&gt;snap,&amp;task-&gt;snap,</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF0">SnapStruct</span><span class="cF7">)</span><span class="cF0">);
+<a name="l52"></a>
+<a name="l53"></a>  tempse-&gt;win_max_refresh=task-&gt;win_max_refresh;
+<a name="l54"></a>  tempse-&gt;text_attr=task-&gt;text_attr;
+<a name="l55"></a>  tempse-&gt;border_attr=task-&gt;border_attr;
+<a name="l56"></a>  tempse-&gt;border=!Bt(&amp;task-&gt;display_flags,DISPLAYf_NO_BORDER);
+<a name="l57"></a>  tempse-&gt;preempt=Bt(&amp;task-&gt;task_flags,TASKf_PREEMPT);
+<a name="l58"></a>  </span><span class="cF1">if</span><span class="cF0"> (TaskValidate</span><span class="cF7">(</span><span class="cF0">ws_task</span><span class="cF7">)</span><span class="cF0">)
+<a name="l59"></a>    tempse-&gt;wordstat=TRUE;
+<a name="l60"></a>  </span><span class="cF1">else</span><span class="cF0">
+<a name="l61"></a>    tempse-&gt;wordstat=FALSE;
+<a name="l62"></a>
+<a name="l63"></a>  tempse-&gt;next=task-&gt;next_settings;
+<a name="l64"></a>  task-&gt;next_settings=tempse;
+<a name="l65"></a>  </span><span class="cF1">return</span><span class="cF0"> tempse;
+<a name="l66"></a>}
+<a name="l67"></a>
+<a name="l68"></a></span><span class="cF1">public</span><span class="cF0"> </span><span class="cF1">U0</span><span class="cF0"> SettingsPop(TaskStruct *task=NULL,</span><span class="cF1">U64</span><span class="cF0"> flags=0)
+<a name="l69"></a>{
+<a name="l70"></a>  TaskSettings *tempse;
+<a name="l71"></a>  Ltf *l;
+<a name="l72"></a>  BoolI8 old_preempt=Preempt(OFF);
+<a name="l73"></a>  </span><span class="cF1">if</span><span class="cF0"> (!task) task=Fs;
+<a name="l74"></a>  </span><span class="cF1">if</span><span class="cF0"> (!TaskValidate</span><span class="cF7">(</span><span class="cF0">task</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF7">{</span><span class="cF0">
+<a name="l75"></a>    Preempt(old_preempt);
+<a name="l76"></a>    </span><span class="cF1">return</span><span class="cF0">;
+<a name="l77"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l78"></a>  </span><span class="cF1">if</span><span class="cF0"> (tempse=task-&gt;next_settings) </span><span class="cF7">{</span><span class="cF0">
+<a name="l79"></a>    task-&gt;next_settings=tempse-&gt;next;
+<a name="l80"></a>    task-&gt;update_win=tempse-&gt;update_win;
+<a name="l81"></a>    task-&gt;draw_it=tempse-&gt;draw_it;
+<a name="l82"></a>    SetVGAPalette4(tempse-&gt;palette4);
+<a name="l83"></a>    task-&gt;task_end_cb=tempse-&gt;task_end_cb;
+<a name="l84"></a>
+<a name="l85"></a>    </span><span class="cF1">if</span><span class="cF0"> (task-&gt;animate_task)
+<a name="l86"></a>      Kill(task-&gt;animate_task);
+<a name="l87"></a>    </span><span class="cF1">if</span><span class="cF0"> (task-&gt;animate_task=tempse-&gt;animate_task)
+<a name="l88"></a>      LBtr(&amp;task-&gt;animate_task-&gt;task_flags,TASKf_SUSPENDED);
+<a name="l89"></a>
+<a name="l90"></a>    </span><span class="cF1">if</span><span class="cF0"> (!</span><span class="cF7">(</span><span class="cF0">flags&amp;TSF_SAME_SONG</span><span class="cF7">)</span><span class="cF0">) {
+<a name="l91"></a>      </span><span class="cF1">if</span><span class="cF0"> (task-&gt;song_task)
+<a name="l92"></a>        Kill(task-&gt;song_task);
+<a name="l93"></a>      </span><span class="cF1">if</span><span class="cF0"> (task-&gt;song_task=tempse-&gt;song_task)
+<a name="l94"></a>        LBtr(&amp;task-&gt;song_task-&gt;task_flags,TASKf_SUSPENDED);
+<a name="l95"></a>    }
+<a name="l96"></a>
+<a name="l97"></a>    </span><span class="cF1">if</span><span class="cF0"> (l=LtfCur</span><span class="cF7">(</span><span class="cF0">task</span><span class="cF7">)</span><span class="cF0">) {
+<a name="l98"></a>      LBEqu(&amp;l-&gt;flags,LTFf_HIDE_CURSOR,!tempse-&gt;cursor);
+<a name="l99"></a>      l-&gt;start_text_attr=tempse-&gt;ltf_cur_attr;
+<a name="l100"></a>    }
+<a name="l101"></a>    </span><span class="cF1">if</span><span class="cF0"> (l=LtfAux</span><span class="cF7">(</span><span class="cF0">task</span><span class="cF7">)</span><span class="cF0">)
+<a name="l102"></a>      l-&gt;start_text_attr=tempse-&gt;ltf_aux_attr;
+<a name="l103"></a>
+<a name="l104"></a>    WinBorder(tempse-&gt;border,task);
+<a name="l105"></a>    SetWinHorz(tempse-&gt;left,tempse-&gt;right,task);
+<a name="l106"></a>    SetWinVert(tempse-&gt;top,tempse-&gt;bottom,task);
+<a name="l107"></a>    task-&gt;win_scroll_x=tempse-&gt;scroll_x;
+<a name="l108"></a>    task-&gt;win_scroll_y=tempse-&gt;scroll_y;
+<a name="l109"></a>    task-&gt;win_scroll_z=tempse-&gt;scroll_z;
+<a name="l110"></a>    MemCpy(&amp;task-&gt;snap,&amp;tempse-&gt;snap,</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF0">SnapStruct</span><span class="cF7">)</span><span class="cF0">);
+<a name="l111"></a>    task-&gt;win_inhibit=tempse-&gt;win_inhibit;
+<a name="l112"></a>    task-&gt;win_max_refresh=tempse-&gt;win_max_refresh;
+<a name="l113"></a>    task-&gt;text_attr=tempse-&gt;text_attr;
+<a name="l114"></a>    task-&gt;border_attr=tempse-&gt;border_attr;
+<a name="l115"></a>    WordStat(tempse-&gt;wordstat);
+<a name="l116"></a>    Snd(0);
+<a name="l117"></a>    Free(tempse);
+<a name="l118"></a>    WinSync;
+<a name="l119"></a>    Preempt(old_preempt);
+<a name="l120"></a>    LBEqu(&amp;task-&gt;task_flags,TASKf_PREEMPT,tempse-&gt;preempt);
+<a name="l121"></a>  </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0">
+<a name="l122"></a>    Preempt(old_preempt);
+<a name="l123"></a>}
+<a name="l124"></a>
+<a name="l125"></a>#</span><span class="cF1">help_index</span><span class="cF0"> </span><span class="cF6">""</span><span class="cF0">
+</span></pre><div class="archive-note">Historical capture: 2012-03-12. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

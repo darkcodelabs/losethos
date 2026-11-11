@@ -1,0 +1,218 @@
+[
+  {
+    "path": "backend.html",
+    "timestamp": "20081015175011",
+    "sha256": "e9647a9c541187950fb5be214efc2cf96b48f9c48255ff7c83f4e05d1c432b6e",
+    "source": "https://web.archive.org/web/20081015175011/http://www.losethos.com/backend.html"
+  },
+  {
+    "path": "bitmaps.html",
+    "timestamp": "20081015175018",
+    "sha256": "32d032a8f8d5262611bae7be69834d6686f2059edaeb1184a4313922123d7780",
+    "source": "https://web.archive.org/web/20081015175018/http://www.losethos.com/bitmaps.html"
+  },
+  {
+    "path": "blot.html",
+    "timestamp": "20060711022717",
+    "sha256": "b6bf4de7f8029a1a609fac581861575b2b8a953804ce8011a02e816b110e3221",
+    "source": "https://web.archive.org/web/20060711022717/http://www.losethos.com/blot.html"
+  },
+  {
+    "path": "change.html",
+    "timestamp": "20060711022615",
+    "sha256": "df87fcd1efff252d35b748a2b5a0fd495d239cc290e4237d6ddc6e6dd32f94e4",
+    "source": "https://web.archive.org/web/20060711022615/http://www.losethos.com/change.html"
+  },
+  {
+    "path": "compile.html",
+    "timestamp": "20060711022628",
+    "sha256": "7a6980f635662c7938fa4f6a56f13d99524afa086dfb47c4d00b5f950ea3f7d8",
+    "source": "https://web.archive.org/web/20060711022628/http://www.losethos.com/compile.html"
+  },
+  {
+    "path": "except.html",
+    "timestamp": "20060711022602",
+    "sha256": "aaa1881d17232b502a66320f66b2a57c22e6ed7c6d0e0bf31e3bdb38074abf35",
+    "source": "https://web.archive.org/web/20060711022602/http://www.losethos.com/except.html"
+  },
+  {
+    "path": "files/LT.EXE",
+    "timestamp": "20060711022800",
+    "sha256": "576dd4aa99e08df0602a6f7ce1eeb56aead733a96ff21df6ff83575d9499c4ec",
+    "source": "https://web.archive.org/web/20060711022800/http://www.losethos.com/files/LT.EXE"
+  },
+  {
+    "path": "files/LTCD.ISO",
+    "timestamp": "20060719175707",
+    "sha256": "a9a59f4453b4aacda47fcb4f18fe92366aa19374538d1f2db3713ea615d9f94e",
+    "source": "https://web.archive.org/web/20060719175707/http://www.losethos.com/files/LTCD.ISO"
+  },
+  {
+    "path": "files/LTSongs.ISO",
+    "timestamp": "20060713193942",
+    "sha256": "42cec7b98e99bc50779c02b67951493db721578d42b7b253368d02db61245e3c",
+    "source": "https://web.archive.org/web/20060713193942/http://www.losethos.com/files/LTSongs.ISO"
+  },
+  {
+    "path": "files/LTZ.EXE",
+    "timestamp": "20060711022642",
+    "sha256": "15baa1f565a35a8898a2b44fafc037b0563e4fd2df438729d083b7857392a5f5",
+    "source": "https://web.archive.org/web/20060711022642/http://www.losethos.com/files/LTZ.EXE"
+  },
+  {
+    "path": "filesystem.html",
+    "timestamp": "20060711022652",
+    "sha256": "202f29ba4c12703a4e2d344d9f30b0dfcf6c3e612dd2519a01dbf3d3bc1cad29",
+    "source": "https://web.archive.org/web/20060711022652/http://www.losethos.com/filesystem.html"
+  },
+  {
+    "path": "frontend.html",
+    "timestamp": "20081015173524",
+    "sha256": "b836ebdd7584ef10d6a45beafc446f59a376c89cb2775a1cc3d900413f7e3d67",
+    "source": "https://web.archive.org/web/20081015173524/http://www.losethos.com/frontend.html"
+  },
+  {
+    "path": "glossary.html",
+    "timestamp": "20060711022535",
+    "sha256": "772c86aa082ed15901a3c4ed5d53c5a3de1301a5c9dc5501148c3c4449e416c9",
+    "source": "https://web.archive.org/web/20060711022535/http://www.losethos.com/glossary.html"
+  },
+  {
+    "path": "images/Header.JPG",
+    "timestamp": "20110328033120",
+    "sha256": "88c282c7fecc275f9db3d296f7335c39118206b38f54f7769a007bdc28513b87",
+    "source": "https://web.archive.org/web/20110328033120/http://www.losethos.com/images/Header.JPG"
+  },
+  {
+    "path": "index.html",
+    "timestamp": "20060707060247",
+    "sha256": "3dfa6ba2ee5016446e168328b9a0507097632b293cce5d3067664519a29cedeb",
+    "source": "https://web.archive.org/web/20060707060247/http://www.losethos.com/index.html"
+  },
+  {
+    "path": "interrupts.html",
+    "timestamp": "20081015175022",
+    "sha256": "39c9fb4fddc28f7de2a5a46b34443b29481b39b193bfc5f5e12a9d0da896ad62",
+    "source": "https://web.archive.org/web/20081015175022/http://www.losethos.com/interrupts.html"
+  },
+  {
+    "path": "kernel.html",
+    "timestamp": "20080802173408",
+    "sha256": "b68d1887951939558061e2b7875e6a74fec33439f9b298445065b3d96061b11c",
+    "source": "https://web.archive.org/web/20080802173408/http://www.losethos.com/kernel.html"
+  },
+  {
+    "path": "license.html",
+    "timestamp": "20060711022810",
+    "sha256": "64dae243fa3a442ab839c48f03363afed2b46ac0f9cfa49cf59c179563164366",
+    "source": "https://web.archive.org/web/20060711022810/http://www.losethos.com/license.html"
+  },
+  {
+    "path": "memory.html",
+    "timestamp": "20060711022730",
+    "sha256": "a4876a903ae0c68cf9ef6b08c742b9449861c35dca326ec5539d29bfcf71bfa7",
+    "source": "https://web.archive.org/web/20060711022730/http://www.losethos.com/memory.html"
+  },
+  {
+    "path": "mid.html",
+    "timestamp": "20081015175027",
+    "sha256": "9934dbb9fb4f031a872e298eccfc8d4fa570a15474e725fcba036ab4e0f51d31",
+    "source": "https://web.archive.org/web/20081015175027/http://www.losethos.com/mid.html"
+  },
+  {
+    "path": "misc.html",
+    "timestamp": "20060711022743",
+    "sha256": "d2f6835794c9c7cda6f5a4626c84339445defe30320a088cf2b32683a9c5dd38",
+    "source": "https://web.archive.org/web/20060711022743/http://www.losethos.com/misc.html"
+  },
+  {
+    "path": "multicore.html",
+    "timestamp": "20080802172951",
+    "sha256": "931ba600b1b8bff57d4dd34cb7f107d8285e6578dea82c85a2494b5209a77b1f",
+    "source": "https://web.archive.org/web/20080802172951/http://www.losethos.com/multicore.html"
+  },
+  {
+    "path": "ode.html",
+    "timestamp": "20060711022705",
+    "sha256": "d31bdb1494aa382b7b5524467ead793d111c8d36be5385a27e01b346fa9fbd0e",
+    "source": "https://web.archive.org/web/20060711022705/http://www.losethos.com/ode.html"
+  },
+  {
+    "path": "plot.html",
+    "timestamp": "20081015175032",
+    "sha256": "28641673045f5f82274c04832ef1ffd2b1423659da93b1bb1830b290ce10ce7a",
+    "source": "https://web.archive.org/web/20081015175032/http://www.losethos.com/plot.html"
+  },
+  {
+    "path": "scheduler.html",
+    "timestamp": "20081015175047",
+    "sha256": "8b527f34c3e9e004f64a934114b75069b5d904b556371655435fd9b8e351b5ca",
+    "source": "https://web.archive.org/web/20081015175047/http://www.losethos.com/scheduler.html"
+  },
+  {
+    "path": "screen.html",
+    "timestamp": "20081015175052",
+    "sha256": "4fb9382ff9b22c722346fcc1989ee46a3f8f1fc6a7468afa51aef5685376c992",
+    "source": "https://web.archive.org/web/20081015175052/http://www.losethos.com/screen.html"
+  },
+  {
+    "path": "screenshot.html",
+    "timestamp": "20060711022518",
+    "sha256": "26f3227952f84bef82675c432e380d0a037a188f51a2cf6c7654f3860c068a4c",
+    "source": "https://web.archive.org/web/20060711022518/http://www.losethos.com/screenshot.html"
+  },
+  {
+    "path": "sitebuilder/images/BOX-600x450.jpg",
+    "timestamp": "20060719175547",
+    "sha256": "b8cf42915955ce62efcc3f2b80564c0fec301fa7f36db2cb553224604479d1ff",
+    "source": "https://web.archive.org/web/20060719175547/http://www.losethos.com/sitebuilder/images/BOX-600x450.jpg"
+  },
+  {
+    "path": "sitebuilder/images/CLASSREP-600x450.jpg",
+    "timestamp": "20060711031146",
+    "sha256": "225e080f3f209a9ae973ff502e38c1f7eb39e50a43041e56e12c0a296f3f86aa",
+    "source": "https://web.archive.org/web/20060711031146/http://www.losethos.com/sitebuilder/images/CLASSREP-600x450.jpg"
+  },
+  {
+    "path": "sitebuilder/images/CTRLT-600x450.jpg",
+    "timestamp": "20060719175624",
+    "sha256": "2409ccba481a68878f944342713bd797be9a379211ad3db5dfb10b5ce172ea17",
+    "source": "https://web.archive.org/web/20060719175624/http://www.losethos.com/sitebuilder/images/CTRLT-600x450.jpg"
+  },
+  {
+    "path": "sitebuilder/images/EXEBLK-600x450.jpg",
+    "timestamp": "20060711022548",
+    "sha256": "9c2b2c9eb648815d2c4f764dc9d99a709857c37ec52b7708379e66df129f21af",
+    "source": "https://web.archive.org/web/20060711022548/http://www.losethos.com/sitebuilder/images/EXEBLK-600x450.jpg"
+  },
+  {
+    "path": "sitebuilder/images/FLAG2-600x450.jpg",
+    "timestamp": "20060719175817",
+    "sha256": "a2de3d8a212d0eb1b6cdfeceb3db4bffc34c2ae2d9a8cd62c662482ec47bf3b3",
+    "source": "https://web.archive.org/web/20060719175817/http://www.losethos.com/sitebuilder/images/FLAG2-600x450.jpg"
+  },
+  {
+    "path": "sitebuilder/images/PALM-600x450.jpg",
+    "timestamp": "20060719175717",
+    "sha256": "4f269ee7ac529cae3efe9688eb56acab447765f2661d2331d63b3872f2123665",
+    "source": "https://web.archive.org/web/20060719175717/http://www.losethos.com/sitebuilder/images/PALM-600x450.jpg"
+  },
+  {
+    "path": "sitebuilder/images/START-600x450.jpg",
+    "timestamp": "20060711031134",
+    "sha256": "f7b5c035f85a2b1f0ec7f0caa73fcb122571cb84218b9185ac6136bdccf81baa",
+    "source": "https://web.archive.org/web/20060711031134/http://www.losethos.com/sitebuilder/images/START-600x450.jpg"
+  },
+  {
+    "path": "startup.html",
+    "timestamp": "20081015041144",
+    "sha256": "55418649d26cca6582f4c1eafeb1b38d88a3ee785cacc53060609ba75c4c6cf5",
+    "source": "https://web.archive.org/web/20081015041144/http://www.losethos.com/startup.html"
+  },
+  {
+    "path": "startups.html",
+    "timestamp": "20060711022822",
+    "sha256": "f76da75b52b280c465a71f4f191bd024f83f48d6a5730ce69793c1c98e45964f",
+    "source": "https://web.archive.org/web/20060711022822/http://www.losethos.com/startups.html"
+  }
+]

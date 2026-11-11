@@ -1,0 +1,466 @@
+<html>
+<head><meta charset="utf-8"/>
+<style>
+</style>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+Project: OSMain
+/* Tasks are ordered in a queue based
+on window front-to-back order with the
+window manager as the head, which
+paints the wallpaper.The scheduler
+goes in a circle, checking if a task is
+ready and swapping-it-in if so.
+Swapping just involves storing and
+restoring registers -- no disk I/O for
+virtual memory and no address map
+changes.Tasks can be switched in half
+a microsecond.
+
+The scheduler checks if a task is
+waiting for a certain time or waiting
+on a message and skips it if it's not
+ready.A task runs until it
+voluntarily yields control with a call
+to TaskNext or gets preempted by the
+timer interrupt.See IRQ20.The timer
+freqency is JIFFY_FREQ.Tasks can ask
+not to be preempted with Preempt(ON/OFF).
+Tasks waiting on I/O often loop,
+checking for a status and swapping-out.
+This does not really degrade
+performance, though it pegs the CPU
+Load.
+
+The scheduler checks for a few critical
+key-strokes such as CTRL-ALT-X, which
+kills a task; CTRL-ALT-D, which reboots;
+CTRL-ALT-T, which changes focus and CTRL-ALT-C,
+which breaks execution of a program.
+
+Each core has it's own circular task
+queue.For AP processors, they have a
+"Seth" task which stays in a loop
+waiting for jobs or requests to spawn
+tasks.See MPWaitForTask().
+
+All cores have an idle task.If the
+scheduler determined all tasks were
+waiting on a message or a time, it would
+loop for a long time without swapping
+in a task, with interrupts off.To avoid
+locking-out interrupts when no task is
+ready, the scheduler swaps in the idle
+task(enabling IRQs).It turns-out that
+core #0, indeed, swaps in the idle task,
+but the other cores do not because their
+Seth tasks are always checking for a
+command, so there is never a case when
+no task is ready.
+
+
+*/
+
+asm {
+USE64
+// ************************************
+IDLE_START::
+SAVE_CONTEXT::
+//OUT:  RSI=FS
+        PUSH    RSI
+        PUSHFD
+        XOR     RSI,RSI
+        MOV     RSI,FS:TASK_ADDRESS[RSI]
+        POP     U8 TASK_RFLAGS[RSI]
+        POP     U8 TASK_RSI[RSI]
+        MOV     U8 TASK_RAX[RSI],RAX
+
+/*
+We divert the stack to the TaskStruct memory
+and push onto it and divert it back.
+It's a little faster.
+*/
+        MOV     RAX,RSP
+        LEA     RSP,U8 TASK_R15+8[RSI]
+        PUSH    R15
+        PUSH    R14
+        PUSH    R13
+        PUSH    R12
+        PUSH    R11
+        PUSH    R10
+        PUSH    R9
+        PUSH    R8
+        PUSH    RDI
+        PUSH    RBP
+        PUSH    RBX
+        PUSH    RDX
+        PUSH    RCX
+        MOV     RSP,RAX
+
+        RDTSC
+        SHL     RDX,32
+        ADD     RAX,RDX
+        SUB     RAX,U8 TASK_TIME_SLICE_START[RSI]
+        ADD     U8 TASK_TOTAL_TIME[RSI],RAX
+
+        MOV     RAX,U8 TASK_FPU_MMX[RSI]
+        FXSAVE  U8 [RAX]
+
+        MOV     RDX,U8 TASK_BPT_LIST[RSI]
+@@3:    OR      RDX,RDX
+        JZ      @@4
+        MOV     RDI,U8 BPT_ADDRESS[RDX]
+        MOV     AL,U1 BPT_U1[RDX]
+        MOV     U1 [RDI],AL
+        MOV     RDX,U8 BPT_NEXT[RDX]
+        JMP     @@3
+@@4:    LOCK
+        BTR     U8 TASK_TASK_FLAGS[RSI],TASKf_CURRENTLY_RUNNING
+        LOCK
+        BTS     U8 TASK_TASK_FLAGS[RSI],TASKf_HAS_BEEN_SWAPPED
+        RET
+// ************************************
+RESTORE_CONTEXT::
+        XOR     RAX,RAX
+        INC     U8 GS:CPU_SWAP_CNTER[RAX]
+        XOR     RAX,RAX
+        MOV     RSI,FS:TASK_ADDRESS[RAX]
+        LOCK
+        BTS     U8 TASK_TASK_FLAGS[RSI],TASKf_CURRENTLY_RUNNING
+        BT      U8 TASK_TASK_FLAGS[RSI],TASKf_DISABLE_BPTS
+        JC      @@4
+        MOV     RDX,U8 TASK_BPT_LIST[RSI]
+@@3:    OR      RDX,RDX
+        JZ      @@4
+        MOV     RDI,U8 BPT_ADDRESS[RDX]
+        MOV     U1 [RDI],OC_BPT
+        MOV     RDX,U8 BPT_NEXT[RDX]
+        JMP     @@3
+
+@@4:    INC     U8 TASK_SWAP_CNTER[RSI]
+
+        MOV     RAX,U8 TASK_FPU_MMX[RSI]
+        FXRSTOR U8 [RAX]
+
+        RDTSC
+        SHL     RDX,32
+        ADD     RAX,RDX
+        MOV     U8 TASK_TIME_SLICE_START[RSI],RAX
+
+        MOV     RAX,RSP
+        LEA     RSP,U8 TASK_RCX[RSI]
+        POP     RCX
+        POP     RDX
+        POP     RBX
+        POP     RBP
+        POP     RDI
+        POP     R8
+        POP     R9
+        POP     R10
+        POP     R11
+        POP     R12
+        POP     R13
+        POP     R14
+        POP     R15
+        MOV     RSP,RAX
+
+        MOV     RAX,U8 TASK_RAX[RSI]
+        PUSH    ZERO_DS_SEL
+        PUSH    U8 TASK_RSP[RSI]
+        PUSH    U8 TASK_RFLAGS[RSI]
+        PUSH    SYS_CS64_SEL
+        PUSH    U8 TASK_RIP[RSI]
+        MOV     RSI,U8 TASK_RSI[RSI]
+        IRET
+// ************************************
+END_RSI_TASK:
+        MOV     RAX,RSI
+        CALL    SET_FS_BASE
+TASK_END_NOW::
+        CALL    _TASK_END
+        MOV     RSI,RAX
+        CALL    SET_FS_BASE
+        JMP     I4 RESTORE_RSI_TASK_WITH_KEY_CHECK
+
+RESTORE_RSI_NO_PREEMPT_TASK:
+        BT      U8 [SYS_CTRL_ALT_FLAGS],SYSf_CTRL_ALT_DEL
+        JC      I4 HANDLE_SWAP_KEY_EVENT
+        XOR     RAX,RAX
+        CMP     U8 GS:CPU_IDLE_TASK[RAX],RSI
+        JE      I4 RESTORE_IDLE_TASK
+        JMP     RESTORE_RSI_TASK_NO_KEY_CHECK
+
+SAVE_CONTEXT_SWAP_IN_NEXT::
+        PUSHFD
+        PUSH    RAX
+        MOV     RAX,SYS_SEMAS
+        BT      U4 SYS_SEMA_SINGLE_USER*SEMA_STRUCT_SIZE[RAX],0
+        JC      @@4
+        POP     RAX
+
+        CLI
+        PUSH    RSI
+        XOR     RSI,RSI
+        MOV     RSI,FS:TASK_ADDRESS[RSI]
+        CMP     U8 TASK_NEXT_TASK[RSI],RSI
+        JNE     @@0
+
+        PUSH    RAX
+        PUSH    RDX
+        RDTSC
+        SHL     RDX,32
+        ADD     RAX,RDX
+        CMP     U8 TASK_WAKE_TIME[RSI],RAX
+        JA      @@0A
+
+        POP     RDX
+        POP     RAX
+        POP     RSI
+        POPFD
+        RET
+
+@@4:    POP     RAX
+        POPFD
+        RET
+
+@@0A:   POP     RDX
+        POP     RAX
+@@0:    POP     RSI
+        CALL    SAVE_CONTEXT
+
+        MOV     RBX,U4 IDLE_POINT
+        MOV     U8 TASK_RIP[RSI],RBX
+        POP     U8 TASK_RFLAGS[RSI]
+        MOV     U8 TASK_RSP[RSI],RSP
+
+RESTORE_NEXT_RSI_TASK:
+        MOV     RSI,U8 TASK_NEXT_TASK[RSI]
+
+RESTORE_RSI_TASK_WITH_KEY_CHECK:
+        TEST    U4 [SYS_CTRL_ALT_FLAGS],1&lt;&lt;SYSf_CTRL_ALT_DEL|
+1&lt;&lt;SYSf_CTRL_ALT_TAB|1&lt;&lt;SYSf_CTRL_ALT_X|1&lt;&lt;SYSf_CTRL_ALT_C
+        JNZ     I4 HANDLE_SWAP_KEY_EVENT
+
+RESTORE_RSI_TASK_NO_KEY_CHECK:
+        XOR     RAX,RAX
+        MOV     U8 GS:CPU_SWAP_LOOP_TASK[RAX],RSI
+
+@@1:    BT      U8 TASK_TASK_FLAGS[RSI],TASKf_KILL_TASK
+        JC      I4 END_RSI_TASK
+        TEST    U8 TASK_TASK_FLAGS[RSI],1&lt;&lt;TASKf_AWAITING_MSG|1&lt;&lt;TASKf_SUSPENDED|1&lt;&lt;TASKf_PAUSED
+        JNZ     @@2
+
+        RDTSC
+        SHL     RDX,32
+        ADD     RAX,RDX
+        CMP     U8 TASK_WAKE_TIME[RSI],RAX
+        JA      @@2
+
+        CMP     U4 TASK_IN_QUEUE_SIGNATURE[RSI],TASK_IN_QUEUE_SIGNATURE_VAL
+        JNE     SWAP_IN_SETH_TASK
+        MOV     RAX,RSI
+        CALL    SET_FS_BASE
+        JMP     I4 RESTORE_CONTEXT
+
+@@2:    MOV     RSI,U8 TASK_NEXT_TASK[RSI]
+        XOR     RAX,RAX
+        CMP     U8 GS:CPU_SWAP_LOOP_TASK[RAX],RSI
+        JNE     @@1
+        MOV     RAX,U8 GS:CPU_IDLE_TASK[RAX]
+        MOV     RSP,U8 TASK_STACK_BASE[RAX]
+        ADD     RSP,IDLE_STACK  //Reset to top
+        CALL    SET_FS_BASE
+        STI
+        CALL    LOW_POWER_START
+        OR      RAX,RAX
+        JZ      RESTORE_IDLE_TASK
+        HLT
+RESTORE_IDLE_TASK:
+        CALL    LOW_POWER_END
+        CLI
+        JMP     I4 RESTORE_RSI_TASK_WITH_KEY_CHECK
+
+SWAP_IN_SETH_TASK:
+        XOR     RAX,RAX
+        MOV     RSI,GS:CPU_SETH_TASK[RAX]
+        JMP     I4 RESTORE_RSI_TASK_WITH_KEY_CHECK
+
+IDLE_POINT::
+        RET
+
+LOW_POWER_START::
+        XOR     RAX,RAX
+        MOV     U8 GS:CPU_LOW_POWER_START[RAX],RAX
+
+        MOV     RBX,SYS_SEMAS
+        BT      U4 SYS_SEMA_LOW_POWER*SEMA_STRUCT_SIZE[RBX],0
+        JNC     @@100
+        RDTSC
+        SHL     RDX,32
+        ADD     RDX,RAX
+        XOR     RAX,RAX
+        MOV     U8 GS:CPU_LOW_POWER_START[RAX],RDX
+        INC     RAX
+@@100:  RET
+
+LOW_POWER_END::
+        MOV     RBX,SYS_SEMAS
+        BT      U4 SYS_SEMA_LOW_POWER*SEMA_STRUCT_SIZE[RBX],0
+        JNC     @@100
+
+        RDTSC
+        SHL     RDX,32
+        ADD     RDX,RAX
+        XOR     RAX,RAX
+        MOV     RBX,U8 GS:CPU_LOW_POWER_START[RAX]
+        OR      RBX,RBX
+        JZ      @@100
+        SUB     RDX,RBX
+        LOCK
+        ADD     U8 GS:CPU_LOW_POWER_CYCLES[RAX],RDX
+        MOV     U8 GS:CPU_LOW_POWER_START[RAX],RAX
+@@100:  RET
+
+IDLE_END::
+
+HANDLE_SWAP_KEY_EVENT:
+        MOV     RAX,RSI
+        CALL    SET_FS_BASE
+        XOR     RAX,RAX
+        MOV     RAX,GS:CPU_NUM[RAX]
+        OR      RAX,RAX
+        JNZ     I4 RESTORE_RSI_TASK_NO_KEY_CHECK
+
+        MOV     RAX,U4 SYS_CTRL_ALT_FLAGS
+        LOCK
+        BTR     U4 [RAX],SYSf_CTRL_ALT_DEL
+        JC      I4 _REBOOT
+
+@@2:    LOCK
+        BTR     U4 [RAX],SYSf_CTRL_ALT_TAB
+        JNC     @@3
+        PUSH    RSI
+        MOV     RSI,U8 [SYS_CUR_FOCUS_TASK]
+        MOV     U8 [SYS_CUR_FOCUS_TASK],0
+        CALL    FOCUS_RSI_NEXT_USER
+        POP     RSI
+        JMP     I4 RESTORE_FS_TASK_WITH_KEY_CHECK
+
+@@3:    LOCK
+        BTR     U4 [RAX],SYSf_CTRL_ALT_X
+        JC      END_FOCUS_USER
+        LOCK
+        BTR     U4 [RAX],SYSf_CTRL_ALT_C
+        JNC     I4 RESTORE_RSI_TASK_WITH_KEY_CHECK
+
+BREAK_FOCUS_USER:
+        MOV     RSI,U8 [SYS_CUR_FOCUS_TASK]
+        OR      RSI,RSI
+        JZ      I4 SWAP_IN_SETH_TASK
+        BT      U8 TASK_TASK_FLAGS[RSI],TASKf_LOCAL_USER
+        JNC     I4 RESTORE_RSI_TASK_NO_KEY_CHECK
+        LOCK
+        BTR     U8 TASK_TASK_FLAGS[RSI],TASKf_BREAK_LOCKED
+        JNC     @@1
+        LOCK
+        BTS     U8 TASK_TASK_FLAGS[RSI],TASKf_PENDING_BREAK
+        JMP     I4 RESTORE_RSI_TASK_NO_KEY_CHECK
+
+@@1:    MOV     RAX,_BREAK
+        MOV     U8 TASK_RIP[RSI],RAX
+        BT      U8 TASK_TASK_FLAGS[RSI],TASKf_BREAK_TO_CTRLQ
+        JC      @@4
+
+//We do these two now, in case interrupt happens
+        MOV     U8 TASK_WAKE_TIME[RSI],0
+        LOCK
+        BTR     U8 TASK_TASK_FLAGS[RSI],TASKf_AWAITING_MSG
+
+@@4:    JMP     I4 RESTORE_RSI_TASK_NO_KEY_CHECK
+
+END_FOCUS_USER:
+        MOV     RSI,U8 [SYS_CUR_FOCUS_TASK]
+        MOV     U8 [SYS_CUR_FOCUS_TASK],0
+        PUSH    RSI
+        CALL    FOCUS_RSI_NEXT_USER
+        POP     RSI
+        OR      RSI,RSI
+        JZ      I4 SWAP_IN_SETH_TASK
+        MOV     RAX,RSI
+        CALL    SET_FS_BASE
+        BT      U8 TASK_TASK_FLAGS[RSI],TASKf_LOCAL_USER
+        JNC     I4 RESTORE_RSI_TASK_WITH_KEY_CHECK
+        LOCK
+        BTS     U8 TASK_TASK_FLAGS[RSI],TASKf_KILL_TASK
+        JMP     I4 END_RSI_TASK
+
+RESTORE_FS_TASK_WITH_KEY_CHECK:
+        XOR     RSI,RSI
+        MOV     RSI,FS:TASK_ADDRESS[RSI]
+        JMP     I4 RESTORE_RSI_TASK_WITH_KEY_CHECK
+
+FOCUS_RSI_NEXT_USER:
+        OR      RSI,RSI
+        JNZ     @@11
+        MOV     RSI,U4 SYS_ADAM_TASK
+@@11:   MOV     RDI,RSI
+        MOV     RSI,U8 TASK_NEXT_TASK[RSI]
+@@14:   BT      U8 TASK_TASK_FLAGS[ESI],TASKf_LOCAL_USER
+        JNC     @@19
+        CMP     U8 [SYS_CUR_FOCUS_TASK],RSI
+        JE      @@19
+        MOV     U8 [SYS_CUR_FOCUS_TASK],RSI
+        MOV     RAX,U8 [SYS_EXTERN_TABLE]
+        MOV     RAX,U8 EXT_WIN_TO_TOP*8[RAX]
+        OR      RAX,RAX
+        JZ      @@19B
+        PUSH    RSI
+        CALL    RAX
+        ADD     RSP,8
+        JMP     @@19B
+@@19:   MOV     RSI,U8 TASK_NEXT_TASK[RSI]
+        CMP     RSI,RDI
+        JNE     @@14
+        MOV     U8 [SYS_CUR_FOCUS_TASK],0
+@@19B:  RET
+
+}
+
+LTextern LOW_POWER_START BoolI8 LowPowerStart();
+LTextern LOW_POWER_END   U0 LowPowerEnd();
+LTextern RESTORE_CONTEXT U0 RestoreContext();
+LTextern SAVE_CONTEXT_SWAP_IN_NEXT U0 TaskNext();
+LTextern IDLE_START U1 sys_idle_start;
+LTextern IDLE_END   U1 sys_idle_end;
+LTextern TASK_END_NOW U0 TaskEndNow();
+
+U0 TaskQueueAdd(TaskStruct *task,TaskStruct *pred=NULL)
+{
+  TaskStruct *last;
+  PushFD;
+  Cli;
+  if (!pred) pred=Fs;
+  last=pred-&gt;last_task;
+  last-&gt;next_task=pred-&gt;last_task=task;
+  task -&gt;last_task=last;
+  task -&gt;next_task=pred;
+  task-&gt;task_in_queue_signature=TASK_IN_QUEUE_SIGNATURE_VAL;
+  PopFD;
+}
+
+U0 TaskChildAdd(TaskStruct *task)
+{
+  TaskStruct *last,*pred;
+  PushFD;
+  Cli;
+  pred=task-&gt;parent_task-&gt;last_child_task;
+  last=pred-&gt;last_sibling_task;
+  last-&gt;next_sibling_task=pred-&gt;last_sibling_task=task;
+  task -&gt;last_sibling_task=last;
+  task -&gt;next_sibling_task=pred;
+  PopFD;
+}
+
+</pre><div class="archive-note">Historical capture: 2010-01-29. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head></html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

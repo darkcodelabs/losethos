@@ -1,0 +1,31 @@
+<!--$sitebuilder version="2.2.7" extra="Java(1.5.0_02)" md5="03ea7cfcefe867b21d7567d66c955e40"$-->
+<!--$templateKey Blank||1.0.0$-->
+<html>
+<head><meta charset="utf-8"/>
+<!--$begin exclude$--><title>memory</title><!--$end exclude$-->
+<meta content="Yahoo! SiteBuilder/2.2.7/1.5.0_02" name="generator"/>
+<!--$fontFamily Arial$-->
+<!--$fontSize 14$-->
+<style type="text/css"><!--
+      BODY {font-family:"Arial"; font-size:14;}
+      P {font-family:"Arial"; font-size:14;}
+      FORM {margin:0;padding:0;}
+    --></style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/></head>
+<body bgcolor="#FFFFFF" hspace="0" leftmargin="0" link="#0000FF" marginheight="0" marginwidth="0" text="#000000" topmargin="0" vlink="#800080" vspace="0">
+<table border="0" cellpadding="0" cellspacing="0" height="608" width="604">
+<col width="7"/>
+<col width="597"/>
+<tr>
+<td colspan="2" height="9" width="604"></td>
+</tr>
+<tr>
+<td height="599" width="7"></td>
+<td height="599" nowrap="" valign="top"><span class="text"><font face="Courier New"><span style="font-size:14px;line-height:17px;">Each task has a heap which allows dynamic allocation using </span></font><font color="#3333FF" face="Courier New"><span style="font-size:14px;line-height:17px;">MAlloc()</span></font><font face="Courier New"><span style="font-size:14px;line-height:17px;"> and <br soft=""/></span></font><font color="#3333FF" face="Courier New"><span style="font-size:14px;line-height:17px;">Free()</span></font><font face="Courier New"><span style="font-size:14px;line-height:17px;">.  For small allocations (&lt;1024 bytes) when you free something, it <br soft=""/>is stored in a hash table to speed reallocation of the same size (just an <br soft=""/>array of linked lists for different sizes).  Each task has it's own <br soft=""/>small-reallocation hash table.  There is a medium-size hash table, shared <br soft=""/>by all tasks, which rounds to the nearest block (512 bytes) and stores <br soft=""/>sizes up to 128K.  For larger chunks, the shared hash table goes by <br soft=""/>powers of two.<br/><br/>When you specify a disk cache during recompilation, the size is <br soft=""/>rounded-up to a power of two.  There is a function called </span></font><font color="#3333FF" face="Courier New"><span style="font-size:14px;line-height:17px;">MSize()</span></font><font face="Courier New"><span style="font-size:14px;line-height:17px;"> which <br soft=""/>will return the true size of an allocated memory chunk and the disk cache <br soft=""/>code uses the true size, so nothing is wasted.<br/><br/>Free'd small chunks stay in the task's hash table after a program runs.  <br soft=""/>To return them to the system, kill the task </span></font><font color="#009900" face="Courier New"><span style="font-size:14px;line-height:17px;">CTRL-ALT-X</span></font><font face="Courier New"><span style="font-size:14px;line-height:17px;"> or </span></font><font color="#3333FF" face="Courier New"><span style="font-size:14px;line-height:17px;">Kill()</span></font><font face="Courier New"><span style="font-size:14px;line-height:17px;"> or <br soft=""/></span></font><font color="#3333FF" face="Courier New"><span style="font-size:14px;line-height:17px;">Exit()</span></font><font face="Courier New"><span style="font-size:14px;line-height:17px;"> and start a new task with </span></font><font color="#009900" face="Courier New"><span style="font-size:14px;line-height:17px;">CTRL-ALT-ESC</span></font><font face="Courier New"><span style="font-size:14px;line-height:17px;"> or Spawn().  You can make a <br soft=""/>task that ends after running one program, using </span></font><font color="#3333FF" face="Courier New"><span style="font-size:14px;line-height:17px;">PopUp("")</span></font><font face="Courier New"><span style="font-size:14px;line-height:17px;"> which Spawn()s <br soft=""/>a task and runs the code you place in "".<br/><br/>It's pretty difficult to run-out of memory these days if you don't have <br soft=""/>multimedia graphics and sound.  I have yet to run-out of memory, but I <br soft=""/>reboot a lot since I work on the operating system. (I have, of course, <br soft=""/>made bugs which use everything but that doesn't count.)<br/><br/>Some memory allocations need to be independent of any particular task.  <br soft=""/>Since the "Adam" task is always present, you can allocate such things off <br soft=""/>it's heap using </span></font><font color="#3333FF" face="Courier New"><span style="font-size:14px;line-height:17px;">AMAlloc()</span></font><font face="Courier New"><span style="font-size:14px;line-height:17px;">.  The kernel allocates a few operating system <br soft=""/>structures from the Adam task's heap.<br/><br/>The WORDSTAT feature has a large sparse matrix storing statistics to <br soft=""/>allow smart predictive auto-completion of text.  You can recompile the <br soft=""/>kernel without WORDSTAT and save some memory.<br soft=""/></span></font></span></td>
+</tr>
+</table>
+<br/><br/>
+<div class="archive-note">Historical capture: 2006-07-11. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>
+<img alt="1" height="1" width="1"/>

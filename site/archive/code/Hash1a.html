@@ -1,0 +1,713 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="description"/>
+<meta content="64-Bit, Operating System, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="keywords"/>
+<meta content="LoseThos V6.02" name="generator"/>
+<style type="text/css">
+.cBLACK{color:rgb(0,0,0);}
+.cBLUE{color:rgb(0,0,168);}
+.cGREEN{color:rgb(0,168,0);}
+.cCYAN{color:rgb(0,168,168);}
+.cRED{color:rgb(168,0,0);}
+.cPURPLE{color:rgb(168,0,168);}
+.cBROWN{color:rgb(168,84,0);}
+.cLTGRAY{color:rgb(168,168,168);}
+.cDKGRAY{color:rgb(84,84,84);}
+.cLTBLUE{color:rgb(84,84,252);}
+.cLTGREEN{color:rgb(84,252,84);}
+.cLTCYAN{color:rgb(84,252,252);}
+.cLTRED{color:rgb(252,84,84);}
+.cLTPURPLE{color:rgb(252,84,252);}
+.cYELLOW{color:rgb(252,252,84);}
+.cWHITE{color:rgb(252,252,252);}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cDKGRAY">Project: OSMain</span><span class="cBLACK">
+
+</span><span class="cBLUE">asm</span><span class="cBLACK"> {
+</span><span class="cBLUE">USE64</span><span class="cBLACK">
+</span><span class="cGREEN">// ************************************</span><span class="cBLACK">
+</span><span class="cGREEN">// IN:</span><span class="cBLACK">  </span><span class="cGREEN">RSI</span><span class="cBLACK">
+</span><span class="cGREEN">// OUT:</span><span class="cBLACK"> </span><span class="cGREEN">RAX</span><span class="cBLACK">
+HASH_STR::
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RSI
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RBX
+        </span><span class="cBLUE">XOR</span><span class="cBLACK">     RAX,RAX
+        </span><span class="cBLUE">XOR</span><span class="cBLACK">     RBX,RBX
+        </span><span class="cBLUE">JMP</span><span class="cBLACK">     @@10
+
+@@1:    </span><span class="cBLUE">SHL</span><span class="cBLACK">     RBX,1
+        </span><span class="cBLUE">ADC</span><span class="cBLACK">     RBX,RAX
+@@10:   </span><span class="cBLUE">LODSB</span><span class="cBLACK">
+        </span><span class="cBLUE">OR</span><span class="cBLACK">      AL,AL
+        </span><span class="cBLUE">JNZ</span><span class="cBLACK">     @@1
+
+@@100:  </span><span class="cBLUE">MOV</span><span class="cBLACK">     RAX,RBX
+        </span><span class="cBLUE">SHR</span><span class="cBLACK">     RBX,16
+        </span><span class="cBLUE">ADC</span><span class="cBLACK">     RAX,RBX
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RBX
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RSI
+        </span><span class="cBLUE">RET</span><span class="cBLACK">
+</span><span class="cGREEN">// ************************************</span><span class="cBLACK">
+</span><span class="cGREEN">// IN:</span><span class="cBLACK">  </span><span class="cGREEN">RAX=HASHED_STRING</span><span class="cBLACK">
+</span><span class="cGREEN">//</span><span class="cBLACK">      </span><span class="cGREEN">RSI=STR</span><span class="cBLACK">
+</span><span class="cGREEN">//</span><span class="cBLACK">      </span><span class="cGREEN">RBX=TYPE MASK</span><span class="cBLACK">
+</span><span class="cGREEN">//</span><span class="cBLACK">      </span><span class="cGREEN">RDI=TABLE</span><span class="cBLACK">
+</span><span class="cGREEN">// OUT: RAX=ENTRY OR ZERO NOT FOUND</span><span class="cBLACK">
+</span><span class="cGREEN">// </span><span class="cBLACK">     </span><span class="cGREEN">RDX=POINTER TO POINTER TO ENTRY</span><span class="cBLACK">
+</span><span class="cGREEN">//</span><span class="cBLACK">      </span><span class="cGREEN">ZERO FLAG SET NOT FOUND</span><span class="cBLACK">
+HASH_SINGLE_TABLE_FIND::
+        </span><span class="cBLUE">AND</span><span class="cBLACK">     RAX,</span><span class="cBLUE">U8</span><span class="cBLACK"> HT_MASK[RDI]
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RCX,</span><span class="cBLUE">U8</span><span class="cBLACK"> HT_BODY[RDI]
+        </span><span class="cBLUE">LEA</span><span class="cBLACK">     RDX,</span><span class="cBLUE">U8</span><span class="cBLACK"> [RCX+RAX*8]
+@@1:    </span><span class="cBLUE">MOV</span><span class="cBLACK">     RAX,</span><span class="cBLUE">U8</span><span class="cBLACK"> [RDX]
+        </span><span class="cBLUE">OR</span><span class="cBLACK">      RAX,RAX
+        </span><span class="cBLUE">JNZ</span><span class="cBLACK">     @@3
+        </span><span class="cBLUE">RET</span><span class="cBLACK">
+
+@@3:    </span><span class="cBLUE">TEST</span><span class="cBLACK">    </span><span class="cBLUE">U4</span><span class="cBLACK"> HTE_TYPE[RAX],EBX
+        </span><span class="cBLUE">JZ</span><span class="cBLACK">      @@90
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RAX
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RDI
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RSI
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RDI,</span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_STR[RAX]
+@@2:    </span><span class="cBLUE">LODSB</span><span class="cBLACK">
+        </span><span class="cBLUE">CMP</span><span class="cBLACK">     </span><span class="cBLUE">U1</span><span class="cBLACK"> [RDI],AL
+        </span><span class="cBLUE">JNE</span><span class="cBLACK">     @@80
+        </span><span class="cBLUE">INC</span><span class="cBLACK">     RDI
+        </span><span class="cBLUE">OR</span><span class="cBLACK">      AL,AL
+        </span><span class="cBLUE">JNZ</span><span class="cBLACK">     @@2
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RSI
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RDI
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RAX
+        </span><span class="cBLUE">INC</span><span class="cBLACK">     </span><span class="cBLUE">U4</span><span class="cBLACK"> HTE_USE_CNT[RAX]
+        </span><span class="cBLUE">OR</span><span class="cBLACK">      RAX,RAX
+        </span><span class="cBLUE">RET</span><span class="cBLACK">
+
+@@80:   </span><span class="cBLUE">POP</span><span class="cBLACK">     RSI
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RDI
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RAX
+
+@@90:   </span><span class="cBLUE">LEA</span><span class="cBLACK">     RDX,</span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_NEXT[RAX]
+        </span><span class="cBLUE">JMP</span><span class="cBLACK">     @@1
+</span><span class="cGREEN">// ************************************</span><span class="cBLACK">
+</span><span class="cGREEN">// IN:</span><span class="cBLACK">  </span><span class="cGREEN">RSI=STR</span><span class="cBLACK">
+</span><span class="cGREEN">//</span><span class="cBLACK">      </span><span class="cGREEN">RBX=TYPE MASK</span><span class="cBLACK">
+</span><span class="cGREEN">//</span><span class="cBLACK">      </span><span class="cGREEN">RDI=TABLE</span><span class="cBLACK">
+</span><span class="cGREEN">// OUT: RAX=ENTRY OR ZERO NOT FOUND</span><span class="cBLACK">
+</span><span class="cGREEN">//</span><span class="cBLACK">      </span><span class="cGREEN">ZERO FLAG SET NOT FOUND</span><span class="cBLACK">
+HASH_FIND::
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RDI
+        </span><span class="cBLUE">CALL</span><span class="cBLACK">    HASH_STR
+        
+@@4:    </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RAX
+        </span><span class="cBLUE">CALL</span><span class="cBLACK">    HASH_SINGLE_TABLE_FIND
+        </span><span class="cBLUE">JNZ</span><span class="cBLACK">     @@100
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RAX
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RDI,</span><span class="cBLUE">U8</span><span class="cBLACK"> HT_NEXT[RDI]
+        </span><span class="cBLUE">OR</span><span class="cBLACK">      RDI,RDI
+        </span><span class="cBLUE">JNZ</span><span class="cBLACK">     @@4
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RDI
+        </span><span class="cBLUE">XOR</span><span class="cBLACK">     RAX,RAX
+        </span><span class="cBLUE">RET</span><span class="cBLACK">
+
+@@100:  </span><span class="cBLUE">ADD</span><span class="cBLACK">     RSP,8
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RDI
+        </span><span class="cBLUE">OR</span><span class="cBLACK">      RAX,RAX
+        </span><span class="cBLUE">RET</span><span class="cBLACK">
+</span><span class="cGREEN">// ************************************</span><span class="cBLACK">
+</span><span class="cGREEN">// IN:</span><span class="cBLACK">  </span><span class="cGREEN">RSI=STR</span><span class="cBLACK">
+</span><span class="cGREEN">//</span><span class="cBLACK">      </span><span class="cGREEN">RDI=TABLE</span><span class="cBLACK">
+</span><span class="cGREEN">// OUT: RAX=BUCKET</span><span class="cBLACK">
+HASH_BUCKET_FIND::
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RDX
+        </span><span class="cBLUE">CALL</span><span class="cBLACK">    HASH_STR
+        </span><span class="cBLUE">AND</span><span class="cBLACK">     RAX,</span><span class="cBLUE">U8</span><span class="cBLACK"> HT_MASK[RDI]
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RDX,</span><span class="cBLUE">U8</span><span class="cBLACK"> HT_BODY[RDI]
+        </span><span class="cBLUE">LEA</span><span class="cBLACK">     RAX,</span><span class="cBLUE">U8</span><span class="cBLACK"> [RDX+RAX*8]
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RDX
+        </span><span class="cBLUE">RET</span><span class="cBLACK">
+</span><span class="cGREEN">// ************************************</span><span class="cBLACK">
+EXT_FIND::
+</span><span class="cGREEN">//IN:</span><span class="cBLACK">   </span><span class="cGREEN">RSI</span><span class="cBLACK">
+</span><span class="cGREEN">//OUT:</span><span class="cBLACK">  </span><span class="cGREEN">RSI</span><span class="cBLACK">
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RDI
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RBX
+        </span><span class="cBLUE">XOR</span><span class="cBLACK">     RAX,RAX
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RDI,</span><span class="cBLUE">U8</span><span class="cBLACK"> FS:TASK_HASH_TABLE[RAX]
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RBX,HTT_FUNCTION|HTT_EXPORT_SYS_SYMBOL
+        </span><span class="cBLUE">CALL</span><span class="cBLACK">    HASH_FIND
+        </span><span class="cBLUE">JNZ</span><span class="cBLACK">     @@1
+        </span><span class="cBLUE">XOR</span><span class="cBLACK">     RAX,RAX
+        </span><span class="cBLUE">JMP</span><span class="cBLACK">     @@3
+@@1:    </span><span class="cBLUE">TEST</span><span class="cBLACK">    </span><span class="cBLUE">U4</span><span class="cBLACK"> HTE_TYPE[RAX],HTT_FUNCTION
+        </span><span class="cBLUE">JZ</span><span class="cBLACK">      @@2
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RAX,</span><span class="cBLUE">U8</span><span class="cBLACK"> </span><span class="cBLUE">offset</span><span class="cBLACK">(ClassStruct.executable_address)[RAX]
+        </span><span class="cBLUE">JMP</span><span class="cBLACK">     @@3
+@@2:    </span><span class="cBLUE">MOV</span><span class="cBLACK">     RAX,</span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_VAL[RAX]
+@@3:    </span><span class="cBLUE">POP</span><span class="cBLACK">     RBX
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RDI
+        </span><span class="cBLUE">OR</span><span class="cBLACK">      RAX,RAX
+        </span><span class="cBLUE">RET</span><span class="cBLACK">
+_EXT_FIND::
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RBP
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RBP,RSP
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RSI
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RDI
+        </span><span class="cBLUE">XOR</span><span class="cBLACK">     RAX,RAX
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RDI,</span><span class="cBLUE">U8</span><span class="cBLACK"> FS:TASK_HASH_TABLE[RAX]
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RSI,</span><span class="cBLUE">U8</span><span class="cBLACK"> SF_ARG1[RBP]
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RBX,HTT_FUNCTION|HTT_EXPORT_SYS_SYMBOL
+        </span><span class="cBLUE">CALL</span><span class="cBLACK">    HASH_FIND
+        </span><span class="cBLUE">JNZ</span><span class="cBLACK">     @@1
+        </span><span class="cBLUE">XOR</span><span class="cBLACK">     RAX,RAX
+        </span><span class="cBLUE">JMP</span><span class="cBLACK">     @@3
+@@1:    </span><span class="cBLUE">TEST</span><span class="cBLACK">    </span><span class="cBLUE">U4</span><span class="cBLACK"> HTE_TYPE[RAX],HTT_FUNCTION
+        </span><span class="cBLUE">JZ</span><span class="cBLACK">      @@2
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RAX,</span><span class="cBLUE">U8</span><span class="cBLACK"> </span><span class="cBLUE">offset</span><span class="cBLACK">(ClassStruct.executable_address)[RAX]
+        </span><span class="cBLUE">JMP</span><span class="cBLACK">     @@3
+@@2:    </span><span class="cBLUE">MOV</span><span class="cBLACK">     RAX,</span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_VAL[RAX]
+@@3:    </span><span class="cBLUE">POP</span><span class="cBLACK">     RDI
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RSI
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RBP
+        </span><span class="cBLUE">RET</span><span class="cBLACK">
+</span><span class="cGREEN">// ************************************</span><span class="cBLACK">
+_HASH_STR::
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RBP
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RBP,RSP
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RSI
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RSI,</span><span class="cBLUE">U8</span><span class="cBLACK"> SF_ARG1[RBP]
+        </span><span class="cBLUE">CALL</span><span class="cBLACK">    HASH_STR
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RSI
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RBP
+        </span><span class="cBLUE">RET</span><span class="cBLACK">
+</span><span class="cGREEN">// ************************************</span><span class="cBLACK">
+_HASH_FIND::
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RBP
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RBP,RSP
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RSI
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RDI
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RSI,</span><span class="cBLUE">U8</span><span class="cBLACK"> SF_ARG1[RBP]
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RDI,</span><span class="cBLUE">U8</span><span class="cBLACK"> SF_ARG2[RBP]
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RBX,</span><span class="cBLUE">U8</span><span class="cBLACK"> SF_ARG3[RBP]
+        </span><span class="cBLUE">CALL</span><span class="cBLACK">    HASH_FIND
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RDI
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RSI
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RBP
+        </span><span class="cBLUE">RET</span><span class="cBLACK">
+</span><span class="cGREEN">// ************************************</span><span class="cBLACK">
+_HASH_SINGLE_TABLE_FIND::
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RBP
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RBP,RSP
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RSI
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RDI
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RSI,</span><span class="cBLUE">U8</span><span class="cBLACK"> SF_ARG1[RBP]
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RDI,</span><span class="cBLUE">U8</span><span class="cBLACK"> SF_ARG2[RBP]
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RBX,</span><span class="cBLUE">U8</span><span class="cBLACK"> SF_ARG3[RBP]
+        </span><span class="cBLUE">CALL</span><span class="cBLACK">    HASH_STR
+        </span><span class="cBLUE">CALL</span><span class="cBLACK">    HASH_SINGLE_TABLE_FIND
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RDI
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RSI
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RBP
+        </span><span class="cBLUE">RET</span><span class="cBLACK">
+</span><span class="cGREEN">// ************************************</span><span class="cBLACK">
+_HASH_BUCKET_FIND::
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RBP
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RBP,RSP
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RSI
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RDI
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RSI,</span><span class="cBLUE">U8</span><span class="cBLACK"> SF_ARG1[RBP]
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RDI,</span><span class="cBLUE">U8</span><span class="cBLACK"> SF_ARG2[RBP]
+        </span><span class="cBLUE">CALL</span><span class="cBLACK">    HASH_BUCKET_FIND
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RDI
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RSI
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RBP
+        </span><span class="cBLUE">RET</span><span class="cBLACK">
+</span><span class="cGREEN">// ************************************</span><span class="cBLACK">
+_HASH_ADD::
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RBP
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RBP,RSP
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RSI
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RDI
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RCX,</span><span class="cBLUE">U8</span><span class="cBLACK"> SF_ARG1[RBP]
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RSI,</span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_STR[RCX]
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RDI,</span><span class="cBLUE">U8</span><span class="cBLACK"> SF_ARG2[RBP]
+        </span><span class="cBLUE">CALL</span><span class="cBLACK">    HASH_BUCKET_FIND
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RCX,</span><span class="cBLUE">U8</span><span class="cBLACK"> SF_ARG1[RBP]
+        </span><span class="cBLUE">PUSHFD</span><span class="cBLACK">
+        </span><span class="cBLUE">CLI</span><span class="cBLACK">
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RBX,</span><span class="cBLUE">U8</span><span class="cBLACK"> [RAX]
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_NEXT[RCX],RBX
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cBLUE">U8</span><span class="cBLACK"> [RAX],RCX
+
+</span><span class="cGREEN">//Insque</span><span class="cBLACK">
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RBX,</span><span class="cBLUE">U8</span><span class="cBLACK"> HT_LAST_ADDED[RDI]
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_LAST_ADDED[RCX],RBX
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_NEXT_ADDED[RBX],RCX
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cBLUE">U8</span><span class="cBLACK"> HT_LAST_ADDED[RDI],RCX
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_NEXT_ADDED[RCX],RDI
+
+        </span><span class="cBLUE">POPFD</span><span class="cBLACK">
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RDI
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RSI
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RBP
+        </span><span class="cBLUE">RET</span><span class="cBLACK">
+</span><span class="cGREEN">// ************************************</span><span class="cBLACK">
+_HASH_REPLACE::
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RBP
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RBP,RSP
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RSI
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RDI
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RCX,</span><span class="cBLUE">U8</span><span class="cBLACK"> SF_ARG1[RBP]
+        </span><span class="cBLUE">OR</span><span class="cBLACK">      RCX,RCX
+        </span><span class="cBLUE">JZ</span><span class="cBLACK">      </span><span class="cBLUE">I4</span><span class="cBLACK"> @@100
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RSI,</span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_STR[RCX]
+        </span><span class="cBLUE">XOR</span><span class="cBLACK">     RBX,RBX
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     EBX,</span><span class="cBLUE">U4</span><span class="cBLACK"> HTE_TYPE[RCX]
+        </span><span class="cBLUE">AND</span><span class="cBLACK">     EBX,~(HTT_PRIVATE|HTT_PUBLIC|HTT_EXPORT|HTT_IMPORT|HTT_LITERAL|
+                HTT_UNRESOLVED_LOCAL|HTT_UNRESOLVED_GLBL)&amp;0xFFFFFFFF
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RDI,</span><span class="cBLUE">U8</span><span class="cBLACK"> SF_ARG2[RBP]
+        </span><span class="cBLUE">CALL</span><span class="cBLACK">    HASH_STR
+
+        </span><span class="cBLUE">PUSHFD</span><span class="cBLACK">
+        </span><span class="cBLUE">CLI</span><span class="cBLACK">
+        </span><span class="cBLUE">CALL</span><span class="cBLACK">    HASH_SINGLE_TABLE_FIND
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RCX,</span><span class="cBLUE">U8</span><span class="cBLACK"> SF_ARG1[RBP]
+        </span><span class="cBLUE">JZ</span><span class="cBLACK">      @@11    </span><span class="cGREEN">//Z set by find</span><span class="cBLACK">
+
+</span><span class="cGREEN">//Remque/Insque</span><span class="cBLACK">
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RBX,</span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_NEXT_ADDED[RAX]
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_NEXT_ADDED[RCX],RBX
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_LAST_ADDED[RBX],RCX
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RBX,</span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_LAST_ADDED[RAX]
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_LAST_ADDED[RCX],RBX
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_NEXT_ADDED[RBX],RCX
+
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RBX,</span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_NEXT[RAX]
+        </span><span class="cBLUE">JMP</span><span class="cBLACK">     @@10
+
+</span><span class="cGREEN">//Insque</span><span class="cBLACK">
+@@11:   </span><span class="cBLUE">MOV</span><span class="cBLACK">     RBX,</span><span class="cBLUE">U8</span><span class="cBLACK"> HT_LAST_ADDED[RDI]
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_LAST_ADDED[RCX],RBX
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_NEXT_ADDED[RBX],RCX
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cBLUE">U8</span><span class="cBLACK"> HT_LAST_ADDED[RDI],RCX
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_NEXT_ADDED[RCX],RDI
+
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RBX,RAX
+
+@@10:   </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_NEXT[RCX],RBX
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cBLUE">U8</span><span class="cBLACK"> [RDX],RCX
+        </span><span class="cBLUE">POPFD</span><span class="cBLACK">
+
+        </span><span class="cBLUE">OR</span><span class="cBLACK">      RAX,RAX
+        </span><span class="cBLUE">JZ</span><span class="cBLACK">      @@100
+        PUSH_C_REGS
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RAX
+        </span><span class="cBLUE">CALL</span><span class="cBLACK">    _HASH_DEL
+        </span><span class="cBLUE">ADD</span><span class="cBLACK">     RSP,8
+        POP_C_REGS
+
+@@100:  </span><span class="cBLUE">POP</span><span class="cBLACK">     RDI
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RSI
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RBP
+        </span><span class="cBLUE">RET</span><span class="cBLACK">
+</span><span class="cGREEN">// ************************************</span><span class="cBLACK">
+_HASH_REM_DEL::
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RBP
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RBP,RSP
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RSI
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RDI
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RCX,</span><span class="cBLUE">U8</span><span class="cBLACK"> SF_ARG1[RBP]
+        </span><span class="cBLUE">OR</span><span class="cBLACK">      RCX,RCX
+        </span><span class="cBLUE">JZ</span><span class="cBLACK">      @@102
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RSI,</span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_STR[RCX]
+        </span><span class="cBLUE">XOR</span><span class="cBLACK">     RBX,RBX
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     EBX,</span><span class="cBLUE">U4</span><span class="cBLACK"> HTE_TYPE[RCX]
+        </span><span class="cBLUE">AND</span><span class="cBLACK">     EBX,~(HTT_PRIVATE|HTT_PUBLIC|HTT_EXPORT|HTT_IMPORT|HTT_LITERAL|
+                HTT_UNRESOLVED_LOCAL|HTT_UNRESOLVED_GLBL)&amp;0xFFFFFFFF
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RDI,</span><span class="cBLUE">U8</span><span class="cBLACK"> SF_ARG2[RBP]
+        </span><span class="cBLUE">CALL</span><span class="cBLACK">    HASH_STR
+
+        </span><span class="cBLUE">PUSHFD</span><span class="cBLACK">
+        </span><span class="cBLUE">CLI</span><span class="cBLACK">
+        </span><span class="cBLUE">CALL</span><span class="cBLACK">    HASH_SINGLE_TABLE_FIND
+        </span><span class="cBLUE">JZ</span><span class="cBLACK">      @@101
+        </span><span class="cBLUE">CMP</span><span class="cBLACK">     RAX,</span><span class="cBLUE">U8</span><span class="cBLACK"> SF_ARG1[RBP]
+        </span><span class="cBLUE">JNE</span><span class="cBLACK">     @@101
+
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RBX,</span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_NEXT[RAX]
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cBLUE">U8</span><span class="cBLACK"> [RDX],RBX
+
+</span><span class="cGREEN">//Remque</span><span class="cBLACK">
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RBX,</span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_NEXT_ADDED[RAX]
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RDX,</span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_LAST_ADDED[RAX]
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_NEXT_ADDED[RDX],RBX
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     </span><span class="cBLUE">U8</span><span class="cBLACK"> HTE_LAST_ADDED[RBX],RDX
+        
+        </span><span class="cBLUE">POPFD</span><span class="cBLACK">
+
+        PUSH_C_REGS
+        </span><span class="cBLUE">PUSH</span><span class="cBLACK">    RAX
+        </span><span class="cBLUE">CALL</span><span class="cBLACK">    _HASH_DEL
+        </span><span class="cBLUE">ADD</span><span class="cBLACK">     RSP,8
+        POP_C_REGS
+
+@@100:  </span><span class="cBLUE">POP</span><span class="cBLACK">     RDI
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RSI
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RBP
+        </span><span class="cBLUE">MOV</span><span class="cBLACK">     RAX,1
+        </span><span class="cBLUE">RET</span><span class="cBLACK">
+
+@@101:  </span><span class="cBLUE">POPFD</span><span class="cBLACK">
+@@102:  </span><span class="cBLUE">POP</span><span class="cBLACK">     RDI
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RSI
+        </span><span class="cBLUE">POP</span><span class="cBLACK">     RBP
+        </span><span class="cBLUE">XOR</span><span class="cBLACK">     RAX,RAX
+        </span><span class="cBLUE">RET</span><span class="cBLACK">
+}
+
+</span><span class="cBLUE">LTextern</span><span class="cBLACK"> _HASH_STR </span><span class="cBLUE">U8</span><span class="cBLACK"> HashStr(</span><span class="cBLUE">U1</span><span class="cBLACK"> *st);
+</span><span class="cBLUE">LTextern</span><span class="cBLACK"> _HASH_FIND SysHashEntry *
+  HashFind(</span><span class="cBLUE">U1</span><span class="cBLACK"> *st,SysHashTable *table,</span><span class="cBLUE">U8</span><span class="cBLACK"> mask);
+</span><span class="cBLUE">LTextern</span><span class="cBLACK"> _HASH_SINGLE_TABLE_FIND SysHashEntry *
+  HashSingleTableFind(</span><span class="cBLUE">U1</span><span class="cBLACK"> *st,SysHashTable *table,</span><span class="cBLUE">U8</span><span class="cBLACK"> mask);
+</span><span class="cBLUE">LTextern</span><span class="cBLACK"> _HASH_BUCKET_FIND SysHashEntry **
+  HashBucketFind(</span><span class="cBLUE">U1</span><span class="cBLACK"> *st,SysHashTable *table);
+</span><span class="cBLUE">LTextern</span><span class="cBLACK"> _HASH_ADD </span><span class="cBLUE">U0</span><span class="cBLACK"> HashAdd(SysHashEntry *temph,SysHashTable *table);
+</span><span class="cBLUE">LTextern</span><span class="cBLACK"> _HASH_REPLACE </span><span class="cBLUE">U0</span><span class="cBLACK"> HashReplace(SysHashEntry *temph,SysHashTable *table);
+</span><span class="cBLUE">LTextern</span><span class="cBLACK"> _HASH_REM_DEL BoolI8 HashRemDel(SysHashEntry *temph,SysHashTable *table);
+
+SysHashTable *HashTableNew(</span><span class="cBLUE">U8</span><span class="cBLACK"> size,TaskStruct *mem_task=NULL)
+{
+  SysHashTable *tempht;
+  tempht=CAlloc(</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">SysHashTable</span><span class="cLTGRAY">)</span><span class="cBLACK">,mem_task);
+  tempht-&gt;body=CAlloc(size&lt;&lt;3,mem_task);
+  tempht-&gt;mask=size-1;
+  tempht-&gt;next_added=tempht-&gt;last_added=tempht;
+  </span><span class="cBLUE">return</span><span class="cBLACK"> tempht;
+}
+
+</span><span class="cBLUE">asm</span><span class="cBLACK"> {_HASH_DEL::}
+</span><span class="cBLUE">U0</span><span class="cBLACK"> HashDel(SrcSymHashEntry *temph)
+{
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!temph) </span><span class="cBLUE">return</span><span class="cBLACK">;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!</span><span class="cLTGRAY">(</span><span class="cBLACK">temph-&gt;h.type&amp;HTT_DICT_WORD</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+    Free(temph-&gt;h.str);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (temph-&gt;h.type &amp; HTT_SRC_SYM) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    Free(temph-&gt;src_link);
+    Free(temph-&gt;index);
+    Free(temph-&gt;import_name);
+    LinkedListDel(temph-&gt;list);
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (temph-&gt;h.type &amp; </span><span class="cLTGRAY">(</span><span class="cBLACK">HTT_FUNCTION | HTT_EXPORT_SYS_SYMBOL</span><span class="cLTGRAY">)</span><span class="cBLACK">) {
+      Free(temph-&gt;debug);
+      Free(temph-&gt;indent);
+    }
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (temph-&gt;h.type &amp; </span><span class="cLTGRAY">(</span><span class="cBLACK">HTT_FUNCTION | HTT_CLASS</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+    </span><span class="cGREEN">//Assumes code not on heap, so doesn't Free.</span><span class="cBLACK">
+    </span><span class="cGREEN">//</span><a href="/archive/code/Lex.html"><span class="cRED">MemberListDel</span></a><span class="cGREEN">() is an import to the OSMain module</span><span class="cBLACK">
+      MemberListDel(temph);
+    </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cBLUE">if</span><span class="cBLACK"> (temph-&gt;h.type&amp;HTT_DEFINE_STR)
+      Free(temph&gt;&lt;</span><span class="cLTGRAY">(</span><span class="cBLACK">DefineStrHashEntry *</span><span class="cLTGRAY">)</span><span class="cBLACK">-&gt;data);
+    </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cBLUE">if</span><span class="cBLACK"> (temph-&gt;h.type &amp; HTT_GLBL_VAR) {
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (!</span><span class="cLTGRAY">(</span><span class="cBLACK">temph&gt;&lt;(GlblVarStruct *)-&gt;flags&amp;GVAF_ALIAS</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+        Free(temph&gt;&lt;</span><span class="cLTGRAY">(</span><span class="cBLACK">GlblVarStruct *</span><span class="cLTGRAY">)</span><span class="cBLACK">-&gt;data_address);
+      LinkedListDel(temph&gt;&lt;</span><span class="cLTGRAY">(</span><span class="cBLACK">GlblVarStruct *</span><span class="cLTGRAY">)</span><span class="cBLACK">-&gt;dim.next);
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (temph&gt;&lt;</span><span class="cLTGRAY">(</span><span class="cBLACK">GlblVarStruct *</span><span class="cLTGRAY">)</span><span class="cBLACK">-&gt;fun_ptr)
+        HashDel(temph&gt;&lt;</span><span class="cLTGRAY">(</span><span class="cBLACK">GlblVarStruct *</span><span class="cLTGRAY">)</span><span class="cBLACK">-&gt;fun_ptr-temph&gt;&lt;</span><span class="cLTGRAY">(</span><span class="cBLACK">GlblVarStruct *</span><span class="cLTGRAY">)</span><span class="cBLACK">-&gt;fun_ptr-&gt;ptr_cnt);
+    } </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cBLUE">if</span><span class="cBLACK"> (temph-&gt;h.type &amp; HTT_TYPEDEF) {
+      LinkedListDel(temph&gt;&lt;</span><span class="cLTGRAY">(</span><span class="cBLACK">GlblVarStruct *</span><span class="cLTGRAY">)</span><span class="cBLACK">-&gt;dim.next);
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (temph&gt;&lt;</span><span class="cLTGRAY">(</span><span class="cBLACK">GlblVarStruct *</span><span class="cLTGRAY">)</span><span class="cBLACK">-&gt;fun_ptr)
+        HashDel(temph&gt;&lt;</span><span class="cLTGRAY">(</span><span class="cBLACK">GlblVarStruct *</span><span class="cLTGRAY">)</span><span class="cBLACK">-&gt;fun_ptr-temph&gt;&lt;</span><span class="cLTGRAY">(</span><span class="cBLACK">GlblVarStruct *</span><span class="cLTGRAY">)</span><span class="cBLACK">-&gt;fun_ptr-&gt;ptr_cnt);
+    }
+  </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cBLUE">if</span><span class="cBLACK"> (temph-&gt;h.type &amp; HTT_FILE)
+    Free(temph&gt;&lt;</span><span class="cLTGRAY">(</span><span class="cBLACK">GenericHashEntry *</span><span class="cLTGRAY">)</span><span class="cBLACK">-&gt;user_data0);
+  Free(temph);
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> HashTableDel(SysHashTable *tempht)
+{
+  SrcSymHashEntry *temph,*temph1;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!tempht) </span><span class="cBLUE">return</span><span class="cBLACK">;
+  temph=tempht-&gt;next_added;
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (temph!=tempht) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    temph1=temph-&gt;h.next_added;
+    HashDel(temph);
+    temph=temph1;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  Free(tempht-&gt;body);
+  Free(tempht);
+}
+
+GenericHashEntry *HashGenericAdd(</span><span class="cBLUE">U1</span><span class="cBLACK"> *name,</span><span class="cBLUE">I8</span><span class="cBLACK"> type,</span><span class="cBLUE">I8</span><span class="cBLACK"> u0=0,</span><span class="cBLUE">I8</span><span class="cBLACK"> u1=0,</span><span class="cBLUE">I8</span><span class="cBLACK"> u2=0,TaskStruct *task=NULL)
+{
+  GenericHashEntry *result;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!task) task=Fs;
+  result=CAlloc(</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">GenericHashEntry</span><span class="cLTGRAY">)</span><span class="cBLACK">,task);
+  result-&gt;h.type=type;
+  result-&gt;user_data0=u0;
+  result-&gt;user_data1=u1;
+  result-&gt;user_data2=u2;
+  result-&gt;h.str=StrNew(name,task);
+  HashAdd(result,task-&gt;hash_table);
+  </span><span class="cBLUE">return</span><span class="cBLACK"> result;
+}
+
+</span><span class="cBLUE">I8</span><span class="cBLACK"> NamedFramePtr(</span><span class="cBLUE">U1</span><span class="cBLACK"> *name,TaskStruct *task=NULL)
+{
+  GenericHashEntry *temph;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!task) task=Fs;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (temph=HashFind</span><span class="cLTGRAY">(</span><span class="cBLACK">name,task-&gt;hash_table,HTT_NAMED_FRAME_PTR</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+    </span><span class="cBLUE">return</span><span class="cBLACK"> temph-&gt;user_data0;
+  </span><span class="cBLUE">else</span><span class="cBLACK">
+    </span><span class="cBLUE">return</span><span class="cBLACK"> 0;
+}
+
+GenericHashEntry *NamedFramePtrAdd(</span><span class="cBLUE">U1</span><span class="cBLACK"> *name,</span><span class="cBLUE">I8</span><span class="cBLACK"> u0,TaskStruct *task=NULL)
+{
+  </span><span class="cBLUE">return</span><span class="cBLACK"> HashGenericAdd(name,HTT_NAMED_FRAME_PTR,u0,0,0,task);
+}
+
+</span><span class="cBLUE">I8</span><span class="cBLACK"> NamedFramePtrSet(</span><span class="cBLUE">U1</span><span class="cBLACK"> *name,</span><span class="cBLUE">I8</span><span class="cBLACK"> u0,TaskStruct *task=NULL)
+{
+  GenericHashEntry *temph;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!task) task=Fs;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (temph=HashFind</span><span class="cLTGRAY">(</span><span class="cBLACK">name,task-&gt;hash_table,HTT_NAMED_FRAME_PTR</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+    </span><span class="cBLUE">return</span><span class="cBLACK"> LXchgU8(&amp;temph-&gt;user_data0,u0);
+  </span><span class="cBLUE">else</span><span class="cBLACK">
+    </span><span class="cBLUE">return</span><span class="cBLACK"> 0;
+}
+
+</span><span class="cBLUE">I8</span><span class="cBLACK"> NamedFramePtrDel(</span><span class="cBLUE">U1</span><span class="cBLACK"> *name,TaskStruct *task=NULL)
+{
+  </span><span class="cBLUE">I8</span><span class="cBLACK"> result=0;
+  GenericHashEntry *temph;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!task) task=Fs;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (temph=HashFind</span><span class="cLTGRAY">(</span><span class="cBLACK">name,task-&gt;hash_table,HTT_NAMED_FRAME_PTR</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    result=temph-&gt;user_data0;
+    HashRemDel(temph,task-&gt;hash_table);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  </span><span class="cBLUE">return</span><span class="cBLACK"> result;
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> LoadOneImport(</span><span class="cBLUE">U1</span><span class="cBLACK"> **_ptr,</span><span class="cBLUE">U1</span><span class="cBLACK"> *code,</span><span class="cBLUE">I8</span><span class="cBLACK"> flags)
+{
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *ptr=*_ptr,*ptr2;
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *sptr;
+  </span><span class="cBLUE">I8</span><span class="cBLACK"> i,etype;
+  ExportSysSymHashEntry *tempess=NULL;
+  ImportSysSymHashEntry *tempiss;
+  BoolI1 first=TRUE;
+  ClassStruct *tempc;
+  GlblVarStruct *tempg;
+
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (</span><span class="cLTGRAY">(</span><span class="cBLACK">etype=*ptr++</span><span class="cLTGRAY">)</span><span class="cBLACK">!=EIE_END) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    i=*ptr&gt;&lt;(</span><span class="cBLUE">U4</span><span class="cBLACK"> *)++;
+    sptr=ptr;
+    ptr+=StrLen(sptr)+1;
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (*sptr) {
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (!first) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        *_ptr=sptr-5;
+        </span><span class="cBLUE">return</span><span class="cBLACK">;
+      </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        first=FALSE;
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (!</span><span class="cLTGRAY">(</span><span class="cBLACK">tempess=HashFind(sptr,Fs-&gt;hash_table,HTT_ALL-HTT_IMPORT_SYS_SYMBOL)</span><span class="cLTGRAY">)</span><span class="cBLACK">) {
+          </span><span class="cBLUE">if</span><span class="cBLACK"> (!</span><span class="cLTGRAY">(</span><span class="cBLACK">flags &amp; LDF_SILENT</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+            </span><span class="cBLUE">coutln</span><span class="cBLACK"> Define(</span><span class="cBROWN">"ST_UNRESOLVED_REFERENCE"</span><span class="cBLACK">),sptr;
+          tempiss=CAlloc(</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">ImportSysSymHashEntry</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+          tempiss-&gt;s.h.str=StrNew(sptr);
+          tempiss-&gt;s.h.type=HTT_IMPORT_SYS_SYMBOL;
+          tempiss-&gt;module_header_entry=sptr-5;
+          tempiss-&gt;module_base=code;
+          HashAdd(tempiss,Fs-&gt;hash_table);
+        }
+      </span><span class="cLTGRAY">}</span><span class="cBLACK">
+    }
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (tempess) {
+      ptr2=code+i;
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (tempess-&gt;s.h.type &amp; HTT_FUNCTION) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        tempc=tempess;
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (etype &amp; 1)
+          i=tempc-&gt;executable_address;
+        </span><span class="cBLUE">else</span><span class="cBLACK">
+          i=tempc-&gt;executable_address-code;
+      </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cBLUE">if</span><span class="cBLACK"> (tempess-&gt;s.h.type &amp; HTT_GLBL_VAR) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        tempg=tempess;
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (etype &amp; 1)
+          i=tempg-&gt;data_address;
+        </span><span class="cBLUE">else</span><span class="cBLACK">
+          i=tempg-&gt;data_address-code;
+      </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (etype &amp; 1)
+          i=tempess-&gt;val;
+        </span><span class="cBLUE">else</span><span class="cBLACK">
+          i=tempess-&gt;val&gt;&lt;(</span><span class="cBLUE">U1</span><span class="cBLACK"> *)-code;
+      </span><span class="cLTGRAY">}</span><span class="cBLACK">
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (etype&lt;=EIE_LIT_U1)
+        *ptr2&gt;&lt;(</span><span class="cBLUE">U1</span><span class="cBLACK"> *)+=i;
+      </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cBLUE">if</span><span class="cBLACK"> (etype&lt;=EIE_LIT_U2)
+        *ptr2&gt;&lt;(</span><span class="cBLUE">U2</span><span class="cBLACK"> *)+=i;
+      </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cBLUE">if</span><span class="cBLACK"> (etype&lt;=EIE_LIT_U4)
+        *ptr2&gt;&lt;(</span><span class="cBLUE">U4</span><span class="cBLACK"> *)+=i;
+      </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cBLUE">if</span><span class="cBLACK"> (etype&lt;=EIE_LIT_U8)
+        *ptr2&gt;&lt;(</span><span class="cBLUE">U8</span><span class="cBLACK"> *)+=i;
+    }
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  *_ptr=ptr-1;
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> SysSymImportsResolve(</span><span class="cBLUE">U1</span><span class="cBLACK"> *sptr,</span><span class="cBLUE">I8</span><span class="cBLACK"> flags)
+{
+  ImportSysSymHashEntry *tempiss;
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *ptr;
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (tempiss=HashSingleTableFind</span><span class="cLTGRAY">(</span><span class="cBLACK">sptr,Fs-&gt;hash_table,HTT_IMPORT_SYS_SYMBOL</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    ptr=tempiss-&gt;module_header_entry;
+    LoadOneImport(&amp;ptr,tempiss-&gt;module_base,flags);
+    tempiss-&gt;s.h.type=HTT_INVALID;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> LoadPass1(</span><span class="cBLUE">U1</span><span class="cBLACK"> **_ptr,</span><span class="cBLUE">U1</span><span class="cBLACK"> *code,</span><span class="cBLUE">I8</span><span class="cBLACK"> flags)
+{
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *ptr=*_ptr,*ptr2,*ptr3;
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *sptr;
+  </span><span class="cBLUE">I8</span><span class="cBLACK"> i,j,cnt,etype;
+  ExportSysSymHashEntry *tempess=NULL;
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (</span><span class="cLTGRAY">(</span><span class="cBLACK">etype=*ptr++</span><span class="cLTGRAY">)</span><span class="cBLACK">!=EIE_END) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    i=*ptr&gt;&lt;(</span><span class="cBLUE">U4</span><span class="cBLACK"> *)++;
+    sptr=ptr;
+    ptr+=StrLen(sptr)+1;
+    </span><span class="cBLUE">switch</span><span class="cBLACK"> (etype) {
+      </span><span class="cBLUE">case</span><span class="cBLACK"> EIE_REL_EXPORT:
+      </span><span class="cBLUE">case</span><span class="cBLACK"> EIE_LIT_EXPORT:
+        tempess=CAlloc(</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">ExportSysSymHashEntry</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+        tempess-&gt;s.h.str=StrNew(sptr);
+        tempess-&gt;s.h.type=HTT_EXPORT_SYS_SYMBOL;
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (etype==EIE_LIT_EXPORT)
+          tempess-&gt;val=i;
+        </span><span class="cBLUE">else</span><span class="cBLACK">
+          tempess-&gt;val=i+code;
+        HashAdd(tempess,Fs-&gt;hash_table);
+        SysSymImportsResolve(sptr,flags);
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">case</span><span class="cBLACK"> EIE_REL_U1...EIE_LIT_U8:
+        ptr=sptr-5;
+        LoadOneImport(&amp;ptr,code,flags);
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">case</span><span class="cBLACK"> EIE_ABSOLUTE_ADDRESS:
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (flags &amp; LDF_NO_ABSOLUTES)
+          ptr+=i*</span><span class="cBLUE">sizeof</span><span class="cBLACK">(</span><span class="cBLUE">U4</span><span class="cBLACK">);
+        </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+          cnt=i;
+          </span><span class="cBLUE">for</span><span class="cBLACK"> (j=0;j&lt;cnt;j++) {
+            ptr2=code+*ptr&gt;&lt;(</span><span class="cBLUE">U4</span><span class="cBLACK"> *)++;
+            *ptr2&gt;&lt;(</span><span class="cBLUE">U4</span><span class="cBLACK"> *)+=code;
+          }
+        </span><span class="cLTGRAY">}</span><span class="cBLACK">
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">case</span><span class="cBLACK"> EIE_HEAP_GLBL:
+        ptr3=MAlloc(*ptr&gt;&lt;</span><span class="cLTGRAY">(</span><span class="cBLUE">U8</span><span class="cBLACK"> *</span><span class="cLTGRAY">)</span><span class="cBLACK">++);
+
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (*sptr) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+          tempess=CAlloc(</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">ExportSysSymHashEntry</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+          tempess-&gt;s.h.str=StrNew(sptr);
+          tempess-&gt;s.h.type=HTT_EXPORT_SYS_SYMBOL;
+          tempess-&gt;val=ptr3;
+          HashAdd(tempess,Fs-&gt;hash_table);
+        </span><span class="cLTGRAY">}</span><span class="cBLACK">
+
+        cnt=i;
+        </span><span class="cBLUE">for</span><span class="cBLACK"> (j=0;j&lt;cnt;j++) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+          ptr2=code+*ptr&gt;&lt;(</span><span class="cBLUE">U4</span><span class="cBLACK"> *)++;
+          *ptr2&gt;&lt;(</span><span class="cBLUE">U8</span><span class="cBLACK"> *)+=ptr3;
+        </span><span class="cLTGRAY">}</span><span class="cBLACK">
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+    }
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  *_ptr=ptr;
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> LoadOSMainHeader()
+{
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *ptr;
+  HashGenericAdd(</span><span class="cBROWN">"/LT/OSMain/OS"</span><span class="cBLACK">,HTT_MODULE|HTT_PUBLIC,sys_boot_base);
+  ptr=sys_boot_header_base;
+  LoadPass1(&amp;ptr,sys_boot_base,LDF_NO_ABSOLUTES|LDF_SILENT);
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> *Load(</span><span class="cBLUE">U1</span><span class="cBLACK"> *filename,</span><span class="cBLUE">U8</span><span class="cBLACK"> flags=0)
+{
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *fbuf;
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *code,*ptr,etype;
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *sptr,*absname;
+  </span><span class="cBLUE">U8</span><span class="cBLACK"> size,module_alignment;
+  BinFileHeaderStruct *bfh,*bfh2;
+  </span><span class="cBLUE">I8</span><span class="cBLACK"> i;
+  fbuf=DefaultExtension(filename,</span><span class="cBROWN">"BIZ"</span><span class="cBLACK">);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!</span><span class="cLTGRAY">(</span><span class="cBLACK">bfh2=FileRead(fbuf,&amp;size)</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    Free(fbuf);
+    </span><span class="cBLUE">return</span><span class="cBLACK"> NULL;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  module_alignment=*(bfh2&gt;&lt;</span><span class="cLTGRAY">(</span><span class="cBLUE">U1</span><span class="cBLACK"> *</span><span class="cLTGRAY">)</span><span class="cBLACK">+bfh2-&gt;header_offset+1)&gt;&lt;(</span><span class="cBLUE">U4</span><span class="cBLACK"> *);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!module_alignment || Bsf</span><span class="cLTGRAY">(</span><span class="cBLACK">module_alignment</span><span class="cLTGRAY">)</span><span class="cBLACK">!=Bsr</span><span class="cLTGRAY">(</span><span class="cBLACK">module_alignment</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+    throw(EXCEPT_BIN_MODULE);
+#</span><span class="cBLUE">assert</span><span class="cBLACK"> </span><span class="cBLUE">sizeof</span><span class="cBLACK">(BinFileHeaderStruct)==16
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (Fs-&gt;code_heap!=Fs-&gt;data_heap) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (module_alignment&lt;16)
+      module_alignment=16;
+    bfh=MAllocAligned(size,module_alignment,Fs-&gt;code_heap,module_alignment-</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">BinFileHeaderStruct</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+    MemCpy(bfh,bfh2,size);
+    Free(bfh2);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (module_alignment&gt;8) {
+      bfh=MAllocAligned(size,module_alignment,NULL,module_alignment-</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">BinFileHeaderStruct</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+      MemCpy(bfh,bfh2,size);
+      Free(bfh2);
+    } </span><span class="cBLUE">else</span><span class="cBLACK">
+      bfh=bfh2;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  code=bfh&gt;&lt;(</span><span class="cBLUE">U1</span><span class="cBLACK"> *)+</span><span class="cBLUE">sizeof</span><span class="cBLACK">(BinFileHeaderStruct);
+
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (ArcXSum</span><span class="cLTGRAY">(</span><span class="cBLACK">bfh,bfh-&gt;file_size</span><span class="cLTGRAY">)</span><span class="cBLACK">!=LT_XSUM)
+    throw(EXCEPT_ARC_XSUM);
+
+  absname=FileNameAbs(fbuf);
+  Free(fbuf);
+  fbuf=StrNew(absname);
+  StrLastRem(fbuf,</span><span class="cBROWN">"."</span><span class="cBLACK">);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (fbuf[1]==</span><span class="cBROWN">':'</span><span class="cBLACK"> &amp;&amp; StrLen</span><span class="cLTGRAY">(</span><span class="cBLACK">fbuf</span><span class="cLTGRAY">)</span><span class="cBLACK">&gt;2)
+    HashGenericAdd(fbuf+2,HTT_MODULE|HTT_PUBLIC,code);
+  Free(fbuf);
+
+  ptr=bfh&gt;&lt;(</span><span class="cBLUE">U1</span><span class="cBLACK"> *)+bfh-&gt;header_offset;
+  LoadPass1(&amp;ptr,code,flags);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!</span><span class="cLTGRAY">(</span><span class="cBLACK">flags&amp;LDF_JUST_LOAD</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    ptr=bfh&gt;&lt;(</span><span class="cBLUE">U1</span><span class="cBLACK"> *)+bfh-&gt;header_offset;
+    </span><span class="cBLUE">while</span><span class="cBLACK"> (</span><span class="cLTGRAY">(</span><span class="cBLACK">etype=*ptr++</span><span class="cLTGRAY">)</span><span class="cBLACK">!=EIE_END) { </span><span class="cGREEN">//PASS 2</span><span class="cBLACK">
+      i=*ptr&gt;&lt;(</span><span class="cBLUE">U4</span><span class="cBLACK"> *)++;
+      sptr=ptr;
+      ptr+=StrLen(sptr)+1;
+      </span><span class="cBLUE">switch</span><span class="cBLACK"> (etype) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        </span><span class="cBLUE">case</span><span class="cBLACK"> EIE_MAIN:
+          Call(i+code);
+          </span><span class="cBLUE">break</span><span class="cBLACK">;
+        </span><span class="cBLUE">case</span><span class="cBLACK"> EIE_ABSOLUTE_ADDRESS:
+          ptr+=</span><span class="cBLUE">sizeof</span><span class="cBLACK">(</span><span class="cBLUE">U4</span><span class="cBLACK">)*i;
+          </span><span class="cBLUE">break</span><span class="cBLACK">;
+        </span><span class="cBLUE">case</span><span class="cBLACK"> EIE_HEAP_GLBL:
+          ptr+=8+</span><span class="cBLUE">sizeof</span><span class="cBLACK">(</span><span class="cBLUE">U4</span><span class="cBLACK">)*i;
+          </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cLTGRAY">}</span><span class="cBLACK">
+    }
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  Free(absname);
+  </span><span class="cBLUE">return</span><span class="cBLACK"> bfh;
+}
+</span></pre><div class="archive-note">Historical capture: 2010-02-12. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

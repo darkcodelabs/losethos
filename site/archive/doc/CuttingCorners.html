@@ -1,0 +1,70 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="description"/>
+<meta content="64-Bit, Operating System, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="keywords"/>
+<meta content="LoseThos V6.18" name="generator"/>
+<style type="text/css">
+.cBLACK{color:rgb(0,0,0);}
+.cBLUE{color:rgb(0,0,168);}
+.cGREEN{color:rgb(0,168,0);}
+.cCYAN{color:rgb(0,168,168);}
+.cRED{color:rgb(168,0,0);}
+.cPURPLE{color:rgb(168,0,168);}
+.cBROWN{color:rgb(168,84,0);}
+.cLTGRAY{color:rgb(168,168,168);}
+.cDKGRAY{color:rgb(84,84,84);}
+.cLTBLUE{color:rgb(84,84,252);}
+.cLTGREEN{color:rgb(84,252,84);}
+.cLTCYAN{color:rgb(84,252,252);}
+.cLTRED{color:rgb(252,84,84);}
+.cLTPURPLE{color:rgb(252,84,252);}
+.cYELLOW{color:rgb(252,252,84);}
+.cWHITE{color:rgb(252,252,252);}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<a name="l1"></a><span class="cBLACK">                                </span><span class="cPURPLE">Cutting Corners</span><span class="cBLACK">
+<a name="l2"></a>
+<a name="l3"></a>There are a few places where I cut corners in the interest of not junking-up 
+<a name="l4"></a>code.  This is part of the LoseThos mentality.  I try not to let, often stupid, 
+<a name="l5"></a>legacy compatibility issues enter and junk-up LoseThos.
+<a name="l6"></a>
+<a name="l7"></a>* I made my own type-casting operator, </span><span class="cGREEN">&gt;&lt;(type)</span><span class="cBLACK">, because post-fix makes the 
+<a name="l8"></a>compiler way cleaner and, actually, because LoseThos type-casting is more 
+<a name="l9"></a>powerful.  It's a shame to break compatibility with </span><span class="cGREEN">C</span><span class="cBLACK"> but it's way better.
+<a name="l10"></a>
+<a name="l11"></a>* LoseThos does not figure-out </span><span class="cGREEN">FAT32</span><span class="cBLACK"> short name alias numbers.  
+<a name="l12"></a></span><a href="/archive/code/FileSysFAT.html#l613"><span class="cRED">FAT32DirEntryNew</span></a><span class="cBLACK">().  It can cause hard drive corruption, so I might have to do 
+<a name="l13"></a>it.  It would really take a lot of junky code for this hatefully, detestable, 
+<a name="l14"></a>legacy issue.  "Please don't make me ruin my beautiful shiny-new LoseThos with 
+<a name="l15"></a>that!"  I am also not enthused about </span><span class="cGREEN">FAT32</span><span class="cBLACK"> because it is in patent limbo.  </span><span class="cGREEN">FAT32</span><span class="cBLACK"> 
+<a name="l16"></a>might get removed from LoseThos.  There is a LoseThos native, 64-bit, file 
+<a name="l17"></a>system that works perfectly well.  </span><span class="cGREEN">FAT32</span><span class="cBLACK"> is useful, however, because it assists 
+<a name="l18"></a>in transferring between dual booted operating systems.
+<a name="l19"></a>
+<a name="l20"></a>* I use Pascal argument order for </span><span class="cGREEN">cout</span><span class="cBLACK"> interrupts.  </span><a href="/archive/code/StmtParser.html#l1527"><span class="cRED">PrsCout</span></a><span class="cBLACK">().  If I used </span><span class="cGREEN">C</span><span class="cBLACK"> 
+<a name="l21"></a>order it would look like the normal function </span><a href="/archive/code/ExpParser.html#l444"><span class="cRED">push args</span></a><span class="cBLACK">.  Is it worth junking it 
+<a name="l22"></a>up with code like this?
+<a name="l23"></a>
+<a name="l24"></a>  </span><span class="cBLUE">CbPush(lx);
+<a name="l25"></a>    CbOutPtrsInit(lx);
+<a name="l26"></a>    PrsExpression(lx,NULL,FALSE);
+<a name="l27"></a>    CbIcAdd(lx,EC_END,0,0);
+<a name="l28"></a>    CbPush(lx);
+<a name="l29"></a>    cnt++
+<a name="l30"></a>  CbPop(lx);
+<a name="l31"></a>  while (cnt--)
+<a name="l32"></a>    CbAppend(lx,tempcbh);</span><span class="cBLACK">
+<a name="l33"></a>
+<a name="l34"></a>* I changed the </span><a href="/archive/code/OpCodes.html#l983"><span class="cRED">asm opcodes</span></a><span class="cBLACK"> names to remove the ambiguity between instructions 
+<a name="l35"></a>with different numbers of arguments, making my </span><a href="/archive/code/Assembler.html#l774"><span class="cRED">assembler</span></a><span class="cBLACK"> simpler and I did 
+<a name="l36"></a>minimal 16-bit asm support, since 64-bit is what you should be using, unless 
+<a name="l37"></a>you're doing a </span><a href="/archive/code/BootCD.html#l163"><span class="cRED">boot loader</span></a><span class="cBLACK">.
+</span></pre><div class="archive-note">Historical capture: 2010-11-17. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

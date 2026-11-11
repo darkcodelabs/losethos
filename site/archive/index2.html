@@ -1,0 +1,113 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="description"/>
+<meta content="64-Bit, Operating System, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="keywords"/>
+<meta content="LoseThos V6.12" name="generator"/>
+<style type="text/css">
+.cBLACK{color:rgb(0,0,0);}
+.cBLUE{color:rgb(0,0,168);}
+.cGREEN{color:rgb(0,168,0);}
+.cCYAN{color:rgb(0,168,168);}
+.cRED{color:rgb(168,0,0);}
+.cPURPLE{color:rgb(168,0,168);}
+.cBROWN{color:rgb(168,84,0);}
+.cLTGRAY{color:rgb(168,168,168);}
+.cDKGRAY{color:rgb(84,84,84);}
+.cLTBLUE{color:rgb(84,84,252);}
+.cLTGREEN{color:rgb(84,252,84);}
+.cLTCYAN{color:rgb(84,252,252);}
+.cLTRED{color:rgb(252,84,84);}
+.cLTPURPLE{color:rgb(252,84,252);}
+.cYELLOW{color:rgb(252,252,84);}
+.cWHITE{color:rgb(252,252,252);}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cBLACK">                               </span><a href="/archive/doc/TrivialSolutions.html"><span class="cPURPLE">Trivial Solutions</span></a><span class="cPURPLE">
+                        Happy Programmers Make Us Happy</span><span class="cBLACK">
+
+                    The LoseThos 64-bit PC Operating System
+
+* x86_64
+* Preemptive Multi-tasking
+* Multi-Cored
+* Open Source
+* Public Domain
+* Free
+
+The name, "LoseThos", was inspired by the scene in the movie, </span><a href="http://en.wikipedia.org/wiki/Platoon_(film)"><span class="cRED">Platoon</span></a><span class="cBLACK">, where 
+Elias says to Chris, "S**tcan this and this...", referring to dorky standard 
+issue equipment.
+
+
+                       </span><a href="/emulator/losethos.iso"><span class="cRED">Download LoseThos V6.12 (5.53 Meg)</span></a><span class="cBLACK">
+
+It's a live CD, so you can test drive or install.  It's free.  Burn a CD/DVD and 
+boot it on a </span><a href="http://wiki.osdev.org/IA32_Architecture_Family"><span class="cRED">x86_64</span></a><span class="cBLACK"> machine such as a Core_i7, Core_2_Duo, Pentium_D...  nothing 
+worse than a Pentium_4_Extreme_Edition.  (You weren't hoping to run a 64-bit 
+operating system on 32-bit hardware!)  Also, it's not designed to run under 
+emulation but will run in </span><a href="/archive/doc/VMWare.html"><span class="cRED">VMWare</span></a><span class="cBLACK">, if you're too chicken to run it directly.  
+
+Your assumption is that LoseThos is for pathetic hardware because of the 
+graphics?  Nope, it requires a minimum of, like, a 2 Ghz </span><span class="cGREEN">CPU</span><span class="cBLACK">.  It's the best you 
+can do without </span><span class="cGREEN">GPU</span><span class="cBLACK"> acceleration.  See </span><a href="/archive/doc/LoseThosGraphics.html"><span class="cRED">LoseThos Graphics</span></a><span class="cBLACK">.  Emulators are like 
+running on pathetic hardware, so run it directly.  It's not very power efficient 
+for laptops, either.
+
+The intended way to use LoseThos is to dual boot on your best machine.  LoseThos 
+is all about raw </span><span class="cGREEN">CPU</span><span class="cBLACK"> horsepower -- 64-bit, multicored -- making it easy to 
+program without struggling.  That's what LoseThos is about.  It's also about 
+being able to access all memory from all tasks on all cores at all times with no 
+segmentation, protections or bank switching.
+
+You can dual boot by installing it on a free partition on your main hard drive, 
+but the easiest way to dual boot is to add a second, spare, hard drive; install 
+on that; and use the </span><span class="cGREEN">BIOS</span><span class="cBLACK"> to select which hard drive to boot.  A </span><span class="cGREEN">FAT32</span><span class="cBLACK"> partition 
+can be used to transfer between operating systems.  Make 2 or 3 tiny partitions 
+for LoseThos and, periodically, just copy everything to one of these partitions, 
+making redundant back-ups.  The entire LoseThos distribution is only 5 Meg, 
+right?
+
+
+We're not in Kansas any longer.  I wrote a 64-bit compiler and assembler making 
+awesome innovations which may puzzle you.  See </span><a href="/archive/doc/Differences.html"><span class="cRED">Language Differences from C/C++</span></a><span class="cBLACK">. 
+No point doing an operating system if it's not different and better.  I started 
+from scratch, overhauled everything including the programming language.  Source 
+code is not just ASCII, for example, but can include graphics.
+
+
+</span><a href="/archive/doc/Welcome.html"><span class="cRED">Introduction</span></a><span class="cBLACK">
+</span><a href="/archive/screenshots.html"><span class="cRED">Screen Shots</span></a><span class="cBLACK">
+</span><a href="/archive/doc/Features.html"><span class="cRED">Features</span></a><span class="cBLACK">
+</span><a href="/archive/doc/Motivation.html"><span class="cRED">Motivation for Making LoseThos</span></a><span class="cBLACK">
+</span><a href="/archive/doc/Constitution.html"><span class="cRED">LoseThos' Constitution</span></a><span class="cBLACK">
+</span><a href="/archive/doc/Strategy.html"><span class="cRED">Strategic Decisions</span></a><span class="cBLACK">
+</span><a href="/archive/doc/Requirements.html"><span class="cRED">Requirements</span></a><span class="cBLACK">
+</span><a href="/archive/doc/VMWare.html"><span class="cRED">VMWare</span></a><span class="cBLACK">
+</span><a href="/archive/doc/Install.html"><span class="cRED">Installing</span></a><span class="cBLACK">
+</span><a href="/archive/doc/Upgrade.html"><span class="cRED">Upgrading</span></a><span class="cBLACK">
+</span><a href="/archive/doc/HelpMain.html"><span class="cRED">Main Help System</span></a><span class="cBLACK">
+</span><a href="/archive/doc/LoseThosGraphics.html"><span class="cRED">Discussion of LoseThos' Graphics</span></a><span class="cBLACK">
+</span><a href="/archive/code.html"><span class="cRED">Source Code (Most)</span></a><span class="cBLACK">
+</span><a href="/archive/linecnt.html"><span class="cRED">Complete Source File Listing</span></a><span class="cBLACK">
+</span><a href="/archive/doc/Registered.html"><span class="cRED">Registered Version</span></a><span class="cBLACK">
+</span><a href="/archive/hymns.html"><span class="cRED">Hymns</span></a><span class="cBLACK">
+</span><a href="/archive/videos.html"><span class="cRED">More Videos</span></a><span class="cBLACK">
+</span><a href="/archive/doc/Bugs.html"><span class="cRED">Bug Status</span></a><span class="cBLACK">
+</span><a href="/archive/news.html"><span class="cRED">Change Log</span></a><span class="cBLACK">
+</span><a href="/archive/doc/TrivialSolutions.html"><span class="cRED">Contact Trivial Solutions</span></a><span class="cDKGRAY">
+
+
+* "Core_i7", "Core_2_Duo", "Pentium_D", and "Pentium_4_Extreme_Edition" are 
+trademarks of Intel Corp.
+* "VMWare" is a trademark of VMWare Corp.
+* "Platoon" is a trademark of MGM Pictures.
+* "FAT32" is a trademark of MicroSoft Corp.
+</span></pre><div class="archive-note">Historical capture: 2010-08-02. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

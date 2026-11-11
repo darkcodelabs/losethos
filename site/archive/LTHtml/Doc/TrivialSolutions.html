@@ -1,0 +1,159 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>TrivialSolutions</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V8.00" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<a name="l1"></a><span class="cF0">                               </span><span class="cF5">Trivial Solutions</span><span class="cF0">
+<a name="l2"></a>
+<a name="l3"></a>
+<a name="l4"></a>The </span><a href="http://en.wikipedia.org/wiki/Trivial_solution"><span class="cF2">trivial solution</span></a><span class="cF0"> in math is the simple, obvious answer.  The fable that NASA 
+<a name="l5"></a>spent millions on a space pen while Russia used a pencil is another example.  
+<a name="l6"></a>LoseThos uses many </span><a href="/archive/LTHtml/Doc/Strategy.html"><span class="cF4">trivial solutions</span></a><span class="cF0">.
+<a name="l7"></a>
+<a name="l8"></a></span><span class="cF2">Website:</span><span class="cF0">
+<a name="l9"></a></span><a href="/archive/index.html"><span class="cF0">www.losethos.com</span></a><span class="cF0">
+<a name="l10"></a>
+<a name="l11"></a></span><span class="cF2">Owner/President:</span><span class="cF0">
+<a name="l12"></a>Terry A. Davis
+<a name="l13"></a>8144 Sickle Lane
+<a name="l14"></a>Las Vegas, NV 89128
+<a name="l15"></a>(702)254-4223
+<a name="l16"></a></span><a><span class="cF0">tdavis@losethos.com</span></a><span class="cF0">
+<a name="l17"></a>
+<a name="l18"></a></span><span class="cF2">Artist:</span><span class="cF0">
+<a name="l19"></a>Cody Rigby
+<a name="l20"></a>
+<a name="l21"></a>
+<a name="l22"></a></span><span class="cF2">Ordering the Registered LoseThos Version:</span><span class="cF0">
+<a name="l23"></a>See </span><a href="/archive/LTHtml/Doc/Registered.html"><span class="cF4">Registered Version</span></a><span class="cF0">.
+<a name="l24"></a>
+<a name="l25"></a>
+<a name="l26"></a></span><span class="cF2">History:</span><span class="cF0">
+<a name="l27"></a>I've been working on LoseThos full-time for 8.4 years.  Yes, I wrote every one 
+<a name="l28"></a>of the 129,387 lines myself, no </span><span class="cF2">GPL</span><span class="cF0"> code, no linkage or dependence on other 
+<a name="l29"></a>code.  I am a for profit company, not welcoming code contributions, but feedback 
+<a name="l30"></a>is very welcome.  See </span><a href="/archive/LTHtml/Doc/Acknowledgements.html"><span class="cF4">::/LT/Doc/Acknowledgements.TXZ</span></a><span class="cF0">.
+<a name="l31"></a>
+<a name="l32"></a>Technically, I started LoseThos in about 1993, when I wrote a </span><span class="cF2">TASM</span><span class="cF0"> program that 
+<a name="l33"></a>ran in </span><span class="cF2">DOS</span><span class="cF0"> which switched to protected mode on a </span><span class="cF2">486</span><span class="cF0">.  It did little more than 
+<a name="l34"></a>read the keyboard and echo to the screen, but was multi-tasking.  I set it aside 
+<a name="l35"></a>until 2003 when I resurrected it and worked full-time, seriously, on it.  I 
+<a name="l36"></a>called it </span><a href="https://web.archive.org/web/20120301200919/http://www.losethos.com/files/HOPPY.ZIP"><span class="cF2">Hoppy</span></a><span class="cF0"> because it fit on a floppy and my company name at the time was </span><span class="cF2">H
+<a name="l37"></a>.A.R.E.</span><span class="cF0">  I ran </span><a href="https://web.archive.org/web/20120301200919/http://www.losethos.com/files/HOPPY.ZIP"><span class="cF2">Hoppy</span></a><span class="cF0"> by launching it from </span><a href="http://www.freedos.org"><span class="cF2">FreeDOS</span></a><span class="cF0">.  A compiler (interpreter at 
+<a name="l38"></a>the time) was designed into-it from the start, even before a file system.  I put 
+<a name="l39"></a>the text of files I wanted to compile as raw data in my </span><span class="cF2">TASM</span><span class="cF0"> assembled module.  
+<a name="l40"></a>My first crack at a C interpreter was in </span><a href="https://web.archive.org/web/20120301200919/http://www.losethos.com/files/SimStrSetup.exe"><span class="cF2">SimStructure</span></a><span class="cF0"> (key: A18-W50-U50) and I 
+<a name="l41"></a>had done expression evaluators many times, so I was not intimidated by writing a 
+<a name="l42"></a>compiler.
+<a name="l43"></a>
+<a name="l44"></a>I renamed it </span><span class="cF2">Doors</span><span class="cF0"> and, then, </span><span class="cF2">Davos</span><span class="cF0"> for a little while; I named it </span><a href="https://web.archive.org/web/20120301200919/http://www.losethos.com/files/J051018.zip"><span class="cF2">J</span></a><span class="cF0"> for a year 
+<a name="l45"></a>or two; and, finally, settled on </span><span class="cF2">LoseThos</span><span class="cF0">.  (The name was inspired by the scene 
+<a name="l46"></a>in the movie, </span><a href="http://en.wikipedia.org/wiki/Platoon_(film)"><span class="cF4">Platoon</span></a><span class="cF0">, where Elias says to Chris, "S**tcan this and this...", 
+<a name="l47"></a>referring to dorky standard issue equipment.)
+<a name="l48"></a>
+<a name="l49"></a>If you're curious, download </span><a href="https://web.archive.org/web/20120301200919/http://www.losethos.com/files/HOPPY.ZIP"><span class="cF2">HOPPY.ZIP (278 KB)</span></a><span class="cF0">, </span><a href="https://web.archive.org/web/20120301200919/http://www.losethos.com/files/J051018.zip"><span class="cF2">J051018.zip (357 KB)</span></a><span class="cF0">, or </span><span class="cF2">
+<a name="l50"></a></span><a href="https://web.archive.org/web/20120301200919/http://www.losethos.com/files/LTCDV1.ISO"><span class="cF2">LoseThos V1.0 (1.12 Meg)</span></a><span class="cF0">.  The </span><span class="cF2">FreeDOS</span><span class="cF0"> trick for launching no longer works 
+<a name="l51"></a>because the makers of </span><span class="cF2">FreeDOS</span><span class="cF0"> changed it from real mode to v8086 mode, locking 
+<a name="l52"></a>it down.
+<a name="l53"></a>
+<a name="l54"></a>For some time-stamped proof </span><a href="http://web.archive.org/web/20040410044949/www.simstructure.hare.com/OS.htm"><span class="cF2">2004 www.webarchives.org/hare (has download)</span></a><span class="cF0">,</span><span class="cF2">
+<a name="l55"></a></span><a href="http://web.archive.org/web/20060101021939/http://www.justrighteous.org/index.html"><span class="cF2">2006 www.webarchives.org/justrighteous (no download)</span></a><span class="cF0"> or </span><span class="cF2">
+<a name="l56"></a></span><a href="http://www.youtube.com/watch?v=9i0pMO697Zk"><span class="cF2">2007 YouTube ScreenCast of Songs</span></a><span class="cF0">.  I have weekly Cd-ROM back-ups going way back 
+<a name="l57"></a>and time-stamped back-up files on source forge going back to 2008.  </span><span class="cF2">HOPPY</span><span class="cF0"> runs 
+<a name="l58"></a>from any REAL-MODE </span><span class="cF2">DOS</span><span class="cF0">.  The Visual C project files are just for editing.
+<a name="l59"></a>
+<a name="l60"></a>
+<a name="l61"></a></span><span class="cF2">LoseThos' Public Domain License:</span><span class="cF0">
+<a name="l62"></a>I don't mind if companies use LoseThos code with or without mentioning it.  
+<a name="l63"></a>That's why it's public domain and not GPL.  The wider the usage, the better.  
+<a name="l64"></a>It's kind-of like, "no such thing as bad press."
+<a name="l65"></a>
+<a name="l66"></a>I don't mind if people use LoseThos code in other operating systems.  The casino 
+<a name="l67"></a>people here in Vegas say that reservation casinos do not take business away, 
+<a name="l68"></a>they whet the appetite.  The more people who learn about partitioning and 
+<a name="l69"></a>booting alternative operating systems, the better.
+<a name="l70"></a>
+<a name="l71"></a>You'll have to work to walk-off with LoseThos code :-)  I didn't do that on 
+<a name="l72"></a>purpose, but I'm not going out-of-my-way to make it easy.
+<a name="l73"></a>
+<a name="l74"></a>
+<a name="l75"></a></span><span class="cF2">Business Plan:</span><span class="cF0">
+<a name="l76"></a>I hope to make money with LoseThos in some way following the "dot com" model of 
+<a name="l77"></a>releasing it freely to gain popularity and leveraging that down the road.  I 
+<a name="l78"></a>might sell advertisements, applications or support, but will stick to the 
+<a name="l79"></a></span><a href="/archive/LTHtml/Doc/Constitution.html"><span class="cF4">LoseThos Constitution</span></a><span class="cF0">.
+<a name="l80"></a>
+<a name="l81"></a>
+<a name="l82"></a></span><span class="cF2">Download the Raw Dictionary File:</span><span class="cF0">
+<a name="l83"></a></span><a href="https://web.archive.org/web/20120301200919/http://www.losethos.com/files/Dictionary.TXT"><span class="cF4">Dictionary.TXT (44 Meg)</span></a><span class="cF0">
+<a name="l84"></a>Use </span><a href="/archive/LTHtml/Adam/WordStat/WsDictGen.html"><span class="cF4">::/LT/Adam/WordStat/WsDictGen.CPZ</span></a><span class="cF0"> to process the raw file.
+<a name="l85"></a>It comes courtesy of </span><a href="http://promo.net/pg/"><span class="cF4">Project Gutenberg</span></a><span class="cF0">.
+<a name="l86"></a>
+<a name="l87"></a>
+<a name="l88"></a></span><span class="cF2">Download the Raw PCI Device File:</span><span class="cF0">
+<a name="l89"></a></span><a href="http://www.pcidatabase.com/reports.php?type=tab-delimeted"><span class="cF4">www.pcidatabase.com</span></a><span class="cF0">
+<a name="l90"></a>See </span><a href="/archive/LTHtml/Adam/DevInfo.html#l9"><span class="cF4">PCIDevFileGen</span></a><span class="cF0">.
+<a name="l91"></a>
+<a name="l92"></a>
+<a name="l93"></a></span><span class="cF2">Download SimStructure, a Free Windows-based Physics Simulator I wrote:</span><span class="cF0">
+<a name="l94"></a></span><a href="https://web.archive.org/web/20120301200919/http://www.losethos.com/files/SimStrSetup.exe"><span class="cF0">SimStrSetup.exe (2.02 Meg)</span></a><span class="cF0">
+<a name="l95"></a>Use product key: L00-W10-M70
+<a name="l96"></a>
+<a name="l97"></a>I learned with </span><a href="https://web.archive.org/web/20120301200919/http://www.losethos.com/files/SimStrSetup.exe"><span class="cF2">SimStructure</span></a><span class="cF0"> that making money directly is nearly impossible.  
+<a name="l98"></a>LoseThos would have been even less likely to make money directly, so it's 
+<a name="l99"></a>distributed for free.
+<a name="l100"></a>
+<a name="l101"></a>
+<a name="l102"></a></span><span class="cF2">About Me:</span><span class="cF0">
+<a name="l103"></a>I was a National Merit Scholar with a 1440 SAT at Arizona State University.  I 
+<a name="l104"></a>have a bachelor's in Computer System Engineering from ASU, basically, embedded 
+<a name="l105"></a>systems, and a master's in Electrical Engineering from ASU, control systems.  I 
+<a name="l106"></a>worked as a software, hardware and mechanical engineer at Ticketmaster from 
+<a name="l107"></a>1990-1996.  I designed a 3 axis stepper-motor-driven milling machine 1996-1997 
+<a name="l108"></a>with a CAD/CAM package for a company I started called Home Automation and 
+<a name="l109"></a>Robotic Equipment.  I worked for a company named Xytec Corp. 1997-1999.  We made 
+<a name="l110"></a>FPGA-based image processing equipment for currency inspection, and I installed 
+<a name="l111"></a>passwords on the machine in the Bank of England.  I wrote </span><a href="https://web.archive.org/web/20120301200919/http://www.losethos.com/files/SimStrSetup.exe"><span class="cF2">SimStructure</span></a><span class="cF0"> from 
+<a name="l112"></a>2000-2001 for H.A.R.E.  I worked as head software/electrical engineer for a 
+<a name="l113"></a>company called Graphic Technologies, 2001-2002, making replacement chips for 
+<a name="l114"></a>toner printer cartridges so they could be refilled. 
+<a name="l115"></a>
+<a name="l116"></a>All you need to know in life is that God is just.  Personally, I'm not sure what 
+<a name="l117"></a>I deserve.
+<a name="l118"></a>
+<a name="l119"></a>
+<a name="l120"></a></span><span class="cF8">
+<a name="l121"></a>* "DOS", "Visual C" and "Windows" are trademarks of MicroSoft Corp.
+<a name="l122"></a>* "FreeDOS" is a trademark of Jim Hall.
+<a name="l123"></a>* "TASM" is a trademark of Borland Corporation.
+<a name="l124"></a>* "486" is a trademark of Intel Corporation.
+<a name="l125"></a>* "Linux" is probably a trademark owned by Linus Torvalds.
+<a name="l126"></a>* "Platoon" is a trademark of MGM Pictures.
+</span></pre><div class="archive-note">Historical capture: 2012-03-01. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

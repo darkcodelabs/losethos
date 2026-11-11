@@ -1,0 +1,419 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="description"/>
+<meta content="64-Bit, Operating System, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="keywords"/>
+<meta content="LoseThos V6.02" name="generator"/>
+<style type="text/css">
+.cBLACK{color:rgb(0,0,0);}
+.cBLUE{color:rgb(0,0,168);}
+.cGREEN{color:rgb(0,168,0);}
+.cCYAN{color:rgb(0,168,168);}
+.cRED{color:rgb(168,0,0);}
+.cPURPLE{color:rgb(168,0,168);}
+.cBROWN{color:rgb(168,84,0);}
+.cLTGRAY{color:rgb(168,168,168);}
+.cDKGRAY{color:rgb(84,84,84);}
+.cLTBLUE{color:rgb(84,84,252);}
+.cLTGREEN{color:rgb(84,252,84);}
+.cLTCYAN{color:rgb(84,252,252);}
+.cLTRED{color:rgb(252,84,84);}
+.cLTPURPLE{color:rgb(252,84,252);}
+.cYELLOW{color:rgb(252,252,84);}
+.cWHITE{color:rgb(252,252,252);}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cDKGRAY">Project: OSMain</span><span class="cBLACK">
+</span><span class="cBLUE">U0</span><span class="cBLACK"> DriveDefaultSelect()
+{
+  default_partition=Drive2Partition(default_drive);
+  Fs-&gt;cur_partition=INVALID_PTR;  </span><span class="cGREEN">//Null screws-up cache</span><span class="cBLACK">
+  Fs-&gt;cur_dir=StrNew(</span><span class="cBROWN">"/"</span><span class="cBLACK">);
+  ChangeDisk(</span><span class="cBROWN">':'</span><span class="cBLACK">);
+}
+
+BoolI8 CopySingleZ(</span><span class="cBLUE">U1</span><span class="cBLACK"> *f1,</span><span class="cBLUE">U1</span><span class="cBLACK"> *f2) </span><span class="cGREEN">//Just one file</span><span class="cBLACK">
+{
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *file_buf=NULL;
+  </span><span class="cBLUE">U8</span><span class="cBLACK"> size,attr=0,c;
+  LTDirEntry de;
+ 
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (FileFind</span><span class="cLTGRAY">(</span><span class="cBLACK">f1,&amp;de,FALSE,TRUE</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    file_buf=FileRead(f1,&amp;size,&amp;attr);
+    attr=FileAttr(f2,attr);
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (file_buf) {
+      </span><span class="cBLUE">coutln</span><span class="cBLACK"> </span><span class="cBROWN">"Copying "</span><span class="cBLACK">,f1,</span><span class="cBROWN">" to "</span><span class="cBLACK">,f2;
+      c=FileWrite(f2,file_buf,size,de.datetime,attr);
+      Free(file_buf);
+      </span><span class="cBLUE">return</span><span class="cBLACK"> ToBool(c);
+    } </span><span class="cBLUE">else</span><span class="cBLACK"> PutDefineErr(</span><span class="cBROWN">"ST_FILE_NOT_FOUND"</span><span class="cBLACK">);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK"> PutDefineErr(</span><span class="cBROWN">"ST_FILE_NOT_FOUND"</span><span class="cBLACK">);
+  </span><span class="cBLUE">return</span><span class="cBLACK"> FALSE;
+}
+
+#</span><span class="cBLUE">define</span><span class="cBLACK"> COPY_BUF_BLKS   0x80
+BoolI8 CopySingle(</span><span class="cBLUE">U1</span><span class="cBLACK"> *f1,</span><span class="cBLUE">U1</span><span class="cBLACK"> *f2) </span><span class="cGREEN">//Just one file</span><span class="cBLACK">
+{
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *absf1=FileNameAbs(f1),
+     *absf2=FileNameAbs(f2);
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *buf;
+  </span><span class="cBLUE">U8</span><span class="cBLACK"> cnt,n,size,attr1=FileAttr(f1),attr2=FileAttr(f2);
+  LTFile *in_file=NULL,*out_file=NULL;
+  </span><span class="cBLUE">U8</span><span class="cBLACK"> xsum=LT_XSUM,i,j;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!StrCmp</span><span class="cLTGRAY">(</span><span class="cBLACK">absf1,absf2</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    Free(absf1);
+    Free(absf2);
+    </span><span class="cBLUE">return</span><span class="cBLACK"> FALSE;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  Free(absf1);
+  Free(absf2);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (attr1!=attr2)
+    </span><span class="cBLUE">return</span><span class="cBLACK"> CopySingleZ(f1,f2);
+  buf=MAlloc(COPY_BUF_BLKS&lt;&lt;BLK_SIZE_BITS);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (attr1 &amp; LT_ATTR_CONTIGUOUS)
+    in_file=FOpen(f1,</span><span class="cBROWN">"rc"</span><span class="cBLACK">);
+  </span><span class="cBLUE">else</span><span class="cBLACK">
+    in_file=FOpen(f1,</span><span class="cBROWN">"r"</span><span class="cBLACK">);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (in_file) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    size=FSize(in_file);
+    cnt=(size+BLK_SIZE-1)&gt;&gt;BLK_SIZE_BITS;
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (attr2 &amp; LT_ATTR_CONTIGUOUS)
+      out_file=FOpen(f2,</span><span class="cBROWN">"wc"</span><span class="cBLACK">,cnt);
+    </span><span class="cBLUE">else</span><span class="cBLACK">
+      out_file=FOpen(f2,</span><span class="cBROWN">"w"</span><span class="cBLACK">,cnt);
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (out_file) {
+      </span><span class="cBLUE">coutln</span><span class="cBLACK"> </span><span class="cBROWN">"Copying "</span><span class="cBLACK">,f1,</span><span class="cBROWN">" to "</span><span class="cBLACK">,f2;
+      j=size;
+      </span><span class="cBLUE">while</span><span class="cBLACK"> (cnt) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (cnt&gt;COPY_BUF_BLKS) {
+          n=COPY_BUF_BLKS;
+          i=n&lt;&lt;BLK_SIZE_BITS;
+        } </span><span class="cBLUE">else</span><span class="cBLACK"> {
+          n=cnt;
+          i=j;
+        }
+        FRBlks(in_file, buf,LTFB_NEXT_BLK,n);
+        xsum^=ArcXSum(buf,i);
+        FWBlks(out_file,buf,LTFB_NEXT_BLK,n);
+        cnt-=n;
+        j-=n&lt;&lt;BLK_SIZE_BITS;
+      </span><span class="cLTGRAY">}</span><span class="cBLACK">
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (in_file-&gt;de.xsum &amp;&amp;
+          in_file-&gt;de.xsum!=xsum)
+        throw(EXCEPT_ARC_XSUM);
+      out_file-&gt;de.xsum=xsum;
+      out_file-&gt;flags|=LTF_USE_OLD_DATETIME;
+      out_file-&gt;de.datetime=in_file-&gt;de.datetime;
+      out_file-&gt;de.size=size;
+      out_file-&gt;de.expanded_size=in_file-&gt;de.expanded_size;
+      out_file-&gt;de.attr=FileAttr(f2,in_file-&gt;de.attr);
+      FClose(out_file);
+      FClose(in_file);
+      Free(buf);
+      </span><span class="cBLUE">return</span><span class="cBLACK"> TRUE;
+    } </span><span class="cBLUE">else</span><span class="cBLACK"> PutDefineErr(</span><span class="cBROWN">"ST_FILE_NOT_FOUND"</span><span class="cBLACK">);
+    FClose(in_file);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK"> PutDefineErr(</span><span class="cBROWN">"ST_FILE_NOT_FOUND"</span><span class="cBLACK">);
+  Free(buf);
+  </span><span class="cBLUE">return</span><span class="cBLACK"> FALSE;
+}
+
+BoolI8 MkDir(</span><span class="cBLUE">U1</span><span class="cBLACK"> *filename)
+{
+  BoolI1 result=FALSE;
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *name;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (FileFind</span><span class="cLTGRAY">(</span><span class="cBLACK">filename,NULL,TRUE</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+    </span><span class="cBLUE">return</span><span class="cBLACK"> FALSE;
+  LTFileAccess *fa=LTFileAccessNew(filename);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (fa) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (*fa-&gt;mask) {
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (!FileNameChk</span><span class="cLTGRAY">(</span><span class="cBLACK">fa-&gt;mask</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+        PutDefineErr(</span><span class="cBROWN">"ST_INVALID_FILENAME"</span><span class="cBLACK">);
+      </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        </span><span class="cBLUE">coutln</span><span class="cBLACK"> </span><span class="cBROWN">"Make Directory:"</span><span class="cBLACK">,filename;
+        name=MStrUtil(fa-&gt;mask,
+        SU_REM_LEADING|SU_REM_TRAILING|
+        SU_DISCARD_PARITY|SU_REM_CTRL_CHARS);
+        </span><span class="cBLUE">switch</span><span class="cBLACK"> (fa-&gt;p-&gt;type) {
+          </span><span class="cBLUE">case</span><span class="cBLACK"> PT_LT:
+            result=LTFSMkDir(fa-&gt;p,Fs-&gt;cur_dir,name);
+            </span><span class="cBLUE">break</span><span class="cBLACK">;
+          </span><span class="cBLUE">case</span><span class="cBLACK"> PT_FAT32:
+            result=FAT32MkDir(fa-&gt;p,Fs-&gt;cur_dir,name);
+            </span><span class="cBLUE">break</span><span class="cBLACK">;
+          </span><span class="cBLUE">case</span><span class="cBLACK"> PT_ISO9660:
+            PutDefineErr(</span><span class="cBROWN">"ST_NOT_WRITABLE"</span><span class="cBLACK">);
+            </span><span class="cBLUE">break</span><span class="cBLACK">;
+          </span><span class="cBLUE">default</span><span class="cBLACK">:
+            PutDefineErr(</span><span class="cBROWN">"ST_UNSUPPORTED_FILE_SYSTEM"</span><span class="cBLACK">);
+        }
+        Free(name);
+      </span><span class="cLTGRAY">}</span><span class="cBLACK">
+    }
+    LTFileAccessDel(fa);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  </span><span class="cBLUE">return</span><span class="cBLACK"> result;
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> SysDel(</span><span class="cBLUE">U1</span><span class="cBLACK"> *wild,BoolI1 make_mask)    </span><span class="cGREEN">//this is dangerous</span><span class="cBLACK">
+{
+  LTFileAccess *fa=LTFileAccessNew(wild,make_mask);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (fa) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">switch</span><span class="cBLACK"> (fa-&gt;p-&gt;type) {
+      </span><span class="cBLUE">case</span><span class="cBLACK"> PT_LT:
+        LTFSFilesDel(fa-&gt;p,Fs-&gt;cur_dir,fa-&gt;mask,TRUE);
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">case</span><span class="cBLACK"> PT_FAT32:
+        FAT32FilesDel(fa-&gt;p,Fs-&gt;cur_dir,fa-&gt;mask,TRUE);
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">case</span><span class="cBLACK"> PT_ISO9660:
+        PutDefineErr(</span><span class="cBROWN">"ST_NOT_WRITABLE"</span><span class="cBLACK">);
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">default</span><span class="cBLACK">:
+        PutDefineErr(</span><span class="cBROWN">"ST_UNSUPPORTED_FILE_SYSTEM"</span><span class="cBLACK">);
+    }
+    LTFileAccessDel(fa);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> Format(</span><span class="cBLUE">I8</span><span class="cBLACK"> drive_letter,BoolI1 quick=TRUE,BoolI1 confirm=TRUE,</span><span class="cBLUE">U8</span><span class="cBLACK"> type=PT_LT)
+{</span><span class="cGREEN">//See </span><a href="/archive/code/Adam1a.html"><span class="cRED">PT_FAT32</span></a><span class="cGREEN"> for a list of supported file system types.</span><span class="cBLACK">
+
+  LTPartition *p=Drive2Partition(drive_letter);
+  BoolI1 old_silent=IsSilent;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (confirm) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (!AreYouSure)
+      </span><span class="cBLUE">return</span><span class="cBLACK">;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!p)  </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    PutDefineErr(</span><span class="cBROWN">"ST_INVALID_DRIVE"</span><span class="cBLACK">);
+    </span><span class="cBLUE">return</span><span class="cBLACK">;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  </span><span class="cBLUE">switch</span><span class="cBLACK"> (type) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">case</span><span class="cBLACK"> PT_LT:
+      Silent(ON);
+      Drive(drive_letter);
+      Silent(old_silent);
+      LTFSFormat(drive_letter,quick);
+      DiskCacheInvalidate(Drive2Partition</span><span class="cLTGRAY">(</span><span class="cBLACK">drive_letter</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+      Drive(drive_letter);
+      </span><span class="cBLUE">break</span><span class="cBLACK">;
+    </span><span class="cBLUE">case</span><span class="cBLACK"> PT_FAT32:
+      Silent(ON);
+      Drive(drive_letter);
+      Silent(old_silent);
+      FAT32Format(drive_letter,quick);
+      DiskCacheInvalidate(Drive2Partition</span><span class="cLTGRAY">(</span><span class="cBLACK">drive_letter</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+      Drive(drive_letter);
+      </span><span class="cBLUE">break</span><span class="cBLACK">;
+    </span><span class="cBLUE">case</span><span class="cBLACK"> PT_ISO9660:
+      PutDefineErr(</span><span class="cBROWN">"ST_NOT_WRITABLE"</span><span class="cBLACK">);
+      </span><span class="cBLUE">break</span><span class="cBLACK">;
+    </span><span class="cBLUE">default</span><span class="cBLACK">:
+      PutDefineErr(</span><span class="cBROWN">"ST_UNSUPPORTED_FILE_SYSTEM"</span><span class="cBLACK">);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+}
+
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> CDImageRead(</span><span class="cBLUE">U1</span><span class="cBLACK"> drive_letter,</span><span class="cBLUE">U1</span><span class="cBLACK"> *out_name)
+{
+  LTBlkDev *bdev=Drive2BlkDev(drive_letter);
+  LTPartition *p=Drive2Partition(drive_letter);
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *buf=MAlloc(COPY_BUF_BLKS&lt;&lt;BLK_SIZE_BITS);
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *out_name2=DefaultExtension(out_name,</span><span class="cBROWN">"ISO"</span><span class="cBLACK">);
+  LTFile *f=FOpen(out_name2,</span><span class="cBROWN">"w"</span><span class="cBLACK">);
+  </span><span class="cBLUE">U8</span><span class="cBLACK"> n,spc=bdev-&gt;blk_size&gt;&gt;BLK_SIZE_BITS,blk=0,cnt,retry;
+  BlkDevInit(bdev);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (bdev-&gt;type!=LTBDT_ATAPI)
+    throw(EXCEPT_BLKDEV,3);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!out_name)
+    out_name=default_iso_name;
+  cnt=RoundUpU8(p-&gt;size,spc);
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (cnt) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (cnt&gt;COPY_BUF_BLKS)
+      n=COPY_BUF_BLKS;
+    </span><span class="cBLUE">else</span><span class="cBLACK">
+      n=cnt;
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (n&gt;bdev-&gt;max_reads)
+      n=bdev-&gt;max_reads;
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (!Bt</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;sys_semas[SYS_SEMA_NO_IO_SND],0</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+      Snd(bdev-&gt;read_freq);
+
+    retry=4;
+    </span><span class="cBLUE">while</span><span class="cBLACK"> (--retry)
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (ATAPIReadBlks2</span><span class="cLTGRAY">(</span><span class="cBLACK">bdev,buf,blk/spc,n/spc,TRUE,
+        </span><span class="cGREEN">//n is 0x800 if max_reads.  Up to 8 additional seconds</span><span class="cBLACK">
+        BootTime+7*LTDATE_FREQ+n/spc*LTDATE_FREQ/0x100</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (!retry)
+      ATAPIReadBlks2(bdev,buf,blk/spc,n/spc,TRUE,0);
+
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (!Bt</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;sys_semas[SYS_SEMA_NO_IO_SND],0</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+      Snd(0);
+    FWBlks(f,buf,blk,n);
+    cnt-=n;
+    blk+=n;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  FClose(f);
+  Free(buf);
+  Free(out_name2);
+}
+
+</span><span class="cBLUE">class</span><span class="cBLACK"> LTDualBuf
+{
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *buf0,*buf1;
+  </span><span class="cBLUE">U8</span><span class="cBLACK"> in_buf,out_buf,cnt;
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *filename;
+  LTBlkDev *CD_bdev;
+};
+
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> CDImageWriteTask(LTDualBuf *d)
+{
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *buf;
+  </span><span class="cBLUE">U8</span><span class="cBLACK"> n,blk=0,cnt=d-&gt;cnt;
+  LTFile *f;
+  Preempt(ON);
+  TaskLocalInit; </span><span class="cGREEN">//needed for disk access</span><span class="cBLACK">
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (FileAttr</span><span class="cLTGRAY">(</span><span class="cBLACK">d-&gt;filename</span><span class="cLTGRAY">)</span><span class="cBLACK">&amp;LT_ATTR_CONTIGUOUS)
+    f=FOpen(d-&gt;filename,</span><span class="cBROWN">"rc"</span><span class="cBLACK">);
+  </span><span class="cBLUE">else</span><span class="cBLACK">
+    f=FOpen(d-&gt;filename,</span><span class="cBROWN">"r"</span><span class="cBLACK">);
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (cnt) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (cnt&gt;COPY_BUF_BLKS)
+      n=COPY_BUF_BLKS;
+    </span><span class="cBLUE">else</span><span class="cBLACK">
+      n=cnt;
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (n&gt;d-&gt;CD_bdev-&gt;max_writes)
+      n=d-&gt;CD_bdev-&gt;max_writes;
+    buf=d-&gt;in_buf&amp;1 ? d-&gt;buf1:d-&gt;buf0;
+    </span><span class="cBLUE">while</span><span class="cBLACK"> (d-&gt;in_buf&gt;d-&gt;out_buf+1)
+      TaskNext;
+    FRBlks(f,buf,blk,n);
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (!Bt</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;sys_semas[SYS_SEMA_NO_IO_SND],0</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+      Snd(d-&gt;CD_bdev-&gt;write_freq);
+    d-&gt;in_buf++;
+    cnt-=n;
+    blk+=n;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  FClose(f);
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> CDImageWrite(</span><span class="cBLUE">U1</span><span class="cBLACK"> drive_letter,</span><span class="cBLUE">U1</span><span class="cBLACK"> *in_name,</span><span class="cBLUE">I8</span><span class="cBLACK"> media_type=MT_CD)
+{
+  LTDualBuf *d=CAlloc(</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">LTDualBuf</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *buf;
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *in_name2,*in_name3;
+  </span><span class="cBLUE">U8</span><span class="cBLACK"> i,n,spc,blk=0,cnt;
+  LTPartition *p=Drive2Partition(drive_letter);
+  LTBlkDev *bdev=p-&gt;bdev,*bdev2;
+  TaskStruct *task;
+  BoolI1 old_preempt;
+  LTFile *f;
+
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!in_name)
+    in_name=default_iso_name;
+  in_name3=DefaultExtension(in_name,</span><span class="cBROWN">"ISO"</span><span class="cBLACK">);
+  in_name2=FileNameAbs(in_name3);
+  f=FOpen(in_name2,</span><span class="cBROWN">"r"</span><span class="cBLACK">);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!f) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    Free(d);
+    </span><span class="cBLUE">return</span><span class="cBLACK">;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+
+  cnt=(FSize</span><span class="cLTGRAY">(</span><span class="cBLACK">f</span><span class="cLTGRAY">)</span><span class="cBLACK">+BLK_SIZE-1)&gt;&gt;BLK_SIZE_BITS;
+  FClose(f);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (bdev-&gt;type!=LTBDT_ATAPI)
+    throw(EXCEPT_BLKDEV,4);
+  bdev2=Drive2BlkDev(*in_name2);
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (bdev2-&gt;lock_forwarding)
+    bdev2=bdev2-&gt;lock_forwarding;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (</span><span class="cLTGRAY">(</span><span class="cBLACK">bdev2-&gt;type==LTBDT_ATA || bdev2-&gt;type==LTBDT_ATAPI</span><span class="cLTGRAY">)</span><span class="cBLACK"> &amp;&amp;
+       bdev2-&gt;base0==bdev-&gt;base0) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">coutln</span><span class="cBLACK"> </span><span class="cBROWN">"Cannot Burn CD on same ATA controller as File.\r\n"</span><span class="cBLACK">;
+    throw(EXCEPT_BLKDEV,5);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+
+  bdev-&gt;flags|=LTBDF_READ_ONLY_OVERRIDE;
+  BlkDevInit(bdev);
+  spc=bdev-&gt;blk_size&gt;&gt;BLK_SIZE_BITS;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (p-&gt;size&lt;cnt)
+    p-&gt;size=cnt;
+
+  d-&gt;filename=in_name2;
+  d-&gt;CD_bdev=bdev;
+  d-&gt;buf0=MAlloc(COPY_BUF_BLKS&lt;&lt;BLK_SIZE_BITS);
+  d-&gt;buf1=MAlloc(COPY_BUF_BLKS&lt;&lt;BLK_SIZE_BITS);
+  d-&gt;cnt=cnt;
+
+  old_preempt=Preempt(OFF);
+  task=Spawn(&amp;CDImageWriteTask,d,</span><span class="cBROWN">"Write CD"</span><span class="cBLACK">);
+
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (d-&gt;in_buf&lt;=d-&gt;out_buf)
+    TaskNext;
+
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!Bt</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;sys_semas[SYS_SEMA_NO_IO_SND],0</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+    Snd(bdev-&gt;write_freq);
+  BlkDevLock(bdev);
+  ATAPIWaitReady(bdev,0);
+
+  progress1=0; progress1_max=cnt;
+  StrCpy(progress1_desc,</span><span class="cBROWN">"Writing"</span><span class="cBLACK">);
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (cnt) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (cnt&gt;COPY_BUF_BLKS)
+      n=COPY_BUF_BLKS;
+    </span><span class="cBLUE">else</span><span class="cBLACK">
+      n=cnt;
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (n&gt;bdev-&gt;max_writes)
+      n=bdev-&gt;max_writes;
+    buf=d-&gt;out_buf&amp;1 ? d-&gt;buf1:d-&gt;buf0;
+    </span><span class="cBLUE">while</span><span class="cBLACK"> (d-&gt;in_buf&lt;=d-&gt;out_buf)
+      TaskNext;
+    ATAPIWriteBlks(bdev,buf,blk/spc,</span><span class="cLTGRAY">(</span><span class="cBLACK">n+spc-1</span><span class="cLTGRAY">)</span><span class="cBLACK">/spc);
+    d-&gt;out_buf++;
+    cnt-=n;
+    blk+=n;
+    progress1+=n;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  ATAPISync(bdev);
+
+  progress1=0; progress1_max=2;
+  StrCpy(progress1_desc,</span><span class="cBROWN">"Closing"</span><span class="cBLACK">);
+  </span><span class="cBLUE">for</span><span class="cBLACK"> (i=0;i&lt;2;i++) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    ATAPIClose(bdev,0x100,i); </span><span class="cGREEN">//Close tracks</span><span class="cBLACK">
+    progress1++;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+
+  ATAPISync(bdev);
+
+  ATAPIClose(bdev,0x200); </span><span class="cGREEN">//close disk</span><span class="cBLACK">
+  ATAPISync(bdev);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (media_type==MT_DVD) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    ATAPIClose(bdev,0x300);
+    ATAPISync(bdev);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+
+  *progress1_desc=0;
+  progress1=progress1_max=0;
+
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!Bt</span><span class="cLTGRAY">(</span><span class="cBLACK">&amp;sys_semas[SYS_SEMA_NO_IO_SND],0</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+    Snd(0);
+  bdev-&gt;flags&amp;=~LTBDF_READ_ONLY_OVERRIDE;
+  BlkDevUnlock(bdev);
+  Free(d-&gt;buf0);
+  Free(d-&gt;buf1);
+  Free(in_name2);
+  Free(in_name3);
+  Preempt(old_preempt);
+  Free(d);
+}
+
+</span></pre><div class="archive-note">Historical capture: 2010-02-13. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

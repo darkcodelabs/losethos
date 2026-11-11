@@ -1,0 +1,128 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>GuideLines</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V8.00" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<a name="l1"></a><span class="cF0">                                   </span><span class="cF5">ACCT FILES</span><span class="cF0">
+<a name="l2"></a>
+<a name="l3"></a>You can add and remove accts by making or removing directories in the </span><span class="cF2">::/LT/Acct
+<a name="l4"></a>s</span><span class="cF0"> directory.  An empty account directory should be valid because it will get 
+<a name="l5"></a>default files from the parent directory.
+<a name="l6"></a>
+<a name="l7"></a>See </span><a href="https://web.archive.org/web/20120303011924/http://www.losethos.com/LTHtml/Accts/TAD/PersonalMenu.html"><span class="cF4">HOME/PersonalMenu.TXZ</span></a><span class="cF0"> for a personal menu which can be viewed at the cmd 
+<a name="l8"></a>line with the </span><span class="cF2">WINDOWS</span><span class="cF0"> key or by clicking "</span><span class="cF2">MENU</span><span class="cF0">" in the upper left border area of 
+<a name="l9"></a>a window.
+<a name="l10"></a>
+<a name="l11"></a>See </span><a href="https://web.archive.org/web/20120303011924/http://www.losethos.com/LTHtml/Accts/TAD/DoItOnce.html"><span class="cF4">HOME/DoItOnce.CPZ</span></a><span class="cF0"> for a file which is invoked at the start-up of the first 
+<a name="l12"></a>user.
+<a name="l13"></a>
+<a name="l14"></a>See </span><a href="https://web.archive.org/web/20120303011924/http://www.losethos.com/LTHtml/Accts/TAD/Adam3.html"><span class="cF4">HOME/Adam3.APZ</span></a><span class="cF0"> for the user files that get loaded into the adam task at 
+<a name="l15"></a>start-up.  These are only loaded once.
+<a name="l16"></a>
+<a name="l17"></a></span><a href="https://web.archive.org/web/20120303011924/http://www.losethos.com/LTHtml/Accts/TAD/Registry.html#l2"><span class="cF4">HOME/Registry.CPZ</span></a><span class="cF0"> can be edited by hand or deleted to rst to defaults.  Takes 
+<a name="l18"></a>affect next boot.
+<a name="l19"></a>
+<a name="l20"></a>
+<a name="l21"></a>
+<a name="l22"></a>                              </span><span class="cF5">APPLICATION POLICIES</span><span class="cF0">
+<a name="l23"></a>
+<a name="l24"></a>* Place applications in their own </span><span class="cF2">/LT/Apps</span><span class="cF0"> subdirectory.
+<a name="l25"></a>
+<a name="l26"></a>* Make a file called </span><span class="cF2">Load.CPZ</span><span class="cF0"> to load the application.
+<a name="l27"></a>
+<a name="l28"></a>* Make a file called </span><span class="cF2">Run.CPZ</span><span class="cF0"> to load and run the application, preferable by </span><span class="cF2">#inc
+<a name="l29"></a>lude</span><span class="cF0">ing the </span><span class="cF2">Load.CPZ</span><span class="cF0"> file.
+<a name="l30"></a>
+<a name="l31"></a>* Place user data in a subdirectory of </span><span class="cF2">HOME</span><span class="cF0">, preferably naming the subdirectory 
+<a name="l32"></a>the same as the </span><span class="cF2">/LT/Apps</span><span class="cF0"> subdirectory.  Or, place data in the </span><span class="cF2">Registry.CPZ</span><span class="cF0"> file. 
+<a name="l33"></a> See </span><a href="https://web.archive.org/web/20120303011924/http://www.losethos.com/LTHtml/Demo/RegistryDemo.html"><span class="cF4">::/LT/Demo/RegistryDemo.CPZ</span></a><span class="cF0">.
+<a name="l34"></a>
+<a name="l35"></a>* Make a file called </span><span class="cF2">Install.CPZ</span><span class="cF0"> or </span><span class="cF2">Install.AUZ</span><span class="cF0"> to create the </span><span class="cF2">HOME</span><span class="cF0"> subdirectory 
+<a name="l36"></a>and do similar stuff.
+<a name="l37"></a>
+<a name="l38"></a> 
+<a name="l39"></a>
+<a name="l40"></a>                           </span><span class="cF5">OS PROGRAMMING GUIDELINES:</span><span class="cF0">
+<a name="l41"></a>
+<a name="l42"></a>* Virtual mem is not used (It is identity mapped in EM64T mode).  The stk does 
+<a name="l43"></a>not grow, so allocate enough when the task (process) is </span><a href="/archive/LTHtml/OSMain/Task1a.html#l230"><span class="cF4">Spawn</span></a><span class="cF0">ed and use the heap 
+<a name="l44"></a>for most things.  (The "heap" refers to </span><a href="/archive/LTHtml/OSMain/Memory.html#l957"><span class="cF4">MAlloc</span></a><span class="cF0">() and </span><a href="/archive/LTHtml/OSMain/Memory.html#l951"><span class="cF4">Free</span></a><span class="cF0">().)
+<a name="l45"></a>
+<a name="l46"></a>* See </span><a href="/archive/LTHtml/Doc/Glossary.html#l19"><span class="cF4">Naming convention</span></a><span class="cF0">.
+<a name="l47"></a>
+<a name="l48"></a>* There are two modes of compiling </span><a href="/archive/LTHtml/Doc/Glossary.html#l9"><span class="cF4">Static Compiled Mode</span></a><span class="cF0"> and </span><a href="/archive/LTHtml/Doc/Glossary.html#l2"><span class="cF4">JIT Mode</span></a><span class="cF0">.  Actual 
+<a name="l49"></a>compilation is done in both--nothing is "interpreted".
+<a name="l50"></a>
+<a name="l51"></a>* </span><a href="/archive/LTHtml/Doc/Differences.html"><span class="cF4">Differences from C/C++</span></a><span class="cF0">
+<a name="l52"></a>
+<a name="l53"></a>* </span><a href="https://web.archive.org/web/20120303011924/http://www.losethos.com/LTHtml/Doc/SysPgmGuide.html"><span class="cF4">System Programming Guidelines</span></a><span class="cF0">
+<a name="l54"></a>
+<a name="l55"></a>                                </span><span class="cF5">Hash sym tables:</span><span class="cF0">
+<a name="l56"></a>
+<a name="l57"></a>* See </span><a href="https://web.archive.org/web/20120303011924/http://www.losethos.com/LTHtml/Adam/Hash2a.html"><span class="cF4">::/LT/Adam/Hash2a.APZ</span></a><span class="cF0"> for examples of how the hash tables are set-up.  
+<a name="l58"></a>Basically, syms are placed into hash tables and child process hash tables are 
+<a name="l59"></a>chained to parents.  This provides scopes for vars and functions.
+<a name="l60"></a>
+<a name="l61"></a>* </span><span class="cF2">adam_task-&gt;hash_table</span><span class="cF0"> holds the C/C++ syms loaded in on start-up.
+<a name="l62"></a>
+<a name="l63"></a>* </span><span class="cF2">Fs-&gt;hash_table</span><span class="cF0"> holds user C+ syms and if a sym is not found, it checks 
+<a name="l64"></a>parents.  When a duplicate sym is added to the table, it overshadows the 
+<a name="l65"></a>previous sym unless you have done </span><a href="/archive/LTHtml/Compiler/Directives.html#l8"><span class="cF4">OptOn</span></a><span class="cF0">(</span><a href="/archive/LTHtml/OSMain/Adam1a.html#l1385"><span class="cF4">OPTf_REPLACE_SYMS</span></a><span class="cF0">).  When developing 
+<a name="l66"></a>software, typically you include the file at the cmd prompt, make changes and 
+<a name="l67"></a>reinclude it.  Old syms are overshadowed but they are still there.  
+<a name="l68"></a>Periodically, kill the TASK and start fresh when mem is low.  If you wish your 
+<a name="l69"></a>applications to free themselves instead of staying in mem, spawn or </span><a href="/archive/LTHtml/Adam/Ltf/LtfPopUp.html#l412"><span class="cF4">PopUp</span></a><span class="cF0">() a 
+<a name="l70"></a>task to run the application and kill it when it's done.
+<a name="l71"></a>
+<a name="l72"></a>* To display the contents of a hash table, use the </span><a href="https://web.archive.org/web/20120303011924/http://www.losethos.com/LTHtml/Adam/Hash2a.html#l88"><span class="cF4">HashRep</span></a><span class="cF0">() routine or the 
+<a name="l73"></a>varients.  </span><a href="https://web.archive.org/web/20120303011924/http://www.losethos.com/LTHtml/Adam/Hash2a.html#l375"><span class="cF4">HashDepthRep</span></a><span class="cF0">() gives a histogram  of how long the chains are, in case 
+<a name="l74"></a>you wish to make hash table sizes bigger.
+<a name="l75"></a>
+<a name="l76"></a>                          </span><span class="cF5">Assembly Language Concerns:</span><span class="cF0">
+<a name="l77"></a>
+<a name="l78"></a>* </span><span class="cF2">FS</span><span class="cF0"> must always point to the per-TASK's structure.  See </span><a href="/archive/LTHtml/OSMain/Adam1a.html#l262"><span class="cF4">C+</span></a><span class="cF0"> and </span><a href="https://web.archive.org/web/20120303011924/http://www.losethos.com/LTHtml/OSMain/OSAsmDefs.html#l128"><span class="cF4">Asm</span></a><span class="cF0">.
+<a name="l79"></a>
+<a name="l80"></a>* </span><span class="cF2">GS</span><span class="cF0"> must always point to the per-CPU's structure.  See </span><a href="/archive/LTHtml/OSMain/Adam1a.html#l161"><span class="cF4">C+</span></a><span class="cF0"> and </span><a href="https://web.archive.org/web/20120303011924/http://www.losethos.com/LTHtml/OSMain/OSAsmDefs.html#l288"><span class="cF4">Asm</span></a><span class="cF0">.
+<a name="l81"></a>
+<a name="l82"></a>* Don't change the segment registers unless interrupts are off.
+<a name="l83"></a>
+<a name="l84"></a>* When interacting with compiled code, preserve </span><span class="cF2">RBP, RSI, RDI, R10-R15</span><span class="cF0"> because 
+<a name="l85"></a>the compiler uses these for register vars.  You are free to clobber </span><span class="cF2">RAX, RBX, 
+<a name="l86"></a>RCX, RDX</span><span class="cF0">, </span><span class="cF2">R8</span><span class="cF0"> and </span><span class="cF2">R9</span><span class="cF0">.
+<a name="l87"></a>
+<a name="l88"></a>* I recommend using the standard stk frame for functions because </span><a href="https://web.archive.org/web/20120303011924/http://www.losethos.com/LTHtml/OSMain/Dbg1a.html#l54"><span class="cF4">Caller</span></a><span class="cF0">() is 
+<a name="l89"></a>used to display the call stk, such as for the wallpaper.
+<a name="l90"></a></span><span class="cF2">        ENTER   nnnn
+<a name="l91"></a>...
+<a name="l92"></a>        LEAVE
+<a name="l93"></a>        RET
+<a name="l94"></a></span><span class="cF0">
+<a name="l95"></a>
+</span></pre><div class="archive-note">Historical capture: 2012-03-03. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

@@ -1,0 +1,182 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>ImportExports</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V8.00" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<a name="l1"></a><span class="cF0">                        </span><span class="cF5">Details of Scoping and Linkages</span><span class="cF0">
+<a name="l2"></a>
+<a name="l3"></a></span><a href="/archive/LTHtml/Doc/Glossary.html#l2"><span class="cF4">Just-In-Time Compilation</span></a><span class="cF0"> makes use of the current task's hash sym table and its 
+<a name="l4"></a>parent tasks' tables.  It fetches syms from parent tasks' tables if not found 
+<a name="l5"></a>locally in the current task's table and it places new syms in the current task's 
+<a name="l6"></a>table.  Conceptually, syms are at the scope of environment vars in other 
+<a name="l7"></a>operating systems.
+<a name="l8"></a>
+<a name="l9"></a></span><a href="/archive/LTHtml/Doc/Glossary.html#l9"><span class="cF4">Statical Compilation</span></a><span class="cF0"> creates a new, empty, sym table which you must populate by </span><span class="cF2">
+<a name="l10"></a>#include</span><span class="cF0">ing </span><a href="https://web.archive.org/web/20120309143554/http://www.losethos.com/LTHtml/OSMain/StaticAdam.html"><span class="cF4">::/LT/OSMain/StaticAdam.HPZ</span></a><span class="cF0"> or whatever to import syms.
+<a name="l11"></a>
+<a name="l12"></a>When a sym is placed into a table, older syms with identical names will be 
+<a name="l13"></a>overshadowed if they exist, unless you use the compiler option 
+<a name="l14"></a></span><a href="/archive/LTHtml/OSMain/Adam1a.html#l1385"><span class="cF4">OPTf_REPLACE_SYMS</span></a><span class="cF0">.  Duplicates are not allowed in many cases, especially in asm 
+<a name="l15"></a>blks.  Dupicates are allowed, by design in other cases, so that you can 
+<a name="l16"></a>repeatedly </span><span class="cF2">#include</span><span class="cF0"> the same file from the cmd line while developing it.  Or, so 
+<a name="l17"></a>you can repeatedly declare a function with a standard name, like "</span><span class="cF2">UpdateWin()</span><span class="cF0">".  
+<a name="l18"></a>This case might occur when the </span><span class="cF2">adam task</span><span class="cF0"> is starting-up loading-in many little 
+<a name="l19"></a>utilities.
+<a name="l20"></a>
+<a name="l21"></a></span><span class="cF2">extern</span><span class="cF0"> binds a new </span><a href="/archive/LTHtml/OSMain/Adam1a.html#l519"><span class="cF4">HTT_FUN</span></a><span class="cF0"> or </span><a href="/archive/LTHtml/OSMain/Adam1a.html#l515"><span class="cF4">HTT_GLBL_VAR</span></a><span class="cF0"> sym to an existing sym of the same 
+<a name="l22"></a>name if it exists in the sym table (just in just-in-time code).  It also can be 
+<a name="l23"></a>used to generate a forward referrence.
+<a name="l24"></a>
+<a name="l25"></a></span><span class="cF2">import</span><span class="cF0"> binds a new </span><a href="/archive/LTHtml/OSMain/Adam1a.html#l519"><span class="cF4">HTT_FUN</span></a><span class="cF0"> or </span><a href="/archive/LTHtml/OSMain/Adam1a.html#l515"><span class="cF4">HTT_GLBL_VAR</span></a><span class="cF0"> sym to a sym of the same name 
+<a name="l26"></a>imported from the task's sym table at </span><a href="/archive/LTHtml/OSMain/Hash1a.html#l733"><span class="cF4">Load</span></a><span class="cF0">() time.  If no sym exists to bind to 
+<a name="l27"></a>at </span><a href="/archive/LTHtml/OSMain/Hash1a.html#l733"><span class="cF4">Load</span></a><span class="cF0">() time, the code using this sym will be left incomplete until the sym is 
+<a name="l28"></a>defined.
+<a name="l29"></a>
+<a name="l30"></a>
+<a name="l31"></a></span><span class="cF2">LTextern</span><span class="cF0"> binds a new </span><a href="/archive/LTHtml/OSMain/Adam1a.html#l519"><span class="cF4">HTT_FUN</span></a><span class="cF0"> or </span><a href="/archive/LTHtml/OSMain/Adam1a.html#l515"><span class="cF4">HTT_GLBL_VAR</span></a><span class="cF0"> sym to an existing sym, of a differ
+<a name="l32"></a>ent name.  It must exists in the sym table.  Basically, this binds C to asm.
+<a name="l33"></a>
+<a name="l34"></a></span><span class="cF2">LTimport</span><span class="cF0"> binds a new </span><a href="/archive/LTHtml/OSMain/Adam1a.html#l519"><span class="cF4">HTT_FUN</span></a><span class="cF0"> or </span><a href="/archive/LTHtml/OSMain/Adam1a.html#l515"><span class="cF4">HTT_GLBL_VAR</span></a><span class="cF0"> sym to a sym, of a different name 
+<a name="l35"></a>imported from the task's sym table at </span><a href="/archive/LTHtml/OSMain/Hash1a.html#l733"><span class="cF4">Load</span></a><span class="cF0">() time.  If no sym exists to bind to 
+<a name="l36"></a>at </span><a href="/archive/LTHtml/OSMain/Hash1a.html#l733"><span class="cF4">Load</span></a><span class="cF0">() time, the code using this sym will be left incomplete until the sym is 
+<a name="l37"></a>defined.  Basically, this binds C to asm from elsewhere.
+<a name="l38"></a>
+<a name="l39"></a>
+<a name="l40"></a></span><span class="cF2">S</span><span class="cF0">taticModule/</span><span class="cF2">J</span><span class="cF0">ustInTime
+<a name="l41"></a>| Code occurs in </span><span class="cF2">G</span><span class="cF0">lobalScope/</span><span class="cF2">F</span><span class="cF0">unctionScope
+<a name="l42"></a>| | </span><span class="cF2">C</span><span class="cF0">Code/</span><span class="cF2">A</span><span class="cF0">smCodeBlk
+<a name="l43"></a>| | | </span><span class="cF2">extern</span><span class="cF0">/</span><span class="cF2">import</span><span class="cF0">/</span><span class="cF2">LTextern</span><span class="cF0">/</span><span class="cF2">LTimport</span><span class="cF0">/</span><span class="cF2">IMPORT</span><span class="cF0">/</span><span class="cF2">STRUC</span><span class="cF0">/</span><span class="cF2">static</span><span class="cF0">/</span><span class="cF2">class</span><span class="cF0">/</span><span class="cF2">goto</span><span class="cF0">
+<a name="l44"></a>| | | |        </span><span class="cF2">C</span><span class="cF0">odeHeap/</span><span class="cF2">D</span><span class="cF0">ataHeap/</span><span class="cF2">S</span><span class="cF0">tack/</span><span class="cF2">R</span><span class="cF0">egister
+<a name="l45"></a>| | | |        |          TaskHashEntry:Export</span><span class="cF2">S</span><span class="cF0">ysSym/</span><span class="cF2">M</span><span class="cF0">acro/</span><span class="cF2">F</span><span class="cF0">unction/</span><span class="cF2">C</span><span class="cF0">lass/</span><span class="cF2">T</span><span class="cF0">ypedef
+<a name="l46"></a>| | | |        |          | UsageScope: </span><span class="cF2">M</span><span class="cF0">odule/</span><span class="cF2">A</span><span class="cF0">smLocal/Asm</span><span class="cF2">B</span><span class="cF0">lk/</span><span class="cF2">T</span><span class="cF0">askAndChildren/</span><span class="cF2">F</span><span class="cF0">unction
+<a name="l47"></a>| | | |        |          | |UsageScope: </span><span class="cF2">G</span><span class="cF0">lbl/Asm</span><span class="cF2">L</span><span class="cF0">ocal/</span><span class="cF2">R</span><span class="cF0">emainder/</span><span class="cF2">g</span><span class="cF0">lblThisBlkAndRemainder
+<a name="l48"></a>| | | |        |          | || </span><span class="cF2">S</span><span class="cF0">taticVarInit/</span><span class="cF2">D</span><span class="cF0">ynamicVarInitAllowed/</span><span class="cF2">N</span><span class="cF0">oInitAllowed
+<a name="l49"></a>| | | |        |          | || | Are dups allowed within the namespace? A dup overshadows the original.
+<a name="l50"></a>| | | |        |          | || | </span><span class="cF2">D</span><span class="cF0">upsAllowed/</span><span class="cF2">N</span><span class="cF0">oDups/NoDupsBut</span><span class="cF2">P</span><span class="cF0">ad/</span><span class="cF2">W</span><span class="cF0">arningUnlessClosedOut
+<a name="l51"></a>S G A          C label::  S MG   N
+<a name="l52"></a>S G A          C label:     MG   N
+<a name="l53"></a>S G A          C @@label:   AL   N
+<a name="l54"></a>S G A STRUC      member:: S MR   N
+<a name="l55"></a>S G A STRUC      member:    MR   N
+<a name="l56"></a>S G A IMPORT   C label;     MR   N
+<a name="l57"></a>S F A          C label::  S BG   N
+<a name="l58"></a>S F A          C label:     BG   N
+<a name="l59"></a>S F A          C @@label:   AL   N
+<a name="l60"></a>S F A STRUC      member::   BR   N
+<a name="l61"></a>S F A STRUC      member:    BR   N
+<a name="l62"></a>S F A IMPORT   C label;     BR   N
+<a name="l63"></a>S x x            #define    MR   D
+<a name="l64"></a>S G C          C function S MR   D
+<a name="l65"></a>S F C          R var        FR   N
+<a name="l66"></a>S F C          S var        FR   N
+<a name="l67"></a>S F C static   C var        FR D N
+<a name="l68"></a>S F C goto     C label:     FG   N
+<a name="l69"></a>S G C          C var      S MR D D
+<a name="l70"></a>S G C          D var        MR N D
+<a name="l71"></a>S G C            class      MR   D
+<a name="l72"></a>S G C            typedef    MR   D
+<a name="l73"></a>S G C class      member     MR   P
+<a name="l74"></a>S G C extern     class      MR   D
+<a name="l75"></a>S G C extern   C function   MR   W
+<a name="l76"></a>S G C import   C function   MR   D
+<a name="l77"></a>S G C import   C var        MR   D
+<a name="l78"></a>S G C LTextern C function   MR   D
+<a name="l79"></a>S G C LTextern C var        MR   D
+<a name="l80"></a>S G C LTimport C function   MR   D
+<a name="l81"></a>S G C LTimport C var        MR   D
+<a name="l82"></a>J G A          C label::  S Tg   N
+<a name="l83"></a>J G A          C label:     BG   N
+<a name="l84"></a>J G A          C @@label:   AL   N
+<a name="l85"></a>J G A STRUC      member:: S TR   N
+<a name="l86"></a>J G A STRUC      member:    BR   N
+<a name="l87"></a>J G A IMPORT   C label;     TR   N
+<a name="l88"></a>J F A          C label::    BG   N
+<a name="l89"></a>J F A          C label:     BG   N
+<a name="l90"></a>J F A          C @@label:   AL   N
+<a name="l91"></a>J F A STRUC      member::   BR   N
+<a name="l92"></a>J F A STRUC      member:    BR   N
+<a name="l93"></a>J F A IMPORT   C label;     BR   N
+<a name="l94"></a>J x x            #define  M TR   D
+<a name="l95"></a>J G C          C function F TR   D
+<a name="l96"></a>J F C          R var        FR   N
+<a name="l97"></a>J F C          S var        FR   N
+<a name="l98"></a>J F C static   C var        FR D N
+<a name="l99"></a>J F C goto     C label:     FG   N
+<a name="l100"></a>J G C          C var      G TR D D
+<a name="l101"></a>J G C          D var      G TR S D
+<a name="l102"></a>J G C            class    C TR   D
+<a name="l103"></a>J G C            typedef  T TR   D
+<a name="l104"></a>J G C class      member     TR   P
+<a name="l105"></a>J G C extern     class    C TR   D
+<a name="l106"></a>J G C extern   C function F TR   W
+<a name="l107"></a>J G C extern   C var      G TR   D
+<a name="l108"></a>J G C extern   D var      G TR   D
+<a name="l109"></a>J G C LTextern C function F TR   D
+<a name="l110"></a>J G C LTextern C var      G TR   D
+<a name="l111"></a>
+<a name="l112"></a>* GoTo labels must not have the same name as global scope objects.  GoTo's are 
+<a name="l113"></a>rare and I don't want to slow the compiler and add code to fix this.  You will 
+<a name="l114"></a>get errors if a collision happens, so it's not very dangerous, but the error 
+<a name="l115"></a>message is baffling.
+<a name="l116"></a>
+<a name="l117"></a>* The member names "</span><span class="cF2">pad</span><span class="cF0"> and "</span><span class="cF2">reserved</span><span class="cF0">" are special because multiple instances 
+<a name="l118"></a>with the same name are allowed in a class.
+<a name="l119"></a>
+<a name="l120"></a>* Use </span><span class="cF2">reg</span><span class="cF0"> or </span><span class="cF2">noreg</span><span class="cF0"> in front of local var names to override automatic register 
+<a name="l121"></a>var allocation.  You can, optionally, specify a reg after the "</span><span class="cF2">reg</span><span class="cF0">" keyword.
+<a name="l122"></a> 
+<a name="l123"></a>* Local nonregister function vars can be accessed in asm blks with </span><span class="cF2">&amp;i[RBP]</span><span class="cF0"> for 
+<a name="l124"></a>example.
+<a name="l125"></a>
+<a name="l126"></a>* Glbl vars and functions can be accessed in asm with and </span><span class="cF2">&amp;</span><span class="cF0"> as in
+<a name="l127"></a>        </span><span class="cF2">MOV     RAX,U64 [&amp;glbl_var]
+<a name="l128"></a>        CALL    I32 &amp;Fun
+<a name="l129"></a>        CALL    I32 &amp;SYS_SYM</span><span class="cF0">
+<a name="l130"></a>
+<a name="l131"></a>* In </span><span class="cF2">JIT</span><span class="cF0"> asm code, &amp;SYS_SYM and &amp;Fun don't need </span><span class="cF2">IMPORT</span><span class="cF0">.
+<a name="l132"></a>
+<a name="l133"></a>* All offspring tasks of a task inherit syms.
+<a name="l134"></a>
+<a name="l135"></a>* The </span><span class="cF2">sizeof()</span><span class="cF0"> and class </span><span class="cF2">offset()</span><span class="cF0"> internal function can be used in asm blks.
+<a name="l136"></a>
+<a name="l137"></a>* No register vars are used in functions with a try/catch.  They will be force 
+<a name="l138"></a>to </span><span class="cF2">noreg</span><span class="cF0">.
+<a name="l139"></a>
+<a name="l140"></a>* Using </span><span class="cF2">&amp;i</span><span class="cF0"> or </span><span class="cF2">i.u8[2]</span><span class="cF0"> on a local var, </span><span class="cF2">i</span><span class="cF0">, will force it to </span><span class="cF2">noreg</span><span class="cF0">.
+<a name="l141"></a>
+<a name="l142"></a>* An unused gap on the stk is left for </span><span class="cF2">reg</span><span class="cF0"> vars.
+<a name="l143"></a>
+<a name="l144"></a>* Note: </span><span class="cF2">static</span><span class="cF0"> function vars do not go on the data heap, no matter the setting 
+<a name="l145"></a>of the </span><a href="/archive/LTHtml/OSMain/Adam1a.html#l1386"><span class="cF4">OPTf_GLBLS_ON_DATA_HEAP</span></a><span class="cF0">.  They may in the future.
+<a name="l146"></a>
+<a name="l147"></a>* </span><a href="/archive/LTHtml/OSMain/Adam1a.html#l1381"><span class="cF4">OPTf_EXTERNS_TO_IMPORTS</span></a><span class="cF0"> will treat </span><span class="cF2">LTextern</span><span class="cF0"> as </span><span class="cF2">LTimport</span><span class="cF0"> and </span><span class="cF2">extern</span><span class="cF0"> as </span><span class="cF2">import</span><span class="cF0">.  
+<a name="l148"></a>This allows a header to be used either as a </span><span class="cF2">JIT compiled</span><span class="cF0"> or </span><span class="cF2">static compiled</span><span class="cF0"> 
+<a name="l149"></a>header.
+<a name="l150"></a></span></pre><div class="archive-note">Historical capture: 2012-03-09. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

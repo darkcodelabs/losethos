@@ -1,0 +1,281 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>Except</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V8.00" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cF5">                               <a href="/archive/LTHtml/Doc/TrivialSolutions.html">Trivial Solutions</a>
+                    <a href="/archive/index.html">The LoseThos 64-bit PC Operating System</a>
+File:/LT/OSMain/Except.CPZ
+This, and all LoseThos files, are public domain.  Do whatever you like.
+God is watching; God is just; God is never out-done in generosity.  He talks!
+
+LoseThos code compiles with the 64-bit LoseThos compiler/assembler I wrote.
+Boot the LoseThos CD and you can compile it.  Not in Kansas anymore!
+
+<a href="/archive/LTHtml/Demo/Lectures/FixedPoint.html">Click here for preliminary compiler information you need.</a>
+
+</span><a name="l1"></a><span class="cF8">Project: OSMain</span><span class="cF0">
+<a name="l2"></a></span><span class="cF1">U64</span><span class="cF0"> ExceptDepth(TaskStruct *task=NULL)
+<a name="l3"></a>{
+<a name="l4"></a>  </span><span class="cF1">U64</span><span class="cF0"> result=0;
+<a name="l5"></a>  ExceptStruct *tempt;
+<a name="l6"></a>  </span><span class="cF1">if</span><span class="cF0"> (!task) task=Fs;
+<a name="l7"></a>  tempt=task-&gt;next_except;
+<a name="l8"></a>  </span><span class="cF1">while</span><span class="cF0"> (tempt!=&amp;task-&gt;next_except) </span><span class="cF7">{</span><span class="cF0">
+<a name="l9"></a>    result++;
+<a name="l10"></a>    tempt=tempt-&gt;next;
+<a name="l11"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l12"></a>  </span><span class="cF1">return</span><span class="cF0"> result;
+<a name="l13"></a>}
+<a name="l14"></a>
+<a name="l15"></a></span><span class="cF1">asm</span><span class="cF0"> {
+<a name="l16"></a></span><span class="cF1">USE64</span><span class="cF0">
+<a name="l17"></a>#</span><span class="cF1">assert</span><span class="cF0"> !(</span><span class="cF7">(</span><span class="cF0">CREG_NON_PTR_MASK|CREG_VARS_MASK</span><span class="cF7">)</span><span class="cF0">&amp;~0xFCC0)
+<a name="l18"></a>_TEST_EXCEPT::
+<a name="l19"></a>        </span><span class="cF1">XOR</span><span class="cF0">     </span><span class="cFC">RAX</span><span class="cF0">,</span><span class="cFC">RAX</span><span class="cF0">
+<a name="l20"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">RAX</span><span class="cF0">,</span><span class="cFC">FS</span><span class="cF0">:</span><span class="cF1">U64</span><span class="cF0"> TASK_LAST_EXCEPT[</span><span class="cFC">RAX</span><span class="cF0">]
+<a name="l21"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">RBP</span><span class="cF0">,</span><span class="cF1">U64</span><span class="cF0"> EXCEPT_RBP[</span><span class="cFC">RAX</span><span class="cF0">]
+<a name="l22"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">RSI</span><span class="cF0">,</span><span class="cF1">U64</span><span class="cF0"> EXCEPT_RSI[</span><span class="cFC">RAX</span><span class="cF0">]
+<a name="l23"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">RDI</span><span class="cF0">,</span><span class="cF1">U64</span><span class="cF0"> EXCEPT_RDI[</span><span class="cFC">RAX</span><span class="cF0">]
+<a name="l24"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">R10</span><span class="cF0">,</span><span class="cF1">U64</span><span class="cF0"> EXCEPT_R10[</span><span class="cFC">RAX</span><span class="cF0">]
+<a name="l25"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">R11</span><span class="cF0">,</span><span class="cF1">U64</span><span class="cF0"> EXCEPT_R11[</span><span class="cFC">RAX</span><span class="cF0">]
+<a name="l26"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">R12</span><span class="cF0">,</span><span class="cF1">U64</span><span class="cF0"> EXCEPT_R12[</span><span class="cFC">RAX</span><span class="cF0">]
+<a name="l27"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">R13</span><span class="cF0">,</span><span class="cF1">U64</span><span class="cF0"> EXCEPT_R13[</span><span class="cFC">RAX</span><span class="cF0">]
+<a name="l28"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">R14</span><span class="cF0">,</span><span class="cF1">U64</span><span class="cF0"> EXCEPT_R14[</span><span class="cFC">RAX</span><span class="cF0">]
+<a name="l29"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">R15</span><span class="cF0">,</span><span class="cF1">U64</span><span class="cF0"> EXCEPT_R15[</span><span class="cFC">RAX</span><span class="cF0">]
+<a name="l30"></a>        </span><span class="cF1">PUSH</span><span class="cF0">    </span><span class="cF1">U64</span><span class="cF0"> EXCEPT_RFLAGS[</span><span class="cFC">RAX</span><span class="cF0">]
+<a name="l31"></a>        </span><span class="cF1">POPFD</span><span class="cF0">
+<a name="l32"></a>        </span><span class="cF1">JMP</span><span class="cF0">     </span><span class="cF1">U64</span><span class="cF0"> EXCEPT_HANDLER_START[</span><span class="cFC">RAX</span><span class="cF0">]
+<a name="l33"></a>
+<a name="l34"></a>_TAKE_EXCEPT::
+<a name="l35"></a>        </span><span class="cF1">XOR</span><span class="cF0">     </span><span class="cFC">RAX</span><span class="cF0">,</span><span class="cFC">RAX</span><span class="cF0">
+<a name="l36"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">RAX</span><span class="cF0">,</span><span class="cFC">FS</span><span class="cF0">:</span><span class="cF1">U64</span><span class="cF0"> TASK_LAST_EXCEPT[</span><span class="cFC">RAX</span><span class="cF0">]
+<a name="l37"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">RSP</span><span class="cF0">,</span><span class="cF1">U64</span><span class="cF0"> EXCEPT_RSP[</span><span class="cFC">RAX</span><span class="cF0">]
+<a name="l38"></a>        </span><span class="cF1">JMP</span><span class="cF0">     </span><span class="cF1">U64</span><span class="cF0"> EXCEPT_HANDLER_SKIP[</span><span class="cFC">RAX</span><span class="cF0">]
+<a name="l39"></a>
+<a name="l40"></a>_SAVE_EXCEPT_REGS::
+<a name="l41"></a>        </span><span class="cF1">ENTER</span><span class="cF0">   0
+<a name="l42"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cFC">RAX</span><span class="cF0">,</span><span class="cF1">U64</span><span class="cF0"> SF_ARG1[</span><span class="cFC">RBP</span><span class="cF0">]
+<a name="l43"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cF1">U64</span><span class="cF0"> EXCEPT_RSI[</span><span class="cFC">RAX</span><span class="cF0">],</span><span class="cFC">RSI</span><span class="cF0">
+<a name="l44"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cF1">U64</span><span class="cF0"> EXCEPT_RDI[</span><span class="cFC">RAX</span><span class="cF0">],</span><span class="cFC">RDI</span><span class="cF0">
+<a name="l45"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cF1">U64</span><span class="cF0"> EXCEPT_R10[</span><span class="cFC">RAX</span><span class="cF0">],</span><span class="cFC">R10</span><span class="cF0">
+<a name="l46"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cF1">U64</span><span class="cF0"> EXCEPT_R11[</span><span class="cFC">RAX</span><span class="cF0">],</span><span class="cFC">R11</span><span class="cF0">
+<a name="l47"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cF1">U64</span><span class="cF0"> EXCEPT_R12[</span><span class="cFC">RAX</span><span class="cF0">],</span><span class="cFC">R12</span><span class="cF0">
+<a name="l48"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cF1">U64</span><span class="cF0"> EXCEPT_R13[</span><span class="cFC">RAX</span><span class="cF0">],</span><span class="cFC">R13</span><span class="cF0">
+<a name="l49"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cF1">U64</span><span class="cF0"> EXCEPT_R14[</span><span class="cFC">RAX</span><span class="cF0">],</span><span class="cFC">R14</span><span class="cF0">
+<a name="l50"></a>        </span><span class="cF1">MOV</span><span class="cF0">     </span><span class="cF1">U64</span><span class="cF0"> EXCEPT_R15[</span><span class="cFC">RAX</span><span class="cF0">],</span><span class="cFC">R15</span><span class="cF0">
+<a name="l51"></a>        </span><span class="cF1">LEAVE</span><span class="cF0">
+<a name="l52"></a>        </span><span class="cF1">RET1</span><span class="cF0">    8
+<a name="l53"></a>}
+<a name="l54"></a>
+<a name="l55"></a></span><span class="cF1">LTextern</span><span class="cF0"> _TEST_EXCEPT </span><span class="cF1">U0</span><span class="cF0"> TestExcept();
+<a name="l56"></a></span><span class="cF1">LTextern</span><span class="cF0"> _TAKE_EXCEPT </span><span class="cF1">U0</span><span class="cF0"> TakeExcept();
+<a name="l57"></a></span><span class="cF1">LTextern</span><span class="cF0"> _SAVE_EXCEPT_REGS </span><span class="cF1">U0</span><span class="cF0"> SaveExceptRegs(ExceptStruct *t);
+<a name="l58"></a>
+<a name="l59"></a>#</span><span class="cF1">exe</span><span class="cF0"> {NoRegVar(ON);};
+<a name="l60"></a>
+<a name="l61"></a></span><span class="cF1">class</span><span class="cF0"> SysTryStk
+<a name="l62"></a>{
+<a name="l63"></a>  </span><span class="cF1">U64</span><span class="cF0"> var_tempt;
+<a name="l64"></a>  </span><span class="cF1">U64</span><span class="cF0"> var_old_flags;
+<a name="l65"></a>  </span><span class="cF1">U64</span><span class="cF0"> var_rbp;
+<a name="l66"></a>  </span><span class="cF1">U64</span><span class="cF0"> var_rsp;
+<a name="l67"></a>  </span><span class="cF1">U64</span><span class="cF0"> rbp;
+<a name="l68"></a>  </span><span class="cF1">U64</span><span class="cF0"> ret_rip;
+<a name="l69"></a>  </span><span class="cF1">U64</span><span class="cF0"> arg1;
+<a name="l70"></a>  </span><span class="cF1">U64</span><span class="cF0"> arg2;
+<a name="l71"></a>};
+<a name="l72"></a>
+<a name="l73"></a></span><span class="cF1">U0</span><span class="cF0"> SysTry(</span><span class="cF1">U8</span><span class="cF0"> *catch_start,</span><span class="cF1">U8</span><span class="cF0"> *untry_start)
+<a name="l74"></a>{
+<a name="l75"></a>  </span><span class="cF1">U64</span><span class="cF0"> *rsp=GetStkPtr,*rbp=GetBasePtr,old_flags=GetFlags;
+<a name="l76"></a>  ExceptStruct *tempt=MAlloc(</span><span class="cF1">sizeof</span><span class="cF7">(</span><span class="cF0">ExceptStruct</span><span class="cF7">)</span><span class="cF0">);
+<a name="l77"></a>  tempt-&gt;handler_catch=catch_start;
+<a name="l78"></a>  tempt-&gt;handler_untry=untry_start;
+<a name="l79"></a>  tempt-&gt;rsp=rsp&gt;&lt;(</span><span class="cF1">U8</span><span class="cF0"> *)+</span><span class="cF1">sizeof</span><span class="cF0">(SysTryStk);
+<a name="l80"></a>  tempt-&gt;rbp=*rbp;
+<a name="l81"></a>  tempt-&gt;rflags=old_flags;
+<a name="l82"></a>  SaveExceptRegs(tempt);
+<a name="l83"></a>  Cli;
+<a name="l84"></a>  InsQue(tempt,Fs-&gt;last_except);
+<a name="l85"></a>  SetFlags(old_flags);
+<a name="l86"></a>}
+<a name="l87"></a>
+<a name="l88"></a></span><span class="cF1">U0</span><span class="cF0"> SysUntry()
+<a name="l89"></a>{
+<a name="l90"></a>  ExceptStruct *tempt=Fs-&gt;last_except;
+<a name="l91"></a>  PushFD;
+<a name="l92"></a></span><span class="cF2">//The adam task sometimes probes except depth,</span><span class="cF0">
+<a name="l93"></a></span><span class="cF2">//so we lock it out.  A probe from a multicore</span><span class="cF0">
+<a name="l94"></a></span><span class="cF2">//would fail, but who'd want to do that?</span><span class="cF0">
+<a name="l95"></a>  Cli;
+<a name="l96"></a>  RemQue(tempt);
+<a name="l97"></a>  PopFD;
+<a name="l98"></a>  Free(tempt);
+<a name="l99"></a>}
+<a name="l100"></a>
+<a name="l101"></a></span><span class="cF1">U0</span><span class="cF0"> AdamLogExcept(</span><span class="cF1">I64</span><span class="cF0"> argc,</span><span class="cF1">I64</span><span class="cF0"> *argv)
+<a name="l102"></a>{
+<a name="l103"></a>  </span><span class="cF1">U64</span><span class="cF0"> i;
+<a name="l104"></a>  </span><span class="cF1">if</span><span class="cF0"> (!Gs-&gt;num) </span><span class="cF7">{</span><span class="cF0"> </span><span class="cF2">//TODO: Other cores</span><span class="cF0">
+<a name="l105"></a>    AdamLog(</span><span class="cF6">"Depth:%02X Task:%08X throw("</span><span class="cF0">,
+<a name="l106"></a>      ExceptDepth</span><span class="cF7">(</span><span class="cF0">Fs</span><span class="cF7">)</span><span class="cF0">,Fs);
+<a name="l107"></a>    </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;argc;i++) {
+<a name="l108"></a>      AdamLog(</span><span class="cF6">"%X"</span><span class="cF0">,argv[i]);
+<a name="l109"></a>      </span><span class="cF1">if</span><span class="cF0"> (i&lt;argc-1)
+<a name="l110"></a>        AdamLog(</span><span class="cF6">","</span><span class="cF0">);
+<a name="l111"></a>    }
+<a name="l112"></a>    AdamLog(</span><span class="cF6">");\n"</span><span class="cF0">);
+<a name="l113"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l114"></a>}
+<a name="l115"></a>
+<a name="l116"></a></span><span class="cF1">U0</span><span class="cF0"> PutExcept()
+<a name="l117"></a>{
+<a name="l118"></a>  </span><span class="cF1">I64</span><span class="cF0"> i;
+<a name="l119"></a>  </span><span class="cF1">if</span><span class="cF0"> (Fs-&gt;except_argc&gt;0) </span><span class="cF7">{</span><span class="cF0">
+<a name="l120"></a>    </span><span class="cF1">if</span><span class="cF0"> (Fs-&gt;except_argv[0]&lt;DefineSubCnt</span><span class="cF7">(</span><span class="cF6">"ST_EXCEPT_TYPES"</span><span class="cF7">)</span><span class="cF0">) {
+<a name="l121"></a>      </span><span class="cF6">"Exception Type :%Z\n"</span><span class="cF0">,Fs-&gt;except_argv[0],</span><span class="cF6">"ST_EXCEPT_TYPES"</span><span class="cF0">;
+<a name="l122"></a>      </span><span class="cF1">if</span><span class="cF0"> (Fs-&gt;except_argv[0]==EXCEPT_UNDEF_DEFINE)
+<a name="l123"></a>        </span><span class="cF6">"Name:'%s'\n"</span><span class="cF0">,Fs-&gt;except_argv[1];
+<a name="l124"></a>      </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF1">if</span><span class="cF0"> (Fs-&gt;except_argv[0]==EXCEPT_DIVIDE_BY_ZERO)
+<a name="l125"></a>        </span><span class="cF6">"Addr:%P\n"</span><span class="cF0">,Fs-&gt;except_argv[1];
+<a name="l126"></a>      </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l127"></a>        </span><span class="cF1">for</span><span class="cF0"> (i=1;i&lt;Fs-&gt;except_argc;i++)
+<a name="l128"></a>          </span><span class="cF6">"%016X "</span><span class="cF0">,Fs-&gt;except_argv[i];
+<a name="l129"></a>        NewLine;
+<a name="l130"></a>      </span><span class="cF7">}</span><span class="cF0">
+<a name="l131"></a>    } </span><span class="cF1">else</span><span class="cF0"> {
+<a name="l132"></a>      </span><span class="cF6">"Exception:"</span><span class="cF0">;
+<a name="l133"></a>      </span><span class="cF1">for</span><span class="cF0"> (i=0;i&lt;Fs-&gt;except_argc;i++)
+<a name="l134"></a>        </span><span class="cF6">"%016X "</span><span class="cF0">,Fs-&gt;except_argv[i];
+<a name="l135"></a>      NewLine;
+<a name="l136"></a>    }
+<a name="l137"></a>  </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0">
+<a name="l138"></a>    </span><span class="cF6">"Generic Exception\n"</span><span class="cF0">;
+<a name="l139"></a>}
+<a name="l140"></a>
+<a name="l141"></a></span><span class="cF1">U0</span><span class="cF0"> throw_join(</span><span class="cF1">I64</span><span class="cF0"> argc,</span><span class="cF1">I64</span><span class="cF0"> *argv)
+<a name="l142"></a>{
+<a name="l143"></a>  ExceptStruct *tempt=Fs-&gt;last_except;
+<a name="l144"></a>  BoolI8 was_raw;
+<a name="l145"></a>
+<a name="l146"></a>  Fs-&gt;except_argc=argc;
+<a name="l147"></a>  Fs-&gt;except_argv=argv;
+<a name="l148"></a>  Fs-&gt;except_rbp=GetBasePtr;
+<a name="l149"></a>  Fs-&gt;catch_except=FALSE;
+<a name="l150"></a>  Fs-&gt;ignore_except=FALSE;
+<a name="l151"></a>  </span><span class="cF1">while</span><span class="cF0"> (Fs-&gt;next_except!=&amp;Fs-&gt;next_except) </span><span class="cF7">{</span><span class="cF0">
+<a name="l152"></a>    TestExcept;
+<a name="l153"></a>    </span><span class="cF1">if</span><span class="cF0"> (Fs-&gt;catch_except)
+<a name="l154"></a>      TakeExcept;
+<a name="l155"></a>    </span><span class="cF1">if</span><span class="cF0"> (Fs-&gt;ignore_except)
+<a name="l156"></a>      </span><span class="cF1">return</span><span class="cF0">;
+<a name="l157"></a>    SetBasePtr(Fs-&gt;except_rbp);
+<a name="l158"></a>    tempt=Fs-&gt;last_except;
+<a name="l159"></a>    RemQue(tempt);
+<a name="l160"></a>    Free(tempt);
+<a name="l161"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l162"></a>  was_raw=Raw(ON);
+<a name="l163"></a>  PutExcept;
+<a name="l164"></a>  </span><span class="cF1">if</span><span class="cF0"> (!Gs-&gt;num)
+<a name="l165"></a>    Dbg(</span><span class="cF6">"Unhandled Exception"</span><span class="cF0">);
+<a name="l166"></a>  </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0">
+<a name="l167"></a>    DbgStr(</span><span class="cF6">"Unhandled MP Exception"</span><span class="cF0">,5000);
+<a name="l168"></a>    </span><span class="cF1">while</span><span class="cF0"> (TRUE)
+<a name="l169"></a>      Beep;
+<a name="l170"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l171"></a>  Raw(was_raw);
+<a name="l172"></a>}
+<a name="l173"></a>
+<a name="l174"></a></span><span class="cF1">U0</span><span class="cF0"> throw_no_log(...)
+<a name="l175"></a>{
+<a name="l176"></a>  throw_join(argc,argv);
+<a name="l177"></a>}
+<a name="l178"></a>
+<a name="l179"></a></span><span class="cF1">U0</span><span class="cF0"> throw(...)
+<a name="l180"></a>{
+<a name="l181"></a>  AdamLogExcept(argc,argv);
+<a name="l182"></a>  throw_join(argc,argv);
+<a name="l183"></a>}
+<a name="l184"></a>
+<a name="l185"></a>#</span><span class="cF1">exe</span><span class="cF0"> {NoRegVar(OFF);};
+<a name="l186"></a>
+<a name="l187"></a></span><span class="cF1">U0</span><span class="cF0"> SysThrowBreak()
+<a name="l188"></a>{
+<a name="l189"></a>  </span><span class="cF1">if</span><span class="cF0"> (Bt</span><span class="cF7">(</span><span class="cF0">&amp;Fs-&gt;task_flags,TASKf_BREAK_TO_SHIFT_ESC</span><span class="cF7">)</span><span class="cF0">)
+<a name="l190"></a>    Msg(MSG_KEY_DOWN,CH_SHIFT_ESC,0x20100000201);
+<a name="l191"></a>  </span><span class="cF1">else</span><span class="cF0"> </span><span class="cF7">{</span><span class="cF0"> </span><span class="cF2">//TODO: Might want lock</span><span class="cF0">
+<a name="l192"></a>    Fs-&gt;wake_jiffy=0;
+<a name="l193"></a>    TaskRstAwaitingMsg;
+<a name="l194"></a>    PrtsRelease();
+<a name="l195"></a>    BlkDevsRelease();
+<a name="l196"></a>    FlushMsgs;
+<a name="l197"></a>    throw(EXCEPT_BREAK);
+<a name="l198"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l199"></a>}
+<a name="l200"></a>
+<a name="l201"></a></span><span class="cF2">//This can be used to exit an app, but not a task.</span><span class="cF0">
+<a name="l202"></a></span><span class="cF1">U0</span><span class="cF0"> ThrowBreak(TaskStruct *task=NULL)
+<a name="l203"></a>{
+<a name="l204"></a>  </span><span class="cF1">if</span><span class="cF0"> (task &amp;&amp; task!=Fs) </span><span class="cF7">{</span><span class="cF0">
+<a name="l205"></a>    </span><span class="cF1">if</span><span class="cF0"> (!TaskValidate</span><span class="cF7">(</span><span class="cF0">task</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF1">return</span><span class="cF0">;
+<a name="l206"></a>    </span><span class="cF2">//TODO: Might want lock</span><span class="cF0">
+<a name="l207"></a>    sys_focus_task=task;
+<a name="l208"></a>    LBts(sys_ctrl_alt_flags,SYSf_CTRL_ALT_C);
+<a name="l209"></a>  </span><span class="cF7">}</span><span class="cF0"> </span><span class="cF1">else</span><span class="cF0">
+<a name="l210"></a>    SysThrowBreak;
+<a name="l211"></a>}
+<a name="l212"></a>
+<a name="l213"></a>BoolI64 BreakLock(TaskStruct *task=NULL)
+<a name="l214"></a>{
+<a name="l215"></a>  </span><span class="cF1">if</span><span class="cF0"> (!task) task=Fs;
+<a name="l216"></a>  </span><span class="cF1">return</span><span class="cF0"> !LBts(&amp;task-&gt;task_flags,TASKf_BREAK_LOCKED);
+<a name="l217"></a>}
+<a name="l218"></a>
+<a name="l219"></a>BoolI64 BreakUnlock(TaskStruct *task=NULL)
+<a name="l220"></a>{
+<a name="l221"></a>  BoolI8 result;
+<a name="l222"></a>  </span><span class="cF1">if</span><span class="cF0"> (!task) task=Fs;
+<a name="l223"></a>  result=LBtr(&amp;task-&gt;task_flags,TASKf_BREAK_LOCKED);
+<a name="l224"></a>  </span><span class="cF1">if</span><span class="cF0"> (LBtr</span><span class="cF7">(</span><span class="cF0">&amp;task-&gt;task_flags,TASKf_PENDING_BREAK</span><span class="cF7">)</span><span class="cF0">) </span><span class="cF7">{</span><span class="cF0">
+<a name="l225"></a>    </span><span class="cF1">if</span><span class="cF0"> (task==Fs)
+<a name="l226"></a>      ThrowBreak;
+<a name="l227"></a>    </span><span class="cF1">else</span><span class="cF0">
+<a name="l228"></a>      task-&gt;rip=&amp;ThrowBreak;
+<a name="l229"></a>  </span><span class="cF7">}</span><span class="cF0">
+<a name="l230"></a>  </span><span class="cF1">return</span><span class="cF0"> result;
+<a name="l231"></a>}
+<a name="l232"></a>
+<a name="l233"></a></span><span class="cF1">U0</span><span class="cF0"> CatchAll()
+<a name="l234"></a>{
+<a name="l235"></a>  PutExcept;
+<a name="l236"></a>  Fs-&gt;catch_except=TRUE;
+<a name="l237"></a>}
+</span></pre><div class="archive-note">Historical capture: 2012-03-09. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

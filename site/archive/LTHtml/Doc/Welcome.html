@@ -1,0 +1,206 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>Welcome</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="description"/>
+<meta content="64-Bit, Operating System, Christian, OS, PC, Mutlicore, Free, Open Source, Public Domain, MultiTasking" name="keywords"/>
+<meta content="LoseThos V8.00" name="generator"/>
+<style type="text/css">
+.cF0{color:#000000;background-color:#fcfcfc;}
+.cF1{color:#0000a8;background-color:#fcfcfc;}
+.cF2{color:#00a800;background-color:#fcfcfc;}
+.cF3{color:#00a8a8;background-color:#fcfcfc;}
+.cF4{color:#a80000;background-color:#fcfcfc;}
+.cF5{color:#a800a8;background-color:#fcfcfc;}
+.cF6{color:#a85400;background-color:#fcfcfc;}
+.cF7{color:#a8a8a8;background-color:#fcfcfc;}
+.cF8{color:#545454;background-color:#fcfcfc;}
+.cF9{color:#5454fc;background-color:#fcfcfc;}
+.cFA{color:#54fc54;background-color:#fcfcfc;}
+.cFB{color:#54fcfc;background-color:#fcfcfc;}
+.cFC{color:#fc5454;background-color:#fcfcfc;}
+.cFD{color:#fc54fc;background-color:#fcfcfc;}
+.cFE{color:#fcfc54;background-color:#fcfcfc;}
+.cFF{color:#fcfcfc;background-color:#fcfcfc;}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<a name="l1"></a><span class="cF0">                              </span><span class="cF5">Welcome to LoseThos</span><span class="cF0">
+<a name="l2"></a>
+<a name="l3"></a></span><a href="/archive/LTHtml/Doc/TrivialSolutions.html"><span class="cF4">Trivial Solutions</span></a><span class="cF0">'s LoseThos operating system is for recreational programming:
+<a name="l4"></a>  * Professional hobby projects
+<a name="l5"></a>  * Teenager projects
+<a name="l6"></a>  * Non-professional, older-person projects
+<a name="l7"></a>
+<a name="l8"></a>Simplicity is a goal to </span><a href="/archive/LTHtml/Doc/Strategy.html"><span class="cF4">keep the line count down</span></a><span class="cF0">, so it's easy to tinker with.  
+<a name="l9"></a>As it turns-out, simplicity makes it faster in some ways, too.  It never 
+<a name="l10"></a>switches privilege levels, never changes address maps, tends to load whole 
+<a name="l11"></a>contiguous files and other, similar things which boost speed.  It's only 
+<a name="l12"></a>129,387 lines of code including the kernel, the 64-bit compiler, the graphics 
+<a name="l13"></a>library and all the tools.  More importantly, it's designed to keep the user's 
+<a name="l14"></a>line count down -- you can do a "hello world" application in one line of code 
+<a name="l15"></a>and can put graphics on the screen with a three line program!
+<a name="l16"></a>
+<a name="l17"></a>It's a kayak, not a Titanic -- it will crash if you do something wrong.  You 
+<a name="l18"></a>quickly reboot, however.  The 8-bit home computers of the 80's worked fine 
+<a name="l19"></a>without memory protection and most computers in the world -- the embedded ones 
+<a name="l20"></a>-- operate without protection.  The resulting simplicity of no protections is 
+<a name="l21"></a>why LoseThos has value.  In facts, that's the point of LoseThos.  See the 
+<a name="l22"></a></span><a href="/archive/LTHtml/Doc/Constitution.html"><span class="cF4">LoseThos Constitition</span></a><span class="cF0">.
+<a name="l23"></a>
+<a name="l24"></a>Two things to know about LoseThos are that tasks have </span><a href="/archive/LTHtml/OSMain/Memory.html#l957"><span class="cF4">MAlloc</span></a><span class="cF0">/</span><a href="/archive/LTHtml/OSMain/Memory.html#l951"><span class="cF4">Free</span></a><span class="cF0"> heap memory, 
+<a name="l25"></a>not applications, and tasks have compiler symbol tables that persist at a scope 
+<a name="l26"></a>like environment variables in other operating systems, and the symbols can 
+<a name="l27"></a>include functions.
+<a name="l28"></a>
+<a name="l29"></a>In other operating systems, I hated learning one language for command line 
+<a name="l30"></a>scripts and another for programming.  With </span><span class="cF2">LoseThos</span><span class="cF0">, the command line feeds 
+<a name="l31"></a>right into the </span><span class="cF2">C+</span><span class="cF0"> (more than </span><span class="cF2">C</span><span class="cF0">, less than </span><span class="cF2">C++</span><span class="cF0">) compiler, line by line, and it 
+<a name="l32"></a>places code into memory it </span><a href="/archive/LTHtml/OSMain/Memory.html#l957"><span class="cF4">MAlloc</span></a><span class="cF0">()s.  The compiler is paused at the command 
+<a name="l33"></a>line, waiting for input.  Naturally, you </span><span class="cF2">#include</span><span class="cF0"> a program to load it into 
+<a name="l34"></a>memory and, usually, start it.  During the boot process, many files get compiled 
+<a name="l35"></a>before you have access to the command line.  (Don't worry, booting takes only a 
+<a name="l36"></a>couple seconds.)  All the header declarations for the operating system are 
+<a name="l37"></a>compiled and are available for use in your programs without needing to </span><span class="cF2">#include </span><span class="cF0">
+<a name="l38"></a>them.  Everything is truly compiled to native </span><a href="http://wiki.osdev.org/IA32_Architecture_Family"><span class="cF4">x86_64</span></a><span class="cF0"> code and nothing is 
+<a name="l39"></a>"interpreted."
+<a name="l40"></a>
+<a name="l41"></a>Statements at the global scope (outside the scope of </span><span class="cF2">C+</span><span class="cF0"> functions) execute 
+<a name="l42"></a>immediately.  There is no </span><span class="cF2">main()</span><span class="cF0"> function.  Instead, you give meaningful names 
+<a name="l43"></a>to what would be </span><span class="cF2">main()</span><span class="cF0"> functions and you invoke them by calling them with a 
+<a name="l44"></a>statement in the global scope, usually at the bottom of your file.
+<a name="l45"></a>
+<a name="l46"></a>I started with </span><span class="cF2">C</span><span class="cF0"> syntax, but didn't like the command line for a directory 
+<a name="l47"></a>listing looking like this:
+<a name="l48"></a>
+<a name="l49"></a> &gt;</span><span class="cF4">Dir("*.*",FALSE);
+<a name="l50"></a>
+<a name="l51"></a></span><span class="cF0">So, I added default args from </span><span class="cF2">C++</span><span class="cF0"> and it looked like this:
+<a name="l52"></a>
+<a name="l53"></a> &gt;</span><span class="cF4">Dir();
+<a name="l54"></a>
+<a name="l55"></a></span><span class="cF0">I didn't like that, so I made parentheses optional on calls with no args and it, 
+<a name="l56"></a>now, looks like this:
+<a name="l57"></a>
+<a name="l58"></a> &gt;</span><span class="cF4">Dir;</span><span class="cF0">
+<a name="l59"></a>
+<a name="l60"></a>The syntax change created an ambiguity when specifying function addresses.  To 
+<a name="l61"></a>resolve it, I  made a '</span><span class="cF2">&amp;</span><span class="cF0">' required in front of function names when specifying an 
+<a name="l62"></a>address of a function, which is better anyway.
+<a name="l63"></a>
+<a name="l64"></a>Once I was no longer using standard syntax, I decided to change everything I 
+<a name="l65"></a>didn't like.  Here are the new </span><a href="/archive/LTHtml/Doc/Differences.html#l132"><span class="cF4">operator precedence</span></a><span class="cF0"> rules.  See 
+<a name="l66"></a></span><a href="/archive/LTHtml/Doc/Differences.html"><span class="cF4">Departures from C/C++</span></a><span class="cF0">.  It's Biblical!  See </span><a href="/archive/LTHtml/Misc/Bible.html#l82641"><span class="cF4">Luke,5:37</span></a><span class="cF0">.
+<a name="l67"></a>
+<a name="l68"></a>There are no object files in LoseThos and, normally, you don't make executable 
+<a name="l69"></a>files either, but you can.  That's known as "</span><span class="cF2">static</span><span class="cF0">" compilation.  Instead, you 
+<a name="l70"></a>"</span><span class="cF2">just-in-time</span><span class="cF0">" compile.
+<a name="l71"></a>
+<a name="l72"></a>Tasks have no priority scheme and are never removed from the queue.  Instead, 
+<a name="l73"></a>they often poll whatever they are waiting on and swap-out.  (Swapping tasks 
+<a name="l74"></a>takes half a microsecond and does not involve disk activity or memory maps.)  
+<a name="l75"></a>See </span><a href="/archive/LTHtml/OSMain/Scheduler.html"><span class="cF4">Scheduler</span></a><span class="cF0">.  Polling keeps it simple.  It's might be a problem if you had 
+<a name="l76"></a>lots of tasks busy, which rarely happens on a home computer.  The order of the 
+<a name="l77"></a>tasks in the queue determines front-to-back window order.  See 
+<a name="l78"></a></span><a href="/archive/LTHtml/Doc/MultiTasking.html"><span class="cF4">LoseThos MultiTasking</span></a><span class="cF0">.
+<a name="l79"></a>
+<a name="l80"></a>The LoseThos native file system is simple, so I don't get sued.  There is an 
+<a name="l81"></a>allocation bitmap for clusters and all files are stored contiguously.  You can't 
+<a name="l82"></a>grow files.  It's geared toward reading and writing whole files.  Since whole 
+<a name="l83"></a>files are processed, checksums and compression are possible.  Filenames ending 
+<a name="l84"></a>in </span><span class="cF2">'Z'</span><span class="cF0"> are automatically compressed or uncompressed when stored or fetched.  
+<a name="l85"></a>LoseThos supports direct block random access into files, however -- </span><a href="/archive/LTHtml/OSMain/Dsk/DskLTFile.html#l150"><span class="cF4">FRBlks</span></a><span class="cF0">() and 
+<a name="l86"></a></span><a href="/archive/LTHtml/OSMain/Dsk/DskLTFile.html#l201"><span class="cF4">FWBlks</span></a><span class="cF0">().  There is no </span><span class="cF2">PATH</span><span class="cF0">, but parent directories are searched when a file is 
+<a name="l87"></a>not found.  This feature is used for default account files.  Note: the </span><span class="cF2">FAT32</span><span class="cF0"> 
+<a name="l88"></a>filesystem is supported, which makes exchanging files with a dual booted other 
+<a name="l89"></a>operating system easy.  If you don't have a </span><span class="cF2">FAT32</span><span class="cF0"> partition, you can use the 
+<a name="l90"></a></span><a href="/archive/LTHtml/Doc/LTZ.html"><span class="cF4">LTZ</span></a><span class="cF0"> program to transfer files to your primary operating system's partition.
+<a name="l91"></a>
+<a name="l92"></a>It's handy being able to turn-off interrupts with </span><a href="/archive/LTHtml/OSMain/Adam1b.html#l141"><span class="cF4">Cli</span></a><span class="cF0">() and on with </span><a href="/archive/LTHtml/OSMain/Adam1b.html#l142"><span class="cF4">Sti</span></a><span class="cF0">() when 
+<a name="l93"></a>modifying structures in a multitasking environment.  </span><span class="cF2">LoseThos</span><span class="cF0"> runs all programs 
+<a name="l94"></a>in kernel mode, ring 0, so no instructions are off-limits.  Turning-off and on 
+<a name="l95"></a>preemption with </span><a href="/archive/LTHtml/OSMain/Adam1b.html#l94"><span class="cF4">Preempt</span></a><span class="cF0">() is a less drastic measure that is usually sufficient.  
+<a name="l96"></a>A newly </span><a href="/archive/LTHtml/OSMain/Task1a.html#l230"><span class="cF4">Spawn</span></a><span class="cF0">()ed task begins with preemption off.
+<a name="l97"></a>
+<a name="l98"></a>The graphic resolution is poor, </span><span class="cF2">640x480 16 color</span><span class="cF0">, but that's all I feel 
+<a name="l99"></a>comfortable with without GPU support.  A </span><span class="cF2">1600x1200x24</span><span class="cF0"> bit screen takes 37 times 
+<a name="l100"></a>more memory, implying 37 times the CPU power.  Also, a fixed size keeps it 
+<a name="l101"></a>simple with everybody machine having the same appearance.  Look on the 
+<a name="l102"></a>bright-side -- you won't spend as much time twiddling pixels for your game art 
+<a name="l103"></a>and you'll have tons of CPU power available, especially with multicore systems.
+<a name="l104"></a>
+<a name="l105"></a>LoseThos is for hobbyist programmers on single user (at a time) home computers, 
+<a name="l106"></a>not mainframes or servers, but it is preemptive multitasking.  The focus task is 
+<a name="l107"></a>all-important so symmetrical multiprocessing is almost pointless.  Why does it 
+<a name="l108"></a>matter running two apps at the same time twice as fast when you really want to 
+<a name="l109"></a>run one faster?  You could say LoseThos does master/slave multiprocessing.  The 
+<a name="l110"></a>anticipated use for multicore is primarily putting graphics on the screen.  
+<a name="l111"></a>Hardware graphics acceleration is not used, so this is possible.  See 
+<a name="l112"></a></span><a href="/archive/LTHtml/Doc/MultiCore.html"><span class="cF4">LoseThos MultiCore</span></a><span class="cF0">.
+<a name="l113"></a>
+<a name="l114"></a>There is no distinction between the terms "task", "process" or "thread".  All 
+<a name="l115"></a>have a task record, </span><a href="/archive/LTHtml/OSMain/Adam1a.html#l3078"><span class="cF4">TaskStruct</span></a><span class="cF0">(), pointed to by the </span><span class="cF2">FS</span><span class="cF0"> segment register and are 
+<a name="l116"></a>accessed with </span><span class="cF4">Fs-&gt;</span><span class="cF0"> while </span><span class="cF4">Gs-&gt;</span><span class="cF0"> points to a </span><a href="/archive/LTHtml/OSMain/Adam1a.html#l3704"><span class="cF4">CPUStruct</span></a><span class="cF0"> for the current CPU core.  
+<a name="l117"></a>Each task can have just one window, but a task can have children with windows.  
+<a name="l118"></a>(The segment registers are just used as extra registers -- there is nothing 
+<a name="l119"></a>segmented about LoseThos' memory.)
+<a name="l120"></a>
+<a name="l121"></a>In LoseThos, "</span><span class="cF2">Adam</span><span class="cF0">" refers to a task that is the father of all tasks.  He's 
+<a name="l122"></a>never supposed to die.  Since tasks inherit the symbols of parents, system-wide 
+<a name="l123"></a>stuff is associated with </span><span class="cF2">Adam</span><span class="cF0">.  His heap is like kernel memory in other 
+<a name="l124"></a>operating systems.  Since </span><span class="cF2">Adam</span><span class="cF0"> is immortal, it's safe to allocate objects, not 
+<a name="l125"></a>tied to any mortal task, from </span><span class="cF2">Adam</span><span class="cF0">'s heap.  He stays in a server mode, taking 
+<a name="l126"></a>requests, so you can ask him to </span><span class="cF2">#include</span><span class="cF0"> something, placing that code 
+<a name="l127"></a>system-wide.  A funny story is that originally I called it the "root" task and 
+<a name="l128"></a>even had a "</span><span class="cF2">/LT/Root</span><span class="cF0">" directory ;-)  </span><span class="cF2">Adam</span><span class="cF0"> executes </span><a href="/archive/LTHtml/OSMain/Adam1.html"><span class="cF4">::/LT/OSMain/Adam1.APZ</span></a><span class="cF0"> at 
+<a name="l129"></a>boot time.
+<a name="l130"></a>
+<a name="l131"></a>For easy back-ups, place everything you author in your </span><span class="cF2">HOME</span><span class="cF0"> directory and 
+<a name="l132"></a>subdirectories.  Then, use </span><a href="/archive/LTHtml/Adam/Dsk2a.html#l109"><span class="cF4">CopyTree</span></a><span class="cF0">().  That should make upgrading easy, too.  
+<a name="l133"></a>To make an account use </span><a href="/archive/LTHtml/OSMain/Dsk/Dsk1c.html#l96"><span class="cF4">MkDir</span></a><span class="cF0">() to create a directory under </span><span class="cF2">/LT/Accts</span><span class="cF0">.  It will 
+<a name="l134"></a>be </span><span class="cF2">HOME</span><span class="cF0"> if you boot to it.  Recompile with </span><a href="/archive/LTHtml/Adam/Boot/InsBoot.html#l168"><span class="cF4">InstallBoot</span></a><span class="cF0">() and make it boot your 
+<a name="l135"></a>acct.  Customizable start-up scripts go in your </span><span class="cF2">HOME</span><span class="cF0"> directory.  The default 
+<a name="l136"></a>start-up scripts are in </span><span class="cF2">/LT/Accts</span><span class="cF0">, the parent of all accounts.  Copy the 
+<a name="l137"></a>start-up files you wish to customize into </span><span class="cF2">HOME</span><span class="cF0"> and modify them.  See </span><a href="/archive/LTHtml/Doc/GuideLines.html"><span class="cF4">Acct Files</span></a><span class="cF0">.
+<a name="l138"></a>
+<a name="l139"></a>Typically, your usage pattern through the day will be repeatedly left or right 
+<a name="l140"></a>clicking on filenames in a cmd line </span><a href="/archive/LTHtml/OSMain/Dsk/Dsk1b.html#l238"><span class="cF4">Dir</span></a><span class="cF0">() listing.  You left-click files to edit 
+<a name="l141"></a>them and right-click to </span><span class="cF2">#include</span><span class="cF0"> them.  To begin a project, type </span><a href="/archive/LTHtml/Adam/Ltf/LtfMain.html#l122"><span class="cF4">Ed</span></a><span class="cF0">(""); and 
+<a name="l142"></a>supply a filename.  You can also run programs with </span><span class="cF2">&lt;F5&gt;</span><span class="cF0"> when in the editor.  </span><span class="cF2">&lt;ES
+<a name="l143"></a>C&gt;</span><span class="cF0"> to save and exit the file.  You'll need to do a new </span><a href="/archive/LTHtml/OSMain/Dsk/Dsk1b.html#l238"><span class="cF4">Dir</span></a><span class="cF0">() cmd, periodically, 
+<a name="l144"></a>so make a macro on your personal menu.  Access your personal menu by pressing 
+<a name="l145"></a>the </span><span class="cF2">&lt;WINDOWS KEY&gt;</span><span class="cF0">, cursoring until you are on top of it and pressing </span><span class="cF2">&lt;SPACE BAR&gt;</span><span class="cF0">
+<a name="l146"></a>.
+<a name="l147"></a>
+<a name="l148"></a></span><span class="cF2">&lt;CTRL-T&gt;</span><span class="cF0"> toggles plain text mode, showing format commands, a little like viewing 
+<a name="l149"></a>html code.  </span><span class="cF2">&lt;CTRL-L&gt;</span><span class="cF0"> inserts a nongraphic widget.  </span><span class="cF2">&lt;CTRL-R&gt;</span><span class="cF0"> inserts a graphic 
+<a name="l150"></a>resource or edits the graphic under the cursor.
+<a name="l151"></a>
+<a name="l152"></a></span><span class="cF2">&lt;CTRL-D&gt;</span><span class="cF0"> brings-up the file manager.  It's pretty crappy.  I find I don't need 
+<a name="l153"></a>it very often, believe it or not.
+<a name="l154"></a>
+<a name="l155"></a></span><span class="cF2">&lt;CTRL-ALT-E&gt;</span><span class="cF0"> creates a new terminal window.  </span><span class="cF2">&lt;CTRL-ALT-X&gt;</span><span class="cF0"> kills a window.  
+<a name="l156"></a>You'll do these periodically.
+<a name="l157"></a>
+<a name="l158"></a></span><a href="/archive/LTHtml/Adam/Grep.html#l161"><span class="cF4">Grep</span></a><span class="cF0">() is your best friend.  There's a wrapper function called </span><a href="/archive/LTHtml/Accts/Adam3eWrappers.html#l8"><span class="cF4">F</span></a><span class="cF0">() in your </span><span class="cF2">HOME/
+<a name="l159"></a>Adam3eWrappers.APZ</span><span class="cF0"> file.  Feel free to make wrapper functions for functions you 
+<a name="l160"></a>use often and customize the args.  By the way, </span><a href="/archive/LTHtml/Adam/Grep.html#l161"><span class="cF4">Grep</span></a><span class="cF0">() or </span><a href="/archive/LTHtml/Accts/Adam3eWrappers.html#l13"><span class="cF4">R</span></a><span class="cF0">() can be used to 
+<a name="l161"></a>replace strings across multiple files.  You can access </span><a href="/archive/LTHtml/Adam/Grep.html#l161"><span class="cF4">Grep</span></a><span class="cF0">() using </span><span class="cF2">&lt;CTRL-SHIFT-
+<a name="l162"></a>F&gt;</span><span class="cF0">.
+<a name="l163"></a>
+<a name="l164"></a>As you browse code, use the </span><span class="cF2">WordStat</span><span class="cF0"> window to look-up functions, etc.  </span><span class="cF2">&lt;CTRL-SH
+<a name="l165"></a>IFT-F1&gt;</span><span class="cF0"> (or whatever number) to follow a sym to it's source.  You can browse 
+<a name="l166"></a>deeper and deeper.  You go back with </span><span class="cF2">&lt;SHIFT-ESC&gt;</span><span class="cF0">.
+<a name="l167"></a>
+<a name="l168"></a>Use the </span><a href="/archive/LTHtml/Doc/HelpIndex.html"><span class="cF4">Help Index</span></a><span class="cF0"> or </span><a href="/archive/LTHtml/Doc/DemoIndex.html"><span class="cF4">Demo Index</span></a><span class="cF0"> to find-out what exists.  Press </span><span class="cF2">F1</span><span class="cF0"> for help or 
+<a name="l169"></a>use the links on your menu (</span><span class="cF2">&lt;WINDOWS KEY&gt;</span><span class="cF0">).  Also, look in the </span><span class="cF2">/LT/Demo</span><span class="cF0"> or </span><span class="cF2">/LT/A
+<a name="l170"></a>pps</span><span class="cF0"> directories for inspiration.
+<a name="l171"></a>
+<a name="l172"></a>
+<a name="l173"></a></span><span class="cF9">Take Tour</span><span class="cF0">
+</span></pre><div class="archive-note">Historical capture: 2012-03-01. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>

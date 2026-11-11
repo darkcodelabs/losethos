@@ -1,0 +1,484 @@
+<!DOCTYPE HTML>
+
+<html>
+<head><meta charset="utf-8"/>
+<title>LoseThos 64-Bit Operating System</title>
+<meta content="Terry A. Davis" name="author"/>
+<meta content="64-Bit, Operating System, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="description"/>
+<meta content="64-Bit, Operating System, Mutlicore, Free, Open Source, Public Domain, MultiTasking, Preemptive" name="keywords"/>
+<meta content="LoseThos V6.02" name="generator"/>
+<style type="text/css">
+.cBLACK{color:rgb(0,0,0);}
+.cBLUE{color:rgb(0,0,168);}
+.cGREEN{color:rgb(0,168,0);}
+.cCYAN{color:rgb(0,168,168);}
+.cRED{color:rgb(168,0,0);}
+.cPURPLE{color:rgb(168,0,168);}
+.cBROWN{color:rgb(168,84,0);}
+.cLTGRAY{color:rgb(168,168,168);}
+.cDKGRAY{color:rgb(84,84,84);}
+.cLTBLUE{color:rgb(84,84,252);}
+.cLTGREEN{color:rgb(84,252,84);}
+.cLTCYAN{color:rgb(84,252,252);}
+.cLTRED{color:rgb(252,84,84);}
+.cLTPURPLE{color:rgb(252,84,252);}
+.cYELLOW{color:rgb(252,252,84);}
+.cWHITE{color:rgb(252,252,252);}
+</style>
+<meta content="width=device-width, initial-scale=1" name="viewport"/><link href="/memorial.css" rel="stylesheet"/></head>
+<body>
+<pre style="font-family:courier;font-size:10pt">
+<span class="cDKGRAY">Project: OSMain</span><span class="cBLACK">
+BoolI8 MapDrive(</span><span class="cBLUE">U1</span><span class="cBLACK"> drive_letter,LTPartition *p)
+{
+  drive_letter=ToUpper(drive_letter);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (</span><span class="cBROWN">'A'</span><span class="cBLACK">&lt;=drive_letter&lt;=</span><span class="cBROWN">'Z'</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    drive_to_partition[drive_letter-</span><span class="cBROWN">'A'</span><span class="cBLACK">]=p;
+    p-&gt;drive_letter=drive_letter;
+    </span><span class="cBLUE">return</span><span class="cBLACK"> TRUE;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK">
+    </span><span class="cBLUE">return</span><span class="cBLACK"> FALSE;
+}
+
+BoolI8 Drive(</span><span class="cBLUE">U1</span><span class="cBLACK"> drive_letter)
+{
+  LTPartition *p=Drive2Partition(drive_letter);
+  LTBlkDev *bdev=p-&gt;bdev;
+  BlkDevChk(bdev);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (p!=Fs-&gt;cur_partition) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">if</span><span class="cBLACK"> ( bdev-&gt;flags &amp; LTBDF_REMOVABLE &amp;&amp;
+       !</span><span class="cLTGRAY">(</span><span class="cBLACK">bdev-&gt;flags &amp; LTBDF_INITIALIZED</span><span class="cLTGRAY">)</span><span class="cBLACK"> )
+      ChangeDisk(Partition2Drive</span><span class="cLTGRAY">(</span><span class="cBLACK">p</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (bdev-&gt;type==LTBDT_RAM ||
+        bdev-&gt;type==LTBDT_NON_LT_FILE ||
+        bdev-&gt;type==LTBDT_TEMP_LT_FILE)
+      BlkDevInit(bdev);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  Fs-&gt;cur_partition=p;
+  Free(Fs-&gt;cur_dir);
+  Fs-&gt;cur_dir=StrNew(</span><span class="cBROWN">"/"</span><span class="cBLACK">);
+  </span><span class="cBLUE">switch</span><span class="cBLACK"> (p-&gt;type) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">case</span><span class="cBLACK"> PT_LT:
+    </span><span class="cBLUE">case</span><span class="cBLACK"> PT_FAT32:
+    </span><span class="cBLUE">case</span><span class="cBLACK"> PT_ISO9660:
+      </span><span class="cBLUE">return</span><span class="cBLACK"> TRUE;
+    </span><span class="cBLUE">default</span><span class="cBLACK">:
+      PutDefineErr(</span><span class="cBROWN">"ST_UNSUPPORTED_FILE_SYSTEM"</span><span class="cBLACK">);
+      </span><span class="cBLUE">return</span><span class="cBLACK"> FALSE;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+}
+
+BoolI8 Cd(</span><span class="cBLUE">U1</span><span class="cBLACK"> *dirname,BoolI1 make_dirs=FALSE)
+{
+  </span><span class="cBLUE">I8</span><span class="cBLACK"> maxlen;
+  BoolI1 result=TRUE;
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *change_to_buf,*new_cur_dir,*buf;
+  LTPartition *p;
+  </span><span class="cBLUE">U8</span><span class="cBLACK"> cur_dir_cluster=0;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!*dirname) </span><span class="cBLUE">return</span><span class="cBLACK"> TRUE;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (dirname[1]==</span><span class="cBROWN">':'</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (*dirname==</span><span class="cBROWN">':'</span><span class="cBLACK">) {
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (Fs-&gt;cur_partition!=default_partition)
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (!Drive</span><span class="cLTGRAY">(</span><span class="cBLACK">*dirname</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cBLUE">return</span><span class="cBLACK"> FALSE;
+    } </span><span class="cBLUE">else</span><span class="cBLACK"> {
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (Fs-&gt;cur_partition!=
+        Drive2Partition</span><span class="cLTGRAY">(</span><span class="cBLACK">*dirname</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+          </span><span class="cBLUE">if</span><span class="cBLACK"> (!Drive</span><span class="cLTGRAY">(</span><span class="cBLACK">*dirname</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cBLUE">return</span><span class="cBLACK"> FALSE;
+    }
+    dirname+=2;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (*dirname==</span><span class="cBROWN">'/'</span><span class="cBLACK"> || !*dirname || !Fs-&gt;cur_dir) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    Free(Fs-&gt;cur_dir);
+    Fs-&gt;cur_dir=StrNew(</span><span class="cBROWN">"/"</span><span class="cBLACK">);
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (*dirname==</span><span class="cBROWN">'/'</span><span class="cBLACK">)
+      dirname++;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  change_to_buf=MStrUtil(dirname,
+    SU_REM_LEADING|SU_REM_TRAILING|
+    SU_DISCARD_PARITY|SU_REM_CTRL_CHARS);
+  maxlen=StrLen(Fs-&gt;cur_dir)+1+StrLen(change_to_buf)+1;
+  new_cur_dir=MAlloc(maxlen);
+  buf=MAlloc(maxlen);
+  StrCpy(new_cur_dir,Fs-&gt;cur_dir);
+  </span><span class="cBLUE">while</span><span class="cBLACK"> (*change_to_buf &amp;&amp; result) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    StrFirstRem(change_to_buf,</span><span class="cBROWN">"/"</span><span class="cBLACK">,buf);
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (!*buf)
+      StrCpy(new_cur_dir,</span><span class="cBROWN">"/"</span><span class="cBLACK">);
+    </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cBLUE">if</span><span class="cBLACK"> (!StrCmp</span><span class="cLTGRAY">(</span><span class="cBLACK">buf,</span><span class="cBROWN">".."</span><span class="cLTGRAY">)</span><span class="cBLACK">) {
+      StrLastRem(new_cur_dir,</span><span class="cBROWN">"/"</span><span class="cBLACK">);
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (!*new_cur_dir)
+        StrCpy(new_cur_dir,</span><span class="cBROWN">"/"</span><span class="cBLACK">);
+    } </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cBLUE">if</span><span class="cBLACK"> (!StrCmp</span><span class="cLTGRAY">(</span><span class="cBLACK">buf,</span><span class="cBROWN">"."</span><span class="cLTGRAY">)</span><span class="cBLACK">) {
+      ;
+    } </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cBLUE">if</span><span class="cBLACK"> (*buf) {
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (!StrCmp</span><span class="cLTGRAY">(</span><span class="cBLACK">buf,</span><span class="cBROWN">"HOME"</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        result=Cd(sys_home_dir);
+        Free(new_cur_dir);
+        new_cur_dir=MAlloc(maxlen+StrLen</span><span class="cLTGRAY">(</span><span class="cBLACK">sys_home_dir</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+        StrCpy(new_cur_dir,sys_home_dir+2);
+      </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        p=Fs-&gt;cur_partition;
+        cur_dir_cluster=Name2DirCluster(p,new_cur_dir);
+        </span><span class="cBLUE">switch</span><span class="cBLACK"> (p-&gt;type) {
+          </span><span class="cBLUE">case</span><span class="cBLACK"> PT_LT:
+            result=LTFSCd(buf,cur_dir_cluster);
+            </span><span class="cBLUE">break</span><span class="cBLACK">;
+          </span><span class="cBLUE">case</span><span class="cBLACK"> PT_FAT32:
+            result=FAT32Cd(buf,cur_dir_cluster);
+            </span><span class="cBLUE">break</span><span class="cBLACK">;
+          </span><span class="cBLUE">case</span><span class="cBLACK"> PT_ISO9660:
+            result=ISO1Cd(buf,cur_dir_cluster);
+            </span><span class="cBLUE">break</span><span class="cBLACK">;
+          </span><span class="cBLUE">default</span><span class="cBLACK">:
+            PutDefineErr(</span><span class="cBROWN">"ST_UNSUPPORTED_FILE_SYSTEM"</span><span class="cBLACK">);
+            result=FALSE;
+        }
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (!result &amp;&amp; make_dirs) {
+          Free(Fs-&gt;cur_dir);
+          Fs-&gt;cur_dir=StrNew(new_cur_dir);
+          result=MkDir(buf);
+        }
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (result) {
+          </span><span class="cBLUE">if</span><span class="cBLACK"> (StrCmp</span><span class="cLTGRAY">(</span><span class="cBLACK">new_cur_dir,</span><span class="cBROWN">"/"</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+            StrCat(new_cur_dir,</span><span class="cBROWN">"/"</span><span class="cBLACK">);
+          StrCat(new_cur_dir,buf);
+        }
+      </span><span class="cLTGRAY">}</span><span class="cBLACK">
+    }
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  Free(Fs-&gt;cur_dir);
+  Fs-&gt;cur_dir=StrNew(new_cur_dir);
+  Free(buf);
+  Free(change_to_buf);
+  Free(new_cur_dir);
+  </span><span class="cBLUE">return</span><span class="cBLACK"> result;
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> LTFileAccessDel(LTFileAccess *fa)
+{
+  LTBlkDev *bdev;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!fa) </span><span class="cBLUE">return</span><span class="cBLACK">;
+  bdev=fa-&gt;old_partition-&gt;bdev;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!</span><span class="cLTGRAY">(</span><span class="cBLACK">bdev-&gt;flags &amp; LTBDF_INIT_IN_PROGRESS</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (fa-&gt;old_dir) {
+      Drive(Partition2Drive</span><span class="cLTGRAY">(</span><span class="cBLACK">fa-&gt;old_partition</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+      Cd(fa-&gt;old_dir);
+    }
+  </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    Fs-&gt;cur_partition=fa-&gt;old_partition;
+    Free(Fs-&gt;cur_dir);
+    Fs-&gt;cur_dir=StrNew(</span><span class="cBROWN">"/"</span><span class="cBLACK">);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  Free(fa-&gt;old_dir);
+  Free(fa-&gt;mask);
+  Free(fa);
+}
+
+LTFileAccess *LTFileAccessNew(</span><span class="cBLUE">U1</span><span class="cBLACK"> *_mask,BoolI1 make_mask=FALSE,BoolI1 make_dirs=FALSE)
+{
+  BoolI1 valid=TRUE;
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *buf,*mask,*temp_mask;
+  BoolI1 old_silent;
+  LTFileAccess *fa=CAlloc(</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">LTFileAccess</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+  mask=MStrUtil(_mask,
+    SU_REM_LEADING|SU_REM_TRAILING|
+    SU_DISCARD_PARITY|SU_REM_CTRL_CHARS);
+  temp_mask=mask;
+  fa-&gt;old_dir=StrNew(Fs-&gt;cur_dir);
+  fa-&gt;old_partition=Fs-&gt;cur_partition;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (*mask &amp;&amp; mask[1]==</span><span class="cBROWN">':'</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (Fs-&gt;cur_partition!=Drive2Partition</span><span class="cLTGRAY">(</span><span class="cBLACK">*mask</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (!Drive</span><span class="cLTGRAY">(</span><span class="cBLACK">*mask</span><span class="cLTGRAY">)</span><span class="cBLACK">) valid=FALSE;
+    mask+=2;
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (StrStr</span><span class="cLTGRAY">(</span><span class="cBLACK">mask,</span><span class="cBROWN">"HOME"</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">  </span><span class="cGREEN">//TODO</span><span class="cBLACK">
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (Fs-&gt;cur_partition!=*sys_home_dir)
+      Drive(*sys_home_dir);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  fa-&gt;p=Fs-&gt;cur_partition;
+  PartitionChk(fa-&gt;p);
+  buf=MAlloc(StrLen</span><span class="cLTGRAY">(</span><span class="cBLACK">mask</span><span class="cLTGRAY">)</span><span class="cBLACK">+2);
+  StrCpy(buf,mask);
+  fa-&gt;mask=MAlloc(StrLen</span><span class="cLTGRAY">(</span><span class="cBLACK">mask</span><span class="cLTGRAY">)</span><span class="cBLACK">+2);
+  StrLastRem(buf,</span><span class="cBROWN">"/"</span><span class="cBLACK">,fa-&gt;mask);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (*mask==</span><span class="cBROWN">'/'</span><span class="cBLACK"> &amp;&amp; !*buf)
+    StrCpy(buf,</span><span class="cBROWN">"/"</span><span class="cBLACK">);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (*buf)
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (!Cd</span><span class="cLTGRAY">(</span><span class="cBLACK">buf,make_dirs</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+      valid=FALSE;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (valid &amp;&amp; make_mask) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (!*fa-&gt;mask) {
+      Free(fa-&gt;mask);
+      fa-&gt;mask=StrNew(</span><span class="cBROWN">"*"</span><span class="cBLACK">);
+    } </span><span class="cBLUE">else</span><span class="cBLACK"> {
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (!make_dirs || FileNameChk</span><span class="cLTGRAY">(</span><span class="cBLACK">fa-&gt;mask</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        old_silent=Silent(ON);
+        </span><span class="cBLUE">if</span><span class="cBLACK"> (Cd</span><span class="cLTGRAY">(</span><span class="cBLACK">fa-&gt;mask,make_dirs</span><span class="cLTGRAY">)</span><span class="cBLACK">) {
+          Free(fa-&gt;mask);
+          fa-&gt;mask=StrNew(</span><span class="cBROWN">"*"</span><span class="cBLACK">);
+        }
+        Silent(old_silent);
+      </span><span class="cLTGRAY">}</span><span class="cBLACK">
+    }
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  Free(buf);
+  Free(temp_mask);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!valid) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    LTFileAccessDel(fa);
+    fa=NULL;
+</span><span class="cGREEN">//    throw(EXCEPT_FILE);</span><span class="cBLACK">
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  </span><span class="cBLUE">return</span><span class="cBLACK"> fa;
+}
+
+LTDirEntry *FilesFind(</span><span class="cBLUE">U1</span><span class="cBLACK"> *wild,</span><span class="cBLUE">U8</span><span class="cBLACK"> fuf_flags=0)
+{
+  LTDirEntry *result=NULL;
+  LTFileAccess *fa=LTFileAccessNew(wild,TRUE);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (fa) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    result=SysFilesFind(fa-&gt;mask,fuf_flags);
+    LTFileAccessDel(fa);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  </span><span class="cBLUE">return</span><span class="cBLACK"> result;
+}
+
+BoolI8 IsDir(</span><span class="cBLUE">U1</span><span class="cBLACK"> *dir_name)
+{
+  BoolI1 result=FALSE;
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *mask=MSPrintF(</span><span class="cBROWN">"%s/*"</span><span class="cBLACK">,dir_name);
+  BoolI1 old_silent=Silent(ON);
+  LTFileAccess *fa=LTFileAccessNew(mask);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (fa) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    result=TRUE;
+    LTFileAccessDel(fa);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  Free(mask);
+  Silent(old_silent);
+  </span><span class="cBLUE">return</span><span class="cBLACK"> result;
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> Dir(</span><span class="cBLUE">U1</span><span class="cBLACK"> *wild=</span><span class="cBROWN">"*"</span><span class="cBLACK">,BoolI1 full=FALSE)
+{
+  LTFileAccess *fa;
+  fa=LTFileAccessNew(wild,TRUE);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (fa) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    DirLT(fa-&gt;mask,full);
+    LTFileAccessDel(fa);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+}
+
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> Del(</span><span class="cBLUE">U1</span><span class="cBLACK"> *wild,BoolI1 print_msg=TRUE)
+{
+  LTFileAccess *fa=LTFileAccessNew(wild);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (fa) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">switch</span><span class="cBLACK"> (fa-&gt;p-&gt;type) {
+      </span><span class="cBLUE">case</span><span class="cBLACK"> PT_LT:
+        LTFSFilesDel(fa-&gt;p,Fs-&gt;cur_dir,fa-&gt;mask,FALSE,print_msg);
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">case</span><span class="cBLACK"> PT_FAT32:
+        FAT32FilesDel(fa-&gt;p,Fs-&gt;cur_dir,fa-&gt;mask,FALSE,print_msg);
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">case</span><span class="cBLACK"> PT_ISO9660:
+        PutDefineErr(</span><span class="cBROWN">"ST_NOT_WRITABLE"</span><span class="cBLACK">);
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">default</span><span class="cBLACK">:
+        PutDefineErr(</span><span class="cBROWN">"ST_UNSUPPORTED_FILE_SYSTEM"</span><span class="cBLACK">);
+    }
+    LTFileAccessDel(fa);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+}
+
+</span><span class="cBLUE">U1</span><span class="cBLACK"> *FileRead(</span><span class="cBLUE">U1</span><span class="cBLACK"> *filename,</span><span class="cBLUE">U8</span><span class="cBLACK"> *size=NULL,</span><span class="cBLUE">I8</span><span class="cBLACK"> *attr=NULL,BoolI1 raw=FALSE)
+{
+  GenericHashEntry *temph;
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *absname;
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *result=NULL;
+  </span><span class="cBLUE">I8</span><span class="cBLACK"> size2=0,attr2=0;
+  LTFileAccess *fa;
+  ArcCompressStruct *ac=NULL;
+
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (attr)
+    *attr=0;
+  absname=FileNameAbs(filename);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (!raw &amp;&amp; </span><span class="cLTGRAY">(</span><span class="cBLACK">temph=HashFind(absname,adam_task-&gt;hash_table,HTT_FILE)</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (FileAttr</span><span class="cLTGRAY">(</span><span class="cBLACK">absname</span><span class="cLTGRAY">)</span><span class="cBLACK"> &amp; LT_ATTR_COMPRESSED) {
+      ac=temph-&gt;user_data0;
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (size)
+        *size=ac-&gt;expanded_size;
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (attr)
+        *attr=FileAttr(absname,*attr);
+      result=ExpandBuf(ac);
+    } </span><span class="cBLUE">else</span><span class="cBLACK"> {
+      result=MAlloc(temph-&gt;user_data1+1);
+      MemCpy(result,temph-&gt;user_data0,temph-&gt;user_data1);
+      result[temph-&gt;user_data1]=0; </span><span class="cGREEN">//Terminate</span><span class="cBLACK">
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (size)
+        *size=temph-&gt;user_data1;
+    }
+  </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    fa=LTFileAccessNew(absname);
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (fa) {
+      </span><span class="cBLUE">switch</span><span class="cBLACK"> (fa-&gt;p-&gt;type) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        </span><span class="cBLUE">case</span><span class="cBLACK"> PT_LT:
+          result=LTFSFileRead(fa-&gt;p,Fs-&gt;cur_dir,fa-&gt;mask,&amp;size2,&amp;attr2,raw,&amp;ac);
+          </span><span class="cBLUE">break</span><span class="cBLACK">;
+        </span><span class="cBLUE">case</span><span class="cBLACK"> PT_FAT32:
+          result=FAT32FileRead(fa-&gt;p,Fs-&gt;cur_dir,fa-&gt;mask,&amp;size2,&amp;attr2,raw,&amp;ac);
+          </span><span class="cBLUE">break</span><span class="cBLACK">;
+        </span><span class="cBLUE">case</span><span class="cBLACK"> PT_ISO9660:
+          result=ISO1FileRead(fa-&gt;p,Fs-&gt;cur_dir,fa-&gt;mask,&amp;size2,&amp;attr2,raw,&amp;ac);
+          </span><span class="cBLUE">break</span><span class="cBLACK">;
+        </span><span class="cBLUE">default</span><span class="cBLACK">:
+          PutDefineErr(</span><span class="cBROWN">"ST_UNSUPPORTED_FILE_SYSTEM"</span><span class="cBLACK">);
+      </span><span class="cLTGRAY">}</span><span class="cBLACK">
+      </span><span class="cBLUE">while</span><span class="cBLACK"> (!result &amp;&amp; StrCmp</span><span class="cLTGRAY">(</span><span class="cBLACK">Fs-&gt;cur_dir,</span><span class="cBROWN">"/"</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        Cd(</span><span class="cBROWN">".."</span><span class="cBLACK">);
+        </span><span class="cBLUE">switch</span><span class="cBLACK"> (Fs-&gt;cur_partition-&gt;type) {
+          </span><span class="cBLUE">case</span><span class="cBLACK"> PT_LT:
+            result=LTFSFileRead(fa-&gt;p,Fs-&gt;cur_dir,fa-&gt;mask,&amp;size2,&amp;attr2,raw,&amp;ac);
+            </span><span class="cBLUE">break</span><span class="cBLACK">;
+          </span><span class="cBLUE">case</span><span class="cBLACK"> PT_FAT32:
+            result=FAT32FileRead(fa-&gt;p,Fs-&gt;cur_dir,fa-&gt;mask,&amp;size2,&amp;attr2,raw,&amp;ac);
+            </span><span class="cBLUE">break</span><span class="cBLACK">;
+          </span><span class="cBLUE">case</span><span class="cBLACK"> PT_ISO9660:
+            result=ISO1FileRead(fa-&gt;p,Fs-&gt;cur_dir,fa-&gt;mask,&amp;size2,&amp;attr2,raw,&amp;ac);
+            </span><span class="cBLUE">break</span><span class="cBLACK">;
+          </span><span class="cBLUE">default</span><span class="cBLACK">:
+            PutDefineErr(</span><span class="cBROWN">"ST_UNSUPPORTED_FILE_SYSTEM"</span><span class="cBLACK">);
+        }
+      </span><span class="cLTGRAY">}</span><span class="cBLACK">
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (!result) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        </span><span class="cBLUE">cout</span><span class="cBLACK"> filename,</span><span class="cBROWN">" "</span><span class="cBLACK">;
+        PutDefineErr(</span><span class="cBROWN">"ST_FILE_NOT_FOUND"</span><span class="cBLACK">);
+      </span><span class="cLTGRAY">}</span><span class="cBLACK">
+      LTFileAccessDel(fa);
+    }
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (size)
+      *size=size2;
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (attr)
+      *attr=attr2;
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (!raw &amp;&amp; attr2 &amp; LT_ATTR_RESIDENT)
+      HashGenericAdd(absname,HTT_FILE,AMAllocIdentical</span><span class="cLTGRAY">(</span><span class="cBLACK">ac</span><span class="cLTGRAY">)</span><span class="cBLACK">,size2,0,adam_task);
+    Free(ac);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  Free(absname);
+  </span><span class="cBLUE">return</span><span class="cBLACK"> result;
+}
+
+</span><span class="cBLUE">U1</span><span class="cBLACK"> *TextFileRead(</span><span class="cBLUE">U1</span><span class="cBLACK"> *filename,</span><span class="cBLUE">U8</span><span class="cBLACK"> *attr=NULL)
+{
+  </span><span class="cBLUE">return</span><span class="cBLACK"> FileRead(filename,NULL,attr);
+}
+
+
+BoolI8 FileFind(</span><span class="cBLUE">U1</span><span class="cBLACK"> *filename,LTDirEntry *rde=NULL,
+      BoolI1 dir_only=FALSE,BoolI1 file_only=FALSE,BoolI1 scan_parents=FALSE)
+{
+  </span><span class="cBLUE">U8</span><span class="cBLACK"> cur_dir_cluster;
+  BoolI1 result=FALSE;
+  LTDirEntry de;
+  LTFileAccess *fa=LTFileAccessNew(filename);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (fa) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    cur_dir_cluster=Name2DirCluster(fa-&gt;p,Fs-&gt;cur_dir);
+    </span><span class="cBLUE">switch</span><span class="cBLACK"> (fa-&gt;p-&gt;type) {
+      </span><span class="cBLUE">case</span><span class="cBLACK"> PT_LT:
+        result=LTFSFileFind(fa-&gt;p,cur_dir_cluster,fa-&gt;mask,
+                          &amp;de,dir_only,file_only);
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">case</span><span class="cBLACK"> PT_FAT32:
+        result=FAT32FileFind(fa-&gt;p,cur_dir_cluster,fa-&gt;mask,
+                          &amp;de,dir_only,file_only);
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">case</span><span class="cBLACK"> PT_ISO9660:
+        result=ISO1FileFind(fa-&gt;p,cur_dir_cluster,fa-&gt;mask,
+                           &amp;de,dir_only,file_only);
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">default</span><span class="cBLACK">:
+        PutDefineErr(</span><span class="cBROWN">"ST_UNSUPPORTED_FILE_SYSTEM"</span><span class="cBLACK">);
+    }
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (scan_parents) {
+      </span><span class="cBLUE">while</span><span class="cBLACK"> (!result &amp;&amp; StrCmp</span><span class="cLTGRAY">(</span><span class="cBLACK">Fs-&gt;cur_dir,</span><span class="cBROWN">"/"</span><span class="cLTGRAY">)</span><span class="cBLACK">) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        Cd(</span><span class="cBROWN">".."</span><span class="cBLACK">);
+        cur_dir_cluster=Name2DirCluster(fa-&gt;p,Fs-&gt;cur_dir);
+        </span><span class="cBLUE">switch</span><span class="cBLACK"> (fa-&gt;p-&gt;type) {
+           </span><span class="cBLUE">case</span><span class="cBLACK"> PT_LT:
+             result=LTFSFileFind(fa-&gt;p,cur_dir_cluster,fa-&gt;mask,
+                              &amp;de,dir_only,file_only);
+             </span><span class="cBLUE">break</span><span class="cBLACK">;
+           </span><span class="cBLUE">case</span><span class="cBLACK"> PT_FAT32:
+             result=FAT32FileFind(fa-&gt;p,cur_dir_cluster,fa-&gt;mask,
+                              &amp;de,dir_only,file_only);
+             </span><span class="cBLUE">break</span><span class="cBLACK">;
+           </span><span class="cBLUE">case</span><span class="cBLACK"> PT_ISO9660:
+             result=ISO1FileFind(fa-&gt;p,cur_dir_cluster,fa-&gt;mask,
+                                &amp;de,dir_only,file_only);
+             </span><span class="cBLUE">break</span><span class="cBLACK">;
+           </span><span class="cBLUE">default</span><span class="cBLACK">:
+             PutDefineErr(</span><span class="cBROWN">"ST_UNSUPPORTED_FILE_SYSTEM"</span><span class="cBLACK">);
+        }
+      </span><span class="cLTGRAY">}</span><span class="cBLACK">
+    }
+    LTFileAccessDel(fa);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (result &amp;&amp; rde)
+    MemCpy(rde,&amp;de,</span><span class="cBLUE">sizeof</span><span class="cLTGRAY">(</span><span class="cBLACK">LTDirEntry</span><span class="cLTGRAY">)</span><span class="cBLACK">);
+  </span><span class="cBLUE">return</span><span class="cBLACK"> result;
+}
+
+</span><span class="cBLUE">U8</span><span class="cBLACK"> FileSize(</span><span class="cBLUE">U1</span><span class="cBLACK"> *filename)
+{
+  LTDirEntry de;
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (FileFind</span><span class="cLTGRAY">(</span><span class="cBLACK">filename,&amp;de</span><span class="cLTGRAY">)</span><span class="cBLACK">)
+    </span><span class="cBLUE">return</span><span class="cBLACK"> de.size;
+  </span><span class="cBLUE">else</span><span class="cBLACK">
+    </span><span class="cBLUE">return</span><span class="cBLACK"> 0;
+}
+
+</span><span class="cBLUE">U8</span><span class="cBLACK"> FileWrite(</span><span class="cBLUE">U1</span><span class="cBLACK"> *filename,</span><span class="cBLUE">U1</span><span class="cBLACK"> *fbuf,
+   </span><span class="cBLUE">U8</span><span class="cBLACK"> size,LTDate date=0,</span><span class="cBLUE">U8</span><span class="cBLACK"> attr=0,BoolI1 raw=FALSE)
+{
+  </span><span class="cBLUE">U8</span><span class="cBLACK"> c=0;
+  GenericHashEntry *temph;
+  LTFileAccess *fa=LTFileAccessNew(filename);
+  ArcCompressStruct *ac=NULL;
+  </span><span class="cBLUE">U1</span><span class="cBLACK"> *absname=FileNameAbs(filename);
+  </span><span class="cBLUE">if</span><span class="cBLACK"> (fa) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+    </span><span class="cBLUE">switch</span><span class="cBLACK"> (fa-&gt;p-&gt;type) {
+      </span><span class="cBLUE">case</span><span class="cBLACK"> PT_LT:
+        c=LTFSFileWrite(fa-&gt;p,Fs-&gt;cur_dir,fa-&gt;mask,
+          fbuf,size,date,attr,raw,&amp;ac);
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">case</span><span class="cBLACK"> PT_FAT32:
+        c=FAT32FileWrite(fa-&gt;p,Fs-&gt;cur_dir,fa-&gt;mask,
+          fbuf,size,date,attr,raw,&amp;ac);
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">case</span><span class="cBLACK"> PT_ISO9660:
+        PutDefineErr(</span><span class="cBROWN">"ST_NOT_WRITABLE"</span><span class="cBLACK">);
+        </span><span class="cBLUE">break</span><span class="cBLACK">;
+      </span><span class="cBLUE">default</span><span class="cBLACK">:
+        PutDefineErr(</span><span class="cBROWN">"ST_UNSUPPORTED_FILE_SYSTEM"</span><span class="cBLACK">);
+    }
+    </span><span class="cBLUE">if</span><span class="cBLACK"> (temph=HashFind</span><span class="cLTGRAY">(</span><span class="cBLACK">absname,adam_task-&gt;hash_table,HTT_FILE</span><span class="cLTGRAY">)</span><span class="cBLACK">) {
+      </span><span class="cBLUE">if</span><span class="cBLACK"> (!raw &amp;&amp; ac &amp;&amp; attr &amp; LT_ATTR_RESIDENT) </span><span class="cLTGRAY">{</span><span class="cBLACK">
+        Free(temph-&gt;user_data0);
+        temph-&gt;user_data0=AMAllocIdentical(ac);
+        temph-&gt;user_data1=size;
+      </span><span class="cLTGRAY">}</span><span class="cBLACK"> </span><span class="cBLUE">else</span><span class="cBLACK">
+        HashRemDel(temph,adam_task-&gt;hash_table);
+    } </span><span class="cBLUE">else</span><span class="cBLACK"> </span><span class="cBLUE">if</span><span class="cBLACK"> (!raw &amp;&amp; ac &amp;&amp; attr &amp; LT_ATTR_RESIDENT)
+      HashGenericAdd(absname,HTT_FILE,AMAllocIdentical</span><span class="cLTGRAY">(</span><span class="cBLACK">ac</span><span class="cLTGRAY">)</span><span class="cBLACK">,size,0,adam_task);
+    Free(ac);
+    LTFileAccessDel(fa);
+  </span><span class="cLTGRAY">}</span><span class="cBLACK">
+  Free(absname);
+  </span><span class="cBLUE">return</span><span class="cBLACK"> c;
+}
+
+</span><span class="cBLUE">U0</span><span class="cBLACK"> TextFileWrite(</span><span class="cBLUE">U1</span><span class="cBLACK"> *filename,</span><span class="cBLUE">U1</span><span class="cBLACK"> *st,</span><span class="cBLUE">U8</span><span class="cBLACK"> attr=0)
+{
+  FileWrite(filename,st,StrLen</span><span class="cLTGRAY">(</span><span class="cBLACK">st</span><span class="cLTGRAY">)</span><span class="cBLACK">,0,attr);
+}
+</span></pre><div class="archive-note">Historical capture: 2010-02-12. <a href="/">Home</a> | <a href="/boot.html">Power on LoseThos</a> | <a href="/sources/">Sources and changes</a></div></body>
+</html>
+<!-- text below generated by server. PLEASE REMOVE --><!-- Counter/Statistics data collection code --><noscript><img alt="setstats" border="0" height="1" width="1"/></noscript>
